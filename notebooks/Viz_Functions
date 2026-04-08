@@ -6,55 +6,29 @@ PALETTE_SNS = sns.color_palette(PALETTE_KATEGORIAL)
 CMAP_HEATMAP = "mako"
 CMAP_DIVERGIEREND = "coolwarm"
 
-def palette_farben(n):
-    """Gibt n Farben aus der kategorialen Palette zurück."""
-    ...
+balkendiagramm(data, x, y, xlabel="", ylabel="", titel="", ylim=None, palette=None, height=6, aspect=2, rotation=0, order=None)
+→ Einfaches Balkendiagramm
 
-# 1. Balkendiagramm
-def balkendiagramm(data, x, y, xlabel="", ylabel="", titel="",
-                   ylim=None, palette=None,
-                   height=6, aspect=2, rotation=0, order=None):
-    ...
+balkendiagramm_sortiert(data, x, y, xlabel="", ylabel="", titel="", ylim=None, palette=None, height=6, aspect=2, rotation=90)
+→ Sortiertes Balkendiagramm
 
-# 2. Balkendiagramm sortiert
-def balkendiagramm_sortiert(data, x, y, xlabel="", ylabel="", titel="",
-                            ylim=None, palette=None,
-                            height=6, aspect=2, rotation=90):
-    ...
+gestapeltes_balkendiagramm(pivot_prozent, xlabel="", ylabel="Anteil (%)", legend_titel="", figsize=(8, 6), xlabels=None)
+→ Gestapeltes Balkendiagramm
 
-# 3. Gestapeltes Balkendiagramm
-def gestapeltes_balkendiagramm(pivot_prozent, xlabel="", ylabel="Anteil (%)",
-                               legend_titel="", figsize=(8, 6),
-                               xlabels=None):
-    ...
+anteilsdiagramm(data, x, hue, xlabel="", ylabel="Anteil", palette=None, figsize=(8, 5), xlabels=None)
+→ Anteilsdiagramm
 
-# 4. Anteilsdiagramm (100% Fill)
-def anteilsdiagramm(data, x, hue, xlabel="", ylabel="Anteil",
-                    palette=None, figsize=(8, 5), xlabels=None):
-    ...
+heatmap(pivot, xlabel="", ylabel="", vmax=None, cmap=None, figsize=(6, 7), fmt=".0f", xlabels=None, ylabels=None)
+→ Heatmap
 
-# 5. Heatmap
-def heatmap(pivot, xlabel="", ylabel="", vmax=None,
-            cmap=None, figsize=(6, 7), fmt=".0f",
-            xlabels=None, ylabels=None):
-    ...
+boxplot(data, x=None, y=None, titel="", xlabel="", ylabel="", farbe=None, figsize=(10, 5))
+→ Boxplot
 
-# 6. Boxplot
-def boxplot(data, x=None, y=None, titel="", xlabel="", ylabel="",
-            farbe=None, figsize=(10, 5)):
-    ...
+scatterplot(data, x, y, size=None, titel="", xlabel="", ylabel="", sizes=(20, 800), alpha=0.4, farbe=None)
+→ Scatterplot
 
-# 7. Scatterplot
-def scatterplot(data, x, y, size=None, titel="", xlabel="", ylabel="",
-                sizes=(20, 800), alpha=0.4, farbe=None):
-    ...
+histogramm(data, spalte, bins=50, titel="", xlabel="", ylabel="Anzahl", farbe=None, xlim=None, figsize=(10, 5), vlines=None)
+→ Histogramm
 
-# 8. Histogramm
-def histogramm(data, spalte, bins=50, titel="", xlabel="", ylabel="Anzahl",
-               farbe=None, xlim=None, figsize=(10, 5), vlines=None):
-    ...
-
-# 9. Countplot
-def countplot(data, x, titel="", xlabel="", ylabel="Anzahl Nennungen",
-              farbe=None, rotation=0):
-    ...
+countplot(data, x, titel="", xlabel="", ylabel="Anzahl Nennungen", farbe=None, rotation=0)
+→ Countplot
