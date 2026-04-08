@@ -1,9 +1,8 @@
+"""
 Verwendung im Notebook:
     %load_ext autoreload
     %autoreload 2
     from visualisierungen import *
-
-# BALKENDIAGRAMM
 """
 
 import pandas as pd
