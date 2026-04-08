@@ -1,0 +1,34 @@
+# Farben & Paletten
+HAUPTFARBE = "#4477AA"
+AKZENTFARBE = "#CC6677"
+PALETTE_KATEGORIAL = ["#4477AA", "#CC6677", "#DDCC77", "#88CCEE", "#AA4499", "#44AA99"]
+PALETTE_SNS = sns.color_palette(PALETTE_KATEGORIAL)
+CMAP_HEATMAP = "mako"
+CMAP_DIVERGIEREND = "coolwarm"
+
+balkendiagramm(data, x, y, xlabel="", ylabel="", titel="", ylim=None, palette=None, height=6, aspect=2, rotation=0, order=None)
+→ Einfaches Balkendiagramm
+
+balkendiagramm_sortiert(data, x, y, xlabel="", ylabel="", titel="", ylim=None, palette=None, height=6, aspect=2, rotation=90)
+→ Sortiertes Balkendiagramm
+
+gestapeltes_balkendiagramm(pivot_prozent, xlabel="", ylabel="Anteil (%)", legend_titel="", figsize=(8, 6), xlabels=None)
+→ Gestapeltes Balkendiagramm
+
+anteilsdiagramm(data, x, hue, xlabel="", ylabel="Anteil", palette=None, figsize=(8, 5), xlabels=None)
+→ Anteilsdiagramm
+
+heatmap(pivot, xlabel="", ylabel="", vmax=None, cmap=None, figsize=(6, 7), fmt=".0f", xlabels=None, ylabels=None)
+→ Heatmap
+
+boxplot(data, x=None, y=None, titel="", xlabel="", ylabel="", farbe=None, figsize=(10, 5))
+→ Boxplot
+
+scatterplot(data, x, y, size=None, titel="", xlabel="", ylabel="", sizes=(20, 800), alpha=0.4, farbe=None)
+→ Scatterplot
+
+histogramm(data, spalte, bins=50, titel="", xlabel="", ylabel="Anzahl", farbe=None, xlim=None, figsize=(10, 5), vlines=None)
+→ Histogramm
+
+countplot(data, x, titel="", xlabel="", ylabel="Anzahl Nennungen", farbe=None, rotation=0)
+→ Countplot
