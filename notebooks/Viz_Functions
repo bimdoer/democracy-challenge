@@ -32,3 +32,11 @@ histogramm(data, spalte, bins=50, titel="", xlabel="", ylabel="Anzahl", farbe=No
 
 countplot(data, x, titel="", xlabel="", ylabel="Anzahl Nennungen", farbe=None, rotation=0)
 → Countplot
+
+liniendiagramm(df, x="datum", y="volkja-proz",
+               xlabel="Jahr", ylabel="Ja-Anteil (%)")
+→ Eine Linie
+
+liniendiagramm(df_long, x="datum", y="zustimmung", hue="partei",
+               xlabel="Jahr", ylabel="Übereinstimmung")
+→ Mehrere Linien
