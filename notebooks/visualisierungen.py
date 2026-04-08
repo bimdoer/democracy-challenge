@@ -54,8 +54,8 @@ def balkendiagramm(data, x, y, xlabel="", ylabel="", titel="",
         height=height, aspect=aspect, order=order)
  
     plt.title(titel, fontsize=14) if titel else None
-    plt.xlabel(xlabel, fontsize=12, fontweight="bold")
-    plt.ylabel(ylabel, fontsize=12, fontweight="bold")
+    plt.xlabel(xlabel, fontsize=10, fontweight="bold")
+    plt.ylabel(ylabel, fontsize=10, fontweight="bold")
     plt.xticks(fontsize=10, rotation=rotation)
     plt.yticks(fontsize=10)
     if ylim:
@@ -84,8 +84,8 @@ def balkendiagramm_sortiert(data, x, y, xlabel="", ylabel="", titel="",
         height=height, aspect=aspect)
  
     plt.title(titel, fontsize=14) if titel else None
-    plt.xlabel(xlabel, fontsize=12, fontweight="bold")
-    plt.ylabel(ylabel, fontsize=12, fontweight="bold")
+    plt.xlabel(xlabel, fontsize=10, fontweight="bold")
+    plt.ylabel(ylabel, fontsize=10, fontweight="bold")
     plt.xticks(fontsize=9, rotation=rotation)
     plt.yticks(fontsize=9)
     if ylim:
@@ -176,8 +176,8 @@ def heatmap(pivot, xlabel="", ylabel="", vmax=None,
  
     plt.xlabel(xlabel, fontsize=12, fontweight="bold")
     plt.ylabel(ylabel, fontsize=12, fontweight="bold")
-    plt.xticks(fontsize=10)
-    plt.yticks(fontsize=10, rotation=0)
+    plt.xticks(fontsize=9)
+    plt.yticks(fontsize=9, rotation=0)
     plt.tight_layout()
     plt.show()
  
@@ -218,8 +218,8 @@ def scatterplot(data, x, y, size=None, titel="", xlabel="", ylabel="",
         alpha=alpha, color=farbe)
  
     plt.title(titel, fontsize=14) if titel else None
-    plt.xlabel(xlabel, fontsize=12)
-    plt.ylabel(ylabel, fontsize=12)
+    plt.xlabel(xlabel, fontsize=12, fontweight="bold")
+    plt.ylabel(ylabel, fontsize=12, fontweight="bold")
     plt.tight_layout()
     plt.show()
  
@@ -266,7 +266,34 @@ def countplot(data, x, titel="", xlabel="", ylabel="Anzahl Nennungen",
     plt.title(titel, fontsize=14) if titel else None
     plt.xlabel(xlabel, fontsize=12, fontweight="bold")
     plt.ylabel(ylabel, fontsize=12, fontweight="bold")
-    plt.xticks(fontsize=10, rotation=rotation)
+    plt.xticks(fontsize=9, rotation=rotation)
+    plt.yticks(fontsize=9)
+    plt.tight_layout()
+    plt.show()
+
+# ══════════════════════════════════════════════════════════════
+# 10. LINIENDIAGRAMM
+# ══════════════════════════════════════════════════════════════
+
+def liniendiagramm(data, x, y, hue=None, titel="", xlabel="", ylabel="",
+                   palette=None, farbe=None, figsize=(10, 5),
+                   marker="o", linewidth=2):
+    if palette is None and hue:
+        palette = PALETTE_KATEGORIAL
+    if farbe is None and not hue:
+        farbe = HAUPTFARBE
+
+    sns.set_style("whitegrid")
+    plt.figure(figsize=figsize)
+    sns.lineplot(
+        data=data, x=x, y=y, hue=hue,
+        palette=palette, color=farbe,
+        marker=marker, linewidth=linewidth)
+
+    plt.title(titel, fontsize=14) if titel else None
+    plt.xlabel(xlabel, fontsize=12, fontweight="bold")
+    plt.ylabel(ylabel, fontsize=12, fontweight="bold")
+    plt.xticks(fontsize=10)
     plt.yticks(fontsize=10)
     plt.tight_layout()
     plt.show()
