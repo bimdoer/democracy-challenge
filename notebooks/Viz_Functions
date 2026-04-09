@@ -34,4 +34,4 @@ VISUALISIERUNGEN – FUNKTIONSÜBERSICHT
 
 10. liniendiagramm(data, x, y, hue=None, titel="", xlabel="", ylabel="",
                    palette=None, farbe=None, figsize=(10,5),
-                   marker="o", linewidth=2, rotation=0)
+                   marker="o", linewidth=2, rotation=0, errorbar=None)
