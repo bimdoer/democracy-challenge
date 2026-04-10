@@ -51,7 +51,7 @@ def _annotate_bars(ax, fmt=".0f"):
 # 1. BALKENDIAGRAMM
 # ══════════════════════════════════════════════════════════════
 
-def balkendiagramm(data, x, y, xlabel="", ylabel="", titel="",
+def balkendiagramm(data, x, y, hue=None, xlabel="", ylabel="", titel="",
                    ylim=None, palette=None,
                    figsize=(12, 6), rotation=0, order=None,
                    annotate=False, fmt=".0f"):
@@ -60,8 +60,8 @@ def balkendiagramm(data, x, y, xlabel="", ylabel="", titel="",
 
     sns.set_style("whitegrid")
     fig, ax = plt.subplots(figsize=figsize)
-    sns.barplot(data=data, x=x, y=y, hue=x,
-                palette=palette, legend=False, order=order, ax=ax)
+    sns.barplot(data=data, x=x, y=y, hue=hue,
+                palette=palette, legend=hue is not None, order=order, ax=ax)
 
     if annotate:
         _annotate_bars(ax, fmt)
@@ -73,6 +73,8 @@ def balkendiagramm(data, x, y, xlabel="", ylabel="", titel="",
     plt.yticks(fontsize=10)
     if ylim:
         plt.ylim(*ylim)
+    if hue:
+        plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.tight_layout()
     plt.show()
 
