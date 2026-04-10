@@ -21,6 +21,7 @@ AKZENTFARBE = "#CC6677"
 
 # Blau, Altrosa, Sand, Himmel, Purpur, Teal
 PALETTE_KATEGORIAL = ["#4477AA", "#CC6677", "#DDCC77", "#88CCEE", "#AA4499", "#44AA99"]
+PALETTE_KATEGORIAL_VIELE_WERTE = ["#4477AA", "#CC6677", "#DDCC77", "#88CCEE", "#AA4499", "#44AA99", "#332288", "#882255", "#999933", "#66CCEE", "#117733", "#AA7744", "#6699CC", "#CC9988", "#44BB99"]
 PALETTE_SNS = sns.color_palette(PALETTE_KATEGORIAL)
 
 CMAP_HEATMAP = "mako"
@@ -208,18 +209,20 @@ def heatmap(pivot, xlabel="", ylabel="", vmax=None,
 # 6. BOXPLOT
 # ══════════════════════════════════════════════════════════════
 
-def boxplot(data, x=None, y=None, titel="", xlabel="", ylabel="",
-            farbe=None, figsize=(10, 5)):
-    if farbe is None:
+def boxplot(data, x=None, y=None, hue=None, titel="", xlabel="", ylabel="",
+            farbe=None, palette=None, figsize=(10, 5), width = 0.4):
+    if farbe is None and palette is None:
         farbe = HAUPTFARBE
 
     sns.set_style("whitegrid")
     plt.figure(figsize=figsize)
-    sns.boxplot(data=data, x=x, y=y, color=farbe, width=0.4)
+    sns.boxplot(data=data, x=x, y=y, hue=hue, color=farbe, palette=palette, width=width)
 
     plt.title(titel, fontsize=14) if titel else None
     plt.xlabel(xlabel, fontsize=12) if xlabel else None
     plt.ylabel(ylabel, fontsize=12) if ylabel else None
+    if hue:
+        plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.tight_layout()
     plt.show()
 
