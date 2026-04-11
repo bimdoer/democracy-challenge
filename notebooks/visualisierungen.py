@@ -153,7 +153,7 @@ def gestapeltes_balkendiagramm(pivot_prozent, xlabel="", ylabel="Anteil (%)",
 # ══════════════════════════════════════════════════════════════
 
 def anteilsdiagramm(data, x, hue, xlabel="", ylabel="Anteil",
-                    palette=None, figsize=(8, 5), xlabels=None):
+                    palette=None, figsize=(8, 5), xlabels=None, titel=''):
     if palette is None:
         palette = PALETTE_KATEGORIAL
 
@@ -167,6 +167,7 @@ def anteilsdiagramm(data, x, hue, xlabel="", ylabel="Anteil",
     if xlabels:
         ax.set_xticklabels(xlabels)
 
+    ax.legend(title=titel)
     plt.xlabel(xlabel, fontsize=12, fontweight="bold")
     plt.ylabel(ylabel, fontsize=12, fontweight="bold")
     plt.xticks(fontsize=9)
@@ -234,20 +235,22 @@ def boxplot(data, x=None, y=None, hue=None, titel="", xlabel="", ylabel="",
 # ══════════════════════════════════════════════════════════════
 
 def scatterplot(data, x, y, size=None, titel="", xlabel="", ylabel="",
-                sizes=(20, 800), alpha=0.4, farbe=None, figsize=(10, 5)):
+                sizes=(20, 800), alpha=0.4, farbe=None, hue=None, figsize=(10, 5), rotation=0, legendentitel=''):
     if farbe is None:
         farbe = HAUPTFARBE
 
     sns.set_style("whitegrid")
     plt.figure(figsize=figsize)
-    sns.scatterplot(
+    ax = sns.scatterplot(
         data=data, x=x, y=y,
         size=size, sizes=sizes,
-        alpha=alpha, color=farbe)
+        alpha=alpha, color=farbe, hue=hue)
 
+    ax.legend(title=legendentitel)
     plt.title(titel, fontsize=14) if titel else None
     plt.xlabel(xlabel, fontsize=12, fontweight="bold")
     plt.ylabel(ylabel, fontsize=12, fontweight="bold")
+    plt.xticks(rotation=rotation)
     plt.tight_layout()
     plt.show()
 
