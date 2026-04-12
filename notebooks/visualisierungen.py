@@ -314,7 +314,7 @@ def countplot(data, x, titel="", xlabel="", ylabel="Anzahl Nennungen",
 
 def liniendiagramm(data, x, y, hue=None, titel="", xlabel="", ylabel="",
                    palette=None, farbe=None, figsize=(10, 5),
-                   marker="o", linewidth=2, rotation=0, errorbar=False):
+                   marker="o", linewidth=2, rotation=0, errorbar=False, hline=None):
     if palette is None and hue:
         palette = PALETTE_KATEGORIAL
     if farbe is None and not hue:
@@ -327,10 +327,15 @@ def liniendiagramm(data, x, y, hue=None, titel="", xlabel="", ylabel="",
         palette=palette, color=farbe,
         marker=marker, linewidth=linewidth,  errorbar="ci" if errorbar else None)
 
+    # Horizontale Referenzlinie
+    if hline is not None:
+        plt.axhline(hline, color="#CC6677", linestyle="--", linewidth=1, alpha=0.7)
+
     plt.title(titel, fontsize=14) if titel else None
     plt.xlabel(xlabel, fontsize=12, fontweight="bold")
     plt.ylabel(ylabel, fontsize=12, fontweight="bold")
     plt.xticks(fontsize=10, rotation=rotation)
     plt.yticks(fontsize=10)
+    plt.ylim(-0.5, 0.5)
     plt.tight_layout()
     plt.show()
