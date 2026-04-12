@@ -1,42 +1,37 @@
-# Farben & Paletten
-HAUPTFARBE = "#4477AA"
-AKZENTFARBE = "#CC6677"
-PALETTE_KATEGORIAL = ["#4477AA", "#CC6677", "#DDCC77", "#88CCEE", "#AA4499", "#44AA99"]
-PALETTE_SNS = sns.color_palette(PALETTE_KATEGORIAL)
-CMAP_HEATMAP = "mako"
-CMAP_DIVERGIEREND = "coolwarm"
+VISUALISIERUNGEN – FUNKTIONSÜBERSICHT
+══════════════════════════════════════
 
-balkendiagramm(data, x, y, xlabel="", ylabel="", titel="", ylim=None, palette=None, height=6, aspect=2, rotation=0, order=None)
-→ Einfaches Balkendiagramm
+1. balkendiagramm(data, x, y, xlabel="", ylabel="", titel="",
+                  ylim=None, palette=None, figsize=(12,6),
+                  rotation=0, order=None, annotate=False, fmt=".0f")
 
-balkendiagramm_sortiert(data, x, y, xlabel="", ylabel="", titel="", ylim=None, palette=None, height=6, aspect=2, rotation=90)
-→ Sortiertes Balkendiagramm
+2. balkendiagramm_sortiert(data, x, y, xlabel="", ylabel="", titel="",
+                           ylim=None, palette=None, figsize=(12,6),
+                           rotation=90, annotate=False, fmt=".0f")
 
-gestapeltes_balkendiagramm(pivot_prozent, xlabel="", ylabel="Anteil (%)", legend_titel="", figsize=(8, 6), xlabels=None)
-→ Gestapeltes Balkendiagramm
+3. gestapeltes_balkendiagramm(pivot_prozent, xlabel="", ylabel="Anteil (%)",
+                              legend_titel="", figsize=(8,6), xlabels=None,
+                              annotate=False, fmt=".0f", min_anteil=5)
 
-anteilsdiagramm(data, x, hue, xlabel="", ylabel="Anteil", palette=None, figsize=(8, 5), xlabels=None)
-→ Anteilsdiagramm
+4. anteilsdiagramm(data, x, hue, xlabel="", ylabel="Anteil",
+                   palette=None, figsize=(8,5), xlabels=None)
 
-heatmap(pivot, xlabel="", ylabel="", vmax=None, cmap=None, figsize=(6, 7), fmt=".0f", xlabels=None, ylabels=None)
-→ Heatmap
+5. heatmap(pivot, xlabel="", ylabel="", vmax=None,
+           cmap=None, figsize=(6,7), fmt=".0f",
+           xlabels=None, ylabels=None, rotation=0)
 
-boxplot(data, x=None, y=None, titel="", xlabel="", ylabel="", farbe=None, figsize=(10, 5))
-→ Boxplot
+6. boxplot(data, x=None, y=None, titel="", xlabel="", ylabel="",
+           farbe=None, figsize=(10,5))
 
-scatterplot(data, x, y, size=None, titel="", xlabel="", ylabel="", sizes=(20, 800), alpha=0.4, farbe=None)
-→ Scatterplot
+7. scatterplot(data, x, y, size=None, titel="", xlabel="", ylabel="",
+               sizes=(20,800), alpha=0.4, farbe=None, figsize=(10,5))
 
-histogramm(data, spalte, bins=50, titel="", xlabel="", ylabel="Anzahl", farbe=None, xlim=None, figsize=(10, 5), vlines=None)
-→ Histogramm
+8. histogramm(data, spalte, bins=50, titel="", xlabel="", ylabel="Anzahl",
+              farbe=None, xlim=None, figsize=(10,5), vlines=None, rotation=0)
 
-countplot(data, x, titel="", xlabel="", ylabel="Anzahl Nennungen", farbe=None, rotation=0)
-→ Countplot
+9. countplot(data, x, titel="", xlabel="", ylabel="Anzahl Nennungen",
+             farbe=None, figsize=(10,5), rotation=0, annotate=False)
 
-liniendiagramm(df, x="datum", y="volkja-proz",
-               xlabel="Jahr", ylabel="Ja-Anteil (%)")
-→ Eine Linie
-
-liniendiagramm(df_long, x="datum", y="zustimmung", hue="partei",
-               xlabel="Jahr", ylabel="Übereinstimmung")
-→ Mehrere Linien
+10. liniendiagramm(data, x, y, hue=None, titel="", xlabel="", ylabel="",
+                   palette=None, farbe=None, figsize=(10,5),
+                   marker="o", linewidth=2, rotation=0, errorbar=None)
