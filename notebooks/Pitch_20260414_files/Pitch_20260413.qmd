@@ -25,6 +25,8 @@ Bonus: Geografische Achse wird erarbeitet, sofern Relevanz während Projektverla
 ### Kantonale Übereinstimmung
 ![](plots/heatmap.png)
 
+![](plots/geo_heatmap.png)
+
 ## Offene Fragen
 ### Technische Fragen
 - Wir haben aktuell den Main-Branch mit einer Regel geschützt, stellen aber zugleich fest, dass diese Arbeitsweise aufwändig sein kann.
