@@ -26,7 +26,7 @@ PALETTE_KATEGORIAL = ["#4477AA", "#CC6677", "#DDCC77", "#88CCEE", "#AA4499", "#4
 PALETTE_KATEGORIAL_VIELE_WERTE = ["#4477AA", "#CC6677", "#DDCC77", "#88CCEE", "#AA4499", "#44AA99", "#332288", "#882255", "#999933", "#66CCEE", "#117733", "#AA7744", "#6699CC", "#CC9988", "#44BB99"]
 PALETTE_SNS = sns.color_palette(PALETTE_KATEGORIAL)
 
-CMAP_HEATMAP = "mako"
+CMAP_HEATMAP = "coolwarm"
 CMAP_DIVERGIEREND = "coolwarm"
 
 
@@ -192,10 +192,11 @@ def heatmap(pivot, xlabel="", ylabel="", vmax=None,
     plt.figure(figsize=figsize)
     ax = sns.heatmap(
         pivot, cmap=cmap,
-        vmin=0, vmax=vmax,
+        vmin=None, vmax=None,
         linewidths=0.1,
         annot=True, fmt=fmt,
         annot_kws={"size": 9})
+    ax.xaxis.tick_top()
 
     if xlabels:
         ax.set_xticklabels(xlabels)
