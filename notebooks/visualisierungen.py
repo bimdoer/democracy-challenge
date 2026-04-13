@@ -197,6 +197,8 @@ def heatmap(pivot, xlabel="", ylabel="", vmax=None,
         annot=True, fmt=fmt,
         annot_kws={"size": 9})
     ax.xaxis.tick_top()
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=90, ha="center")
+    ax.xaxis.set_label_position("top")
 
     if xlabels:
         ax.set_xticklabels(xlabels)

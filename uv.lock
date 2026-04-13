@@ -1516,6 +1516,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "debugpy" },
+    { name = "ipykernel" },
     { name = "matplotlib" },
     { name = "narwhals" },
     { name = "numpy" },
@@ -1536,6 +1537,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "debugpy", specifier = ">=1.8.20" },
+    { name = "ipykernel", specifier = ">=7.2.0" },
     { name = "matplotlib", specifier = ">=3.7" },
     { name = "narwhals", specifier = ">=2.19.0" },
     { name = "numpy", specifier = ">=1.24" },
