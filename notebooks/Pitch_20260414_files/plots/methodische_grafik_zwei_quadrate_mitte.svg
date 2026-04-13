@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="1200" height="400">
+  <rect width="1200" height="400" fill="#FAFAFA"/>
+
+  <!-- Links: Überschrift über dem Quadrat (Mittelpunkt x=300) -->
+  <text x="300" y="48" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="700" fill="#2C3E50">Deskriptive Statistik</text>
+  <text x="300" y="72" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="400" fill="#5D6D7E">Vergangenheit verstehen</text>
+
+  <!-- Rechts: Überschrift über dem Quadrat (Mittelpunkt x=900) -->
+  <text x="900" y="48" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="700" fill="#2C3E50">Prädikative Statistik</text>
+  <text x="900" y="72" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="400" fill="#5D6D7E">Zukunft modellieren</text>
+
+  <!-- Linkes Quadrat (orange) -->
+  <rect x="210" y="110" width="180" height="180" fill="#E67E22"/>
+
+  <!-- Fokus unter dem linken Quadrat (zentriert, fett, schwarz) -->
+  <text x="300" y="308" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="700" fill="#000000">
+    <tspan x="300" dy="0">Fokus: Kongruenz Volksabstimmung mit</tspan>
+    <tspan x="300" dy="20">institutionellen Empfehlungen.</tspan>
+  </text>
+
+  <!-- Mittlere vertikale Linie (schwarz, oben bis unten im Grafikbereich) -->
+  <line x1="600" y1="30" x2="600" y2="370" stroke="#000000" stroke-width="4" stroke-linecap="square"/>
+
+  <!-- Rechtes Quadrat (violett) -->
+  <rect x="810" y="110" width="180" height="180" fill="#8E44AD" fill-opacity="0.85"/>
+</svg>
