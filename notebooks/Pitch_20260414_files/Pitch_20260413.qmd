@@ -22,10 +22,23 @@ Bonus: Geografische Achse wird erarbeitet, sofern Relevanz während Projektverla
 ### Fokus
 ![](plots/methodische_grafik_zwei_quadrate_mitte.svg)
 
+### Zustimmung Bundesrat im Vergleich zu anderen Institutionen
+#### Parteien und Legislative
+![](plots/Zustimmung_Parteien_BR_BV.png)
+
+#### Exkurs: Parteien unter sich
+![](plots/Zustimmung_Hauptparteien.png)
+
+#### Bunderat und Verbände
+![](plots/BR_Verbände.png)
+
 ### Kantonale Übereinstimmung
 ![](plots/heatmap.png)
 
 ![](plots/geo_heatmap.png)
+
+### Thematische Unterschiede BR vgl. Parteien
+![](plots/Themen_BR_Parteien.png)
 
 ## Offene Fragen
 ### Technische Fragen
@@ -38,8 +51,10 @@ Bonus: Geografische Achse wird erarbeitet, sofern Relevanz während Projektverla
 - Beim Bereinigen der Merge-Conflicts haben wir auch festgestellt, dass es ziemlich mühsam ist, wenn man die Outputs mitgibt (nicht die Exports, sondern die Outpus im Notebook). Diese tauchen auch auf inkl. Anzahl Runs und erschweren den Datei-Vergleich auf Github.
 - Beim anpassen unserer eigenen Bibliothek Visualisierungen.py hatten wir in den Notebooks immer wieder das Problem, dass man den Kernel neu starten musste. Ist hier der Weg mit unserem eingefügten Block der richtige Weg?
 - Der Kernel braucht zum Teil in VSCode ewigs, bis er startet, gibt es hier Gründe dafür?
+
 ### Thematische Fragen
 - Wir zeigen im Moment die Differenz zur 50%-Mitte auf und behalten positive und negative Werte dabei bei. Sind wir auf dem richtigen Weg?
 - Die Mobilisierung konnten wir ausschliessen, die Variable fällt weg und hat keinen Einfluss.
+
 ### Fragen zur Abgabe
 - Wie sollenn wir mit Tests in unserem Repo umgehen? Müssen wir bei allem Sattelfest sein für das Gespräch?

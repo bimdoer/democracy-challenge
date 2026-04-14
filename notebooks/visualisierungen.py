@@ -224,7 +224,7 @@ def heatmap(pivot, xlabel="", ylabel="", vmax=None,
 # ══════════════════════════════════════════════════════════════
 
 def boxplot(data, x=None, y=None, hue=None, titel="", xlabel="", ylabel="",
-            farbe=None, palette=None, figsize=(10, 5), width = 0.4):
+            farbe=None, palette=None, figsize=(10, 5), width = 0.4, rotation = 0, hline=None):
     if farbe is None and palette is None:
         farbe = HAUPTFARBE
 
@@ -232,9 +232,14 @@ def boxplot(data, x=None, y=None, hue=None, titel="", xlabel="", ylabel="",
     plt.figure(figsize=figsize)
     sns.boxplot(data=data, x=x, y=y, hue=hue, color=farbe, palette=palette, width=width)
 
+    # Horizontale Referenzlinie
+    if hline is not None:
+        plt.axhline(hline, color="#CC6677", linestyle="--", linewidth=1, alpha=0.7)
+
     plt.title(titel, fontsize=14) if titel else None
     plt.xlabel(xlabel, fontsize=12) if xlabel else None
     plt.ylabel(ylabel, fontsize=12) if ylabel else None
+    plt.xticks(rotation=rotation)
     if hue:
         plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.tight_layout()
@@ -246,7 +251,7 @@ def boxplot(data, x=None, y=None, hue=None, titel="", xlabel="", ylabel="",
 # ══════════════════════════════════════════════════════════════
 
 def scatterplot(data, x, y, size=None, titel="", xlabel="", ylabel="",
-                sizes=(20, 800), alpha=0.4, farbe=None, hue=None, figsize=(10, 5), rotation=0, legendentitel=''):
+                sizes=(20, 800), alpha=0.4, farbe=None, hue=None, figsize=(10, 5), rotation=0, legendentitel='', palette=None):
     if farbe is None:
         farbe = HAUPTFARBE
 
@@ -255,7 +260,7 @@ def scatterplot(data, x, y, size=None, titel="", xlabel="", ylabel="",
     ax = sns.scatterplot(
         data=data, x=x, y=y,
         size=size, sizes=sizes,
-        alpha=alpha, color=farbe, hue=hue)
+        alpha=alpha, color=farbe, hue=hue, palette=palette)
 
     ax.legend(title=legendentitel)
     plt.title(titel, fontsize=14) if titel else None

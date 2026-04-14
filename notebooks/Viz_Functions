@@ -1,7 +1,7 @@
 VISUALISIERUNGEN – FUNKTIONSÜBERSICHT
 ══════════════════════════════════════
 
-1. balkendiagramm(data, x, y, xlabel="", ylabel="", titel="",
+1. balkendiagramm(data, x, y, hue=None, xlabel="", ylabel="", titel="",
                   ylim=None, palette=None, figsize=(12,6),
                   rotation=0, order=None, annotate=False, fmt=".0f")
 
@@ -14,17 +14,19 @@ VISUALISIERUNGEN – FUNKTIONSÜBERSICHT
                               annotate=False, fmt=".0f", min_anteil=5)
 
 4. anteilsdiagramm(data, x, hue, xlabel="", ylabel="Anteil",
-                   palette=None, figsize=(8,5), xlabels=None)
+                   palette=None, figsize=(8,5), xlabels=None, titel="")
 
 5. heatmap(pivot, xlabel="", ylabel="", vmax=None,
            cmap=None, figsize=(6,7), fmt=".0f",
            xlabels=None, ylabels=None, rotation=0)
 
-6. boxplot(data, x=None, y=None, titel="", xlabel="", ylabel="",
-           farbe=None, figsize=(10,5))
+6. boxplot(data, x=None, y=None, hue=None, titel="", xlabel="", ylabel="",
+           farbe=None, palette=None, figsize=(10,5), width=0.4,
+           rotation=0, hline=None)
 
 7. scatterplot(data, x, y, size=None, titel="", xlabel="", ylabel="",
-               sizes=(20,800), alpha=0.4, farbe=None, figsize=(10,5))
+               sizes=(20,800), alpha=0.4, farbe=None, hue=None,
+               figsize=(10,5), rotation=0, legendentitel="", palette=None)
 
 8. histogramm(data, spalte, bins=50, titel="", xlabel="", ylabel="Anzahl",
               farbe=None, xlim=None, figsize=(10,5), vlines=None, rotation=0)
@@ -34,4 +36,5 @@ VISUALISIERUNGEN – FUNKTIONSÜBERSICHT
 
 10. liniendiagramm(data, x, y, hue=None, titel="", xlabel="", ylabel="",
                    palette=None, farbe=None, figsize=(10,5),
-                   marker="o", linewidth=2, rotation=0, errorbar=None)
+                   marker="o", linewidth=2, rotation=0, errorbar=False,
+                   hline=None)
