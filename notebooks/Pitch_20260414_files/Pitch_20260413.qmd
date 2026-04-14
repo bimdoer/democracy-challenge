@@ -35,6 +35,9 @@ Bonus: Geografische Achse wird erarbeitet, sofern Relevanz während Projektverla
 ### Kantonale Übereinstimmung
 ![](plots/heatmap.png)
 
+### Thematische Unterschiede BR vgl. Parteien
+![](plots/Themen_BR_Parteien.png)
+
 ## Offene Fragen
 ### Technische Fragen
 - Wir haben aktuell den Main-Branch mit einer Regel geschützt, stellen aber zugleich fest, dass diese Arbeitsweise aufwändig sein kann.
