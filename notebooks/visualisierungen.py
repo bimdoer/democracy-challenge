@@ -7,6 +7,9 @@ from visualisierungen import heatmap as heat
 
 # BALKENDIAGRAMM
 
+from pathlib import Path
+
+import geopandas as gpd
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -28,6 +31,9 @@ PALETTE_SNS = sns.color_palette(PALETTE_KATEGORIAL)
 
 CMAP_HEATMAP = "coolwarm"
 CMAP_DIVERGIEREND = "coolwarm"
+
+# GeoJSON Kantone (Simplemaps, data/raw/ch.json): properties «id» z. B. CHZH, «name» englisch
+_DEFAULT_CH_GEOJSON = Path(__file__).resolve().parent.parent / "data" / "raw" / "ch.json"
 
 
 def palette_farben(n):
@@ -347,5 +353,93 @@ def liniendiagramm(data, x, y, hue=None, titel="", xlabel="", ylabel="",
     plt.xticks(fontsize=10, rotation=rotation)
     plt.yticks(fontsize=10)
     plt.ylim(-0.5, 0.5)
+    plt.tight_layout()
+    plt.show()
+
+# ══════════════════════════════════════════════════════════════
+# 11. MAP SCHWEIZERKARTE
+# ══════════════════════════════════════════════════════════════
+
+
+def schweiz_karte_choropleth(
+    data,
+    wert_spalte,
+    join_data="id",
+    geojson_pfad=None,
+    join_geo="id",
+    titel="",
+    cmap=None,
+    figsize=(8, 6),
+    legend_label="",
+    kante_farbe="#333333",
+    kante_linewidth=0.4,
+    fehlend_farbe="#EEEEEE",
+    vmin=None,
+    vmax=None,
+):
+    """
+    Statische Choroplethenkarte (Schweiz), Kantone.
+
+    Standard ist ``data/raw/ch.json`` (Simplemaps): Join-Spalte ``id`` mit Werten wie
+    «CHZH», «CHBE». Bei zwei Buchstaben im Datensatz z. B. ``df['id'] = 'CH' + df['kt']``.
+
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        Enthält ``join_data`` und ``wert_spalte``.
+    geojson_pfad : str oder pathlib.Path, optional
+        GeoJSON mit Kantonsgrenzen. Standard: Projektdatei ``data/raw/ch.json``.
+    join_data / join_geo : str
+        Spalte in ``data`` bzw. in den Geometriedaten (bei ch.json typisch beide ``id``
+        oder z. B. ``name`` für englische Kantonsnamen).
+    vmin, vmax : float, optional
+        Farbskala-Grenzen (wie bei klassischen Heatmaps).
+    """
+    if cmap is None:
+        cmap = CMAP_HEATMAP
+
+    path = Path(geojson_pfad) if geojson_pfad is not None else _DEFAULT_CH_GEOJSON
+    if not path.is_file():
+        raise FileNotFoundError(f"GeoJSON nicht gefunden: {path}")
+
+    if join_data not in data.columns:
+        raise ValueError(f"Spalte «{join_data}» fehlt in data. Vorhanden: {list(data.columns)!r}")
+    if wert_spalte not in data.columns:
+        raise ValueError(f"Spalte «{wert_spalte}» fehlt in data.")
+
+    kantone = gpd.read_file(path)
+    if join_geo not in kantone.columns:
+        raise ValueError(
+            f"Spalte «{join_geo}» fehlt in den Geodaten. Vorhanden: {list(kantone.columns)!r}"
+        )
+
+    data_sub = data[[join_data, wert_spalte]].drop_duplicates(subset=[join_data])
+    if join_geo == join_data:
+        merged = kantone.merge(data_sub, on=join_geo, how="left")
+    else:
+        merged = kantone.merge(data_sub, left_on=join_geo, right_on=join_data, how="left")
+
+    sns.set_style("white")
+    fig, ax = plt.subplots(figsize=figsize)
+
+    plot_kwds = {
+        "column": wert_spalte,
+        "cmap": cmap,
+        "linewidth": kante_linewidth,
+        "edgecolor": kante_farbe,
+        "legend": True,
+        "legend_kwds": {"label": legend_label or str(wert_spalte), "shrink": 0.6},
+        "missing_kwds": {"color": fehlend_farbe, "label": "keine Daten"},
+        "ax": ax,
+    }
+    if vmin is not None:
+        plot_kwds["vmin"] = vmin
+    if vmax is not None:
+        plot_kwds["vmax"] = vmax
+
+    merged.plot(**plot_kwds)
+
+    ax.set_title(titel, fontsize=14)
+    ax.set_axis_off()
     plt.tight_layout()
     plt.show()
