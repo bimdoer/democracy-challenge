@@ -23,4 +23,5 @@ dependencies = [
 dev = [
     "jupyter>=1.0",
     "ipykernel>=6.0",
+    "nbstripout>=0.9.1",
 ]
