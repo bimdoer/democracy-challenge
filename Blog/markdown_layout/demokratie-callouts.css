@@ -1,0 +1,95 @@
+/* ============================================================
+   DEMOKRATIE-CHALLENGE: Callouts & Figuren-Layout (PyCharm)
+   ============================================================
+   Diese Variante nutzt HTML-Klassen statt der Obsidian-
+   spezifischen [!type]-Syntax. Verwendung im Markdown:
+
+   <div class="grafik"><strong>D1:</strong> Titel</div>
+   <div class="lesehilfe">Lesehilfe-Text</div>
+   <div class="haupt">Hauptbox</div>
+   <div class="akzent">Akzentbox</d>
+   <details><summary>Titel</summary>Inhalt</details>
+   ============================================================ */
+
+:root {
+  --hauptfarbe-rgb: 68, 119, 170;       /* #4477AA */
+  --hauptfarbe-hex: #4477aa;
+  --akzentfarbe-rgb: 204, 102, 119;     /* #CC6677 */
+  --akzentfarbe-hex: #cc6677;
+}
+
+
+/* ============================================================
+   1) GRAFIK-TITEL (oberhalb der Grafik)
+   ============================================================ */
+.grafik {
+  border-top: 2px solid var(--hauptfarbe-hex);
+  border-bottom: 1px solid var(--hauptfarbe-hex);
+  padding: 0.6em 0;
+  margin: 1.2em 0 0.4em 0;
+  color: var(--hauptfarbe-hex);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: transparent;
+}
+
+
+/* ============================================================
+   2) LESEHILFE (unterhalb der Grafik)
+   ============================================================ */
+.lesehilfe {
+  border-top: 1px solid var(--hauptfarbe-hex);
+  border-bottom: 2px solid var(--hauptfarbe-hex);
+  padding: 0.5em 0 0.7em 0;
+  margin: 0.4em 0 1.2em 0;
+  font-size: 0.9em;
+  line-height: 1.5;
+  color: #555;
+  background: transparent;
+}
+
+
+/* ============================================================
+   3) HAUPT-CALLOUT (Hauptfarbe, frei beschriftbar)
+   ============================================================ */
+.haupt {
+  border-left: 4px solid var(--hauptfarbe-hex);
+  background: rgba(68, 119, 170, 0.08);
+  padding: 0.8em 1em;
+  margin: 1em 0;
+  border-radius: 0 4px 4px 0;
+}
+
+
+/* ============================================================
+   4) AKZENT-CALLOUT (für Hervorhebungen)
+   ============================================================ */
+.akzent {
+  border-left: 4px solid var(--akzentfarbe-hex);
+  background: rgba(204, 102, 119, 0.08);
+  padding: 0.8em 1em;
+  margin: 1em 0;
+  border-radius: 0 4px 4px 0;
+}
+
+
+/* ============================================================
+   5) KLAPPER (Standard <details>-Element)
+   ============================================================ */
+details {
+  border-left: 4px solid var(--hauptfarbe-hex);
+  background: rgba(68, 119, 170, 0.05);
+  padding: 0.8em 1em;
+  margin: 1em 0;
+  border-radius: 0 4px 4px 0;
+}
+
+details summary {
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--hauptfarbe-hex);
+}
+
+details[open] summary {
+  margin-bottom: 0.5em;
+}
