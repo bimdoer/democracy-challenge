@@ -14,6 +14,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 from matplotlib.colors import ListedColormap
 
 
@@ -444,24 +445,107 @@ def schweiz_karte_choropleth(
     plt.tight_layout()
     plt.show()
 
-# ══════════════════════════════════════════════════════════════
-# 12. Interaktiver Lineplot
-# ══════════════════════════════════════════════════════════════
-import plotly.express as px
-import plotly.graph_objects as go
 
-def liniendiagramm_interaktiv(df, x, y, titel="", xlabel="", ylabel="",
-                                  farbe=HAUPTFARBE, hover_data=None):
-    fig = px.line(
-        df, x=x, y=y,
+
+
+# ══════════════════════════════════════════════════════════════
+# 12. INTERAKTIVES LINIENDIAGRAMM MIT ZEITAUSWAHL
+# ══════════════════════════════════════════════════════════════
+
+def liniendiagramm_interaktiv_zeitwahl(
+    df,
+    wert_cols,
+    label_map=None,
+    farben_map=None,
+    zeit_spalten=None,
+    default_label='10 Jahre',
+    titel="",
+    xlabel="Jahr",
+    ylabel="Wert",
+    legend_titel="Akteur",
+    yrange=None,
+    hline=0,
+):
+    """
+    Interaktiver Lineplot mit Buttons für die Zeitaggregation.
+    Hovermode 'x unified' zeigt alle Akteure am selben x-Wert.
+    Doppelklick auf Akteur in Legende isoliert die Linie.
+    """
+    # --- Defaults ---
+    if label_map is None:
+        label_map = {col: col for col in wert_cols}
+    if farben_map is None:
+        farben_map = {}
+    if zeit_spalten is None:
+        zeit_spalten = {
+            '10 Jahre': 'jahrzehnt',
+            '5 Jahre':  '5_jahre',
+            '1 Jahr':   'jahr',
+        }
+
+    fig = go.Figure()
+    n_linien = len(wert_cols)
+
+    # --- Pro Zeit-Aggregation alle Linien einfügen ---
+    for label, spalte in zeit_spalten.items():
+        agg = df.groupby(spalte)[wert_cols].mean().reset_index()
+
+        for col in wert_cols:
+            name = label_map.get(col, col)
+            farbe = farben_map.get(name)
+            fig.add_trace(go.Scatter(
+                x=agg[spalte],
+                y=agg[col],
+                mode='lines+markers',
+                name=name,
+                line=dict(color=farbe, width=2),
+                marker=dict(size=6),
+                visible=(label == default_label),
+                hovertemplate=f"<b>{name}</b>: %{{y:.3f}}<extra></extra>",
+            ))
+
+    # --- Buttons ---
+    n_traces = n_linien * len(zeit_spalten)
+    buttons = []
+    for i, label in enumerate(zeit_spalten.keys()):
+        visible = [False] * n_traces
+        for j in range(n_linien):
+            visible[i * n_linien + j] = True
+        buttons.append(dict(
+            label=label,
+            method="update",
+            args=[{"visible": visible}],
+        ))
+
+    # --- Referenzlinie ---
+    if hline is not None:
+        fig.add_hline(
+            y=hline, line_dash="dash",
+            line_color=AKZENTFARBE, line_width=1, opacity=0.7,
+        )
+
+    # --- Layout ---
+    layout_args = dict(
         title=titel,
-        hover_data=hover_data,
-        color_discrete_sequence=[farbe],
-    )
-    fig.update_layout(
         xaxis_title=xlabel,
         yaxis_title=ylabel,
         template="simple_white",
         font=dict(family="Arial", size=13),
+        legend=dict(title=legend_titel),
+        hovermode="x unified",
+        updatemenus=[dict(
+            type="buttons",
+            direction="right",
+            x=0.5, xanchor="center",
+            y=1.15, yanchor="top",
+            buttons=buttons,
+            showactive=True,
+        )],
+        margin=dict(t=100),
     )
+    if yrange is not None:
+        layout_args['yaxis'] = dict(range=list(yrange))
+
+    fig.update_layout(**layout_args)
+
     return fig
