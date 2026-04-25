@@ -75,17 +75,17 @@ def balkendiagramm(data, x, y, hue=None, xlabel="", ylabel="", titel="",
     if annotate:
         _annotate_bars(ax, fmt)
 
-    plt.title(titel, fontsize=14) if titel else None
-    plt.xlabel(xlabel, fontsize=10, fontweight="bold")
-    plt.ylabel(ylabel, fontsize=10, fontweight="bold")
-    plt.xticks(fontsize=10, rotation=rotation)
-    plt.yticks(fontsize=10)
+    if titel:  ax.set_title(titel, fontsize=14)
+    ax.set_xlabel(xlabel, fontsize=10, fontweight="bold")
+    ax.set_ylabel(ylabel, fontsize=10, fontweight="bold")
+    ax.tick_params(axis='x', labelsize=10, rotation=rotation)
+    ax.tick_params(axis='y', labelsize=10)
     if ylim:
-        plt.ylim(*ylim)
+        ax.set_ylim(*ylim)
     if hue:
-        plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-    plt.tight_layout()
-    plt.show()
+        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    fig.tight_layout()
+    return fig
 
 
 # ══════════════════════════════════════════════════════════════
@@ -225,26 +225,25 @@ def heatmap(pivot, xlabel="", ylabel="", vmax=None,
 # ══════════════════════════════════════════════════════════════
 
 def boxplot(data, x=None, y=None, hue=None, titel="", xlabel="", ylabel="",
-            farbe=None, palette=None, figsize=(10, 5), width = 0.4, rotation = 0, hline=None):
+            farbe=None, palette=None, figsize=(10, 5), width=0.4, rotation=0, hline=None):
     if farbe is None and palette is None:
         farbe = HAUPTFARBE
 
     sns.set_style("whitegrid")
-    plt.figure(figsize=figsize)
+    fig = plt.figure(figsize=figsize)    # <-- fig hier abfangen
     sns.boxplot(data=data, x=x, y=y, hue=hue, color=farbe, palette=palette, width=width)
 
-    # Horizontale Referenzlinie
     if hline is not None:
         plt.axhline(hline, color="#CC6677", linestyle="--", linewidth=1, alpha=0.7)
 
-    plt.title(titel, fontsize=14) if titel else None
-    plt.xlabel(xlabel, fontsize=12) if xlabel else None
-    plt.ylabel(ylabel, fontsize=12) if ylabel else None
+    if titel:  plt.title(titel, fontsize=14)
+    if xlabel: plt.xlabel(xlabel, fontsize=12)
+    if ylabel: plt.ylabel(ylabel, fontsize=12)
     plt.xticks(rotation=rotation)
     if hue:
         plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.tight_layout()
-    plt.show()
+    return fig
 
 
 # ══════════════════════════════════════════════════════════════
