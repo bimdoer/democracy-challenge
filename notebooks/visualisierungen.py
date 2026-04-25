@@ -443,3 +443,25 @@ def schweiz_karte_choropleth(
     ax.set_axis_off()
     plt.tight_layout()
     plt.show()
+
+# ══════════════════════════════════════════════════════════════
+# 12. Interaktiver Lineplot
+# ══════════════════════════════════════════════════════════════
+import plotly.express as px
+import plotly.graph_objects as go
+
+def liniendiagramm_interaktiv(df, x, y, titel="", xlabel="", ylabel="",
+                                  farbe=HAUPTFARBE, hover_data=None):
+    fig = px.line(
+        df, x=x, y=y,
+        title=titel,
+        hover_data=hover_data,
+        color_discrete_sequence=[farbe],
+    )
+    fig.update_layout(
+        xaxis_title=xlabel,
+        yaxis_title=ylabel,
+        template="simple_white",
+        font=dict(family="Arial", size=13),
+    )
+    return fig
