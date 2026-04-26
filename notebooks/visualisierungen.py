@@ -125,36 +125,35 @@ def balkendiagramm_sortiert(data, x, y, xlabel="", ylabel="", titel="",
 # 3. GESTAPELTES BALKENDIAGRAMM
 # ══════════════════════════════════════════════════════════════
 
-def gestapeltes_balkendiagramm(pivot_prozent, xlabel="", ylabel="Anteil (%)",
+def gestapeltes_balkendiagramm(df, xlabel="", ylabel="Anteil (%)",
                                legend_titel="", figsize=(8, 6),
-                               xlabels=None,
+                               xlabels=None, palette=PALETTE_KATEGORIAL,
                                annotate=False, fmt=".0f", min_anteil=5):
     sns.set_style("whitegrid")
-    farben = palette_farben(len(pivot_prozent.columns))
 
-    ax = pivot_prozent.plot(
+    fig = df.plot(
         kind="bar", stacked=True,
-        color=farben, figsize=figsize,
+        color=palette, figsize=figsize,
         edgecolor="none", legend=True)
 
-    ax.legend(title=legend_titel, loc="center left",
+    fig.legend(title=legend_titel, loc="center left",
               bbox_to_anchor=(1, 0.5), frameon=False)
 
     if xlabels:
-        ax.set_xticklabels(xlabels)
+        fig.set_xticklabels(xlabels)
 
     if annotate:
-        for c in ax.containers:
+        for c in fig.containers:
             labels = [f"{v.get_height():{fmt}}%" if v.get_height() >= min_anteil else ""
                       for v in c]
-            ax.bar_label(c, labels=labels, label_type="center", fontsize=9)
+            fig.bar_label(c, labels=labels, label_type="center", fontsize=9)
 
     plt.xlabel(xlabel, fontsize=12, fontweight="bold")
     plt.ylabel(ylabel, fontsize=12, fontweight="bold")
     plt.xticks(fontsize=10, rotation=0)
     plt.yticks(fontsize=9)
     plt.tight_layout()
-    plt.show()
+    return fig
 
 
 # ══════════════════════════════════════════════════════════════
