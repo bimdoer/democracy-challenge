@@ -242,6 +242,7 @@ def boxplot(data, x=None, y=None, hue=None, titel="", xlabel="", ylabel="",
     if hue:
         plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.tight_layout()
+    plt.close(fig)
     return fig
 
 
