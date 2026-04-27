@@ -1,0 +1,4 @@
+# Strip notebook outputs (and other nbstripout defaults) in the version committed to Git.
+# One-time per clone:  uv run nbstripout --install
+# https://github.com/kynan/nbstripout
+*.ipynb filter=nbstripout

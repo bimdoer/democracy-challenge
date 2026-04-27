@@ -189,7 +189,7 @@ def anteilsdiagramm(data, x, hue, xlabel="", ylabel="Anteil",
 # ══════════════════════════════════════════════════════════════
 
 def heatmap(pivot, xlabel="", ylabel="", vmax=None,
-            cmap=None, figsize=(6, 7), fmt=".0f",
+            cmap=None, figsize=(6, 7), fmt=".2f",
             xlabels=None, ylabels=None, rotation=0):
     if cmap is None:
         cmap = CMAP_HEATMAP
@@ -198,7 +198,7 @@ def heatmap(pivot, xlabel="", ylabel="", vmax=None,
     plt.figure(figsize=figsize)
     ax = sns.heatmap(
         pivot, cmap=cmap,
-        vmin=None, vmax=None,
+        vmin=0, vmax=1,
         linewidths=0.1,
         annot=True, fmt=fmt,
         annot_kws={"size": 9})
