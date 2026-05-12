@@ -1,35 +1,35 @@
-# Prädiktive Direkte Demokratie
+# Predictive Direct Democracy
 
-Datenprojekt zur Frage, wie stark die Empfehlungen politischer Akteure mit eidgenössischen Volksentscheiden in der Schweiz übereinstimmen.
+Data project investigating how closely the recommendations of political actors align with federal popular vote outcomes in Switzerland.
 
-Im Zentrum stehen:
+The main focus areas are:
 
-- **Institutionelle Kongruenz** (Bundesrat, Bundesversammlung, Parteien)
-- **Zeitliche Entwicklung** (seit 1848)
-- **Thematische Unterschiede** (Politikbereiche)
-- **Geografische Unterschiede** (kantonale Muster)
+- **Institutional congruence** (Federal Council, Federal Assembly, political parties)
+- **Temporal development** (since 1848)
+- **Thematic differences** (policy areas)
+- **Geographical differences** (cantonal patterns)
 
-Grundlage ist der Swissvotes-Datensatz (Universität Bern / Année Politique Suisse).
+The project is based on the Swissvotes dataset (University of Bern / Année Politique Suisse).
 
-## Forschungsfrage
+## Research Question
 
-Wie stark stimmen die Abstimmungsempfehlungen von Bundesrat, Bundesversammlung und grossen Parteien mit dem effektiven Volksentscheid überein, und wie verändert sich diese Übereinstimmung über Zeit, Themenfelder und Regionen?
+How closely do the voting recommendations of the Federal Council, the Federal Assembly, and major parties match actual popular vote outcomes, and how does this alignment change over time, across policy topics, and across regions?
 
-## Datengrundlage
+## Data Foundation
 
-- **Quelle:** Swissvotes
-- **Zeitraum:** 1848 bis 2026 (abhängig vom Datenstand)
-- **Rohdaten:** `data/raw/DATASET CSV 11-02-2026.csv`
+- **Source:** Swissvotes
+- **Period:** 1848 to 2026 (depending on dataset updates)
+- **Raw data:** `data/raw/DATASET CSV 11-02-2026.csv`
 - **Codebook:** `data/raw/CODEBOOK.pdf`
 
-## Projektstruktur
+## Project Structure
 
 ```text
 .
 ├── data/
-│   ├── raw/                  # Rohdaten und GeoJSON
-│   └── processed/            # Aufbereitete Zwischenstände (CSV)
-├── notebooks/                # Hauptanalysen in Jupyter Notebooks
+│   ├── raw/                  # Raw data and GeoJSON
+│   └── processed/            # Processed intermediate outputs (CSV)
+├── notebooks/                # Main analyses in Jupyter notebooks
 │   ├── data_wrangling.ipynb
 │   ├── Berechnung_Positionen.ipynb
 │   ├── Institutionelle_Analyse.ipynb
@@ -37,16 +37,16 @@ Wie stark stimmen die Abstimmungsempfehlungen von Bundesrat, Bundesversammlung u
 │   ├── Thematisch_Analyse.ipynb
 │   ├── heatmap.ipynb
 │   ├── geomap.ipynb
-│   └── visualisierungen.py   # Wiederverwendbare Plot-Funktionen
-├── Blog/                     # Blogtexte und exportierte Visualisierungen
+│   └── visualisierungen.py   # Reusable plotting functions
+├── Blog/                     # Blog texts and exported visualizations
 │   └── blog_plots/
-├── Grundlagen/               # Zusatzanalysen, Tabellen, Chart-Generator
+├── Grundlagen/               # Additional analyses, tables, chart generator
 └── pyproject.toml
 ```
 
 ## Setup
 
-### Voraussetzungen
+### Requirements
 
 - Python **3.12+**
 - [uv](https://docs.astral.sh/uv/)
@@ -57,61 +57,61 @@ Wie stark stimmen die Abstimmungsempfehlungen von Bundesrat, Bundesversammlung u
 uv sync --dev
 ```
 
-Jupyter starten:
+Start Jupyter:
 
 ```bash
 uv run jupyter lab
 ```
 
-## Reproduzierbarer Workflow
+## Reproducible Workflow
 
-Die Notebooks bauen aufeinander auf. Für eine saubere Reproduktion in dieser Reihenfolge ausführen:
+The notebooks build on each other. For clean reproduction, run them in this order:
 
 1. `notebooks/data_wrangling.ipynb`  
-   - liest Rohdaten aus `data/raw/`
-   - erstellt `data/processed/swissvotes_processed.csv`
+   - reads raw data from `data/raw/`
+   - creates `data/processed/swissvotes_processed.csv`
 
 2. `notebooks/Berechnung_Positionen.ipynb`  
-   - berechnet Kongruenz-/Zustimmungswerte
-   - erstellt:
+   - computes congruence/agreement scores
+   - creates:
      - `data/processed/df_with_positions.csv`
      - `data/processed/df_heatmap_with_positions.csv`
 
-3. Analyse-Notebooks:
+3. Analysis notebooks:
    - `notebooks/Institutionelle_Analyse.ipynb`
    - `notebooks/Zeitliche_Analyse.ipynb`
    - `notebooks/Thematisch_Analyse.ipynb`
    - `notebooks/heatmap.ipynb`
    - `notebooks/geomap.ipynb`
 
-4. Blog-Visualisierungen und Texte:
-   - Export-Grafiken landen vor allem in `Blog/blog_plots/`
-   - Textbausteine liegen in `Blog/*.md`
+4. Blog visualizations and text:
+   - Exported charts are mainly written to `Blog/blog_plots/`
+   - Text modules are stored in `Blog/*.md`
 
-## Zusätzliche Auswertungen
+## Additional Evaluations
 
-Im Ordner `Grundlagen/` gibt es ergänzende Skripte und Artefakte:
+The `Grundlagen/` folder contains supplementary scripts and artifacts:
 
-- `generate_charts.py` (zusätzliche deskriptive Charts)
-- `Swissvotes_Uebersicht.md` (dokumentierte Datensatzübersicht)
-- CSV-Tabellen für Einbindung in Berichte/Blog
+- `generate_charts.py` (additional descriptive charts)
+- `Swissvotes_Uebersicht.md` (documented dataset overview)
+- CSV tables for use in reports/blog posts
 
-Ausführung (im Ordner `Grundlagen`):
+Run (inside `Grundlagen`):
 
 ```bash
 uv run python generate_charts.py
 ```
 
-## Technologie-Stack
+## Technology Stack
 
 - `pandas`, `numpy`
 - `matplotlib`, `seaborn`, `plotly`
 - `scikit-learn`, `statsmodels`
 - `geopandas`
-- Jupyter Notebooks
+- Jupyter notebooks
 
-## Hinweise
+## Notes
 
-- Das Repository enthält auch ältere Notebook-Versionen unter `notebooks/Old Notebooks/`.
-- Geodaten für Karten liegen in `data/raw/ch.json`.
-- Einige Outputs sind bereits versioniert, damit Ergebnisse direkt nachvollzogen werden können.
+- The repository also contains older notebook versions in `notebooks/Old Notebooks/`.
+- Geodata for maps is located in `data/raw/ch.json`.
+- Some outputs are versioned so results can be inspected directly.
