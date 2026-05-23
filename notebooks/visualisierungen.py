@@ -542,3 +542,144 @@ def liniendiagramm_interaktiv_zeitwahl(
     fig.update_layout(**layout_args)
 
     return fig
+
+def boxplot_interaktiv_zeitwahl(
+    df,
+    wert_cols,
+    hauptgruppe_spalte,                  # NEU: Pflichtparameter
+    phasen_spalte='phase',
+    label_map=None,
+    farben_map=None,
+    zeit_spalten=None,
+    hauptgruppe_reihenfolge=None,        # NEU: optionale x-Reihenfolge
+    default_label='Gesamte Zeitperiode',
+    titel="",
+    xlabel="Hauptgruppe",
+    ylabel="Wert",
+    legend_titel="Akteur",
+    yrange=None,
+    hline=0,
+    fuell_alpha=0.3,                     # deutlich transparenter als vorher
+):
+    # Hilfsfunktion: Hex zu rgba, damit wir Alpha setzen können
+    def hex_zu_rgba(hex_farbe, alpha):
+        if hex_farbe is None:
+            return None
+        h = hex_farbe.lstrip('#')
+        r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+        return f'rgba({r}, {g}, {b}, {alpha})'
+
+    if label_map is None:
+        label_map = {col: col for col in wert_cols}
+    if farben_map is None:
+        farben_map = {}
+    if zeit_spalten is None:
+        zeit_spalten = {
+            'Gesamte Zeitperiode': None,
+            '1848 bis 1899': 'phase1_fruehphase',
+            '1900 bis 1949': 'phase2_volatile',
+            '1950 bis 1980': 'phase3_konsens',
+            '1981 bis 2009': 'phase4_aufspaltung',
+            '2010 bis heute': 'phase5_2010_heute',
+        }
+
+    fig = go.Figure()
+    n_boxen = len(wert_cols)
+
+    # Pro Zeitauswahl ein Trace pro Akteur, x ist jetzt die Hauptgruppe
+    for label, phase in zeit_spalten.items():
+        if phase is None:
+            df_subset = df
+        else:
+            df_subset = df[df[phasen_spalte] == phase]
+
+        for col in wert_cols:
+            name = label_map.get(col, col)
+            farbe = farben_map.get(name)
+            fuellung = hex_zu_rgba(farbe, fuell_alpha)
+
+            fig.add_trace(go.Box(
+                y=df_subset[col],
+                x=df_subset[hauptgruppe_spalte],   # NEU: Hauptgruppe als x
+                name=name,
+                fillcolor=fuellung,
+                line=dict(color=farbe, width=1.2),
+                marker=dict(
+                    color=farbe,
+                    size=4,
+                    opacity=0.85,                  # Punkte gut sichtbar
+                    line=dict(width=0),
+                ),
+                boxpoints='all',
+                jitter=0.4,
+                pointpos=0,
+                visible=(label == default_label),
+                boxmean=True,
+                showlegend=False,                  # Legende läuft über Dummies
+            ))
+
+    # Stabile Legende: ein unsichtbarer Punkt pro Akteur, der nicht weggeschaltet wird
+    for col in wert_cols:
+        name = label_map.get(col, col)
+        farbe = farben_map.get(name)
+        fig.add_trace(go.Scatter(
+            x=[None], y=[None],
+            mode='markers',
+            marker=dict(size=10, color=farbe),
+            name=name,
+            showlegend=True,
+            hoverinfo='skip',
+        ))
+
+    # Buttons: Box-Traces durchschalten, Dummy-Traces am Ende immer sichtbar lassen
+    n_box_traces = n_boxen * len(zeit_spalten)
+    buttons = []
+    for i, label in enumerate(zeit_spalten.keys()):
+        visible = [False] * n_box_traces
+        for j in range(n_boxen):
+            visible[i * n_boxen + j] = True
+        visible.extend([True] * n_boxen)           # Legenden-Traces immer an
+        buttons.append(dict(
+            label=label,
+            method="update",
+            args=[{"visible": visible}],
+        ))
+
+    if hline is not None:
+        fig.add_hline(
+            y=hline, line_dash="dash",
+            line_color=AKZENTFARBE, line_width=1, opacity=1,
+        )
+
+    yaxis_settings = {'title': ylabel}
+    if yrange is not None:
+        yaxis_settings['range'] = list(yrange)
+
+    xaxis_settings = dict(title=xlabel)
+    if hauptgruppe_reihenfolge is not None:
+        xaxis_settings['categoryorder'] = 'array'
+        xaxis_settings['categoryarray'] = hauptgruppe_reihenfolge
+
+    fig.update_layout(
+        title=titel,
+        hovermode=False,
+        boxmode='group',                           # WICHTIG: Akteure pro Hauptgruppe nebeneinander
+        xaxis=xaxis_settings,
+        yaxis=yaxis_settings,
+        template="simple_white",
+        font=dict(family="Arial", size=13),
+        legend=dict(title=legend_titel),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        updatemenus=[dict(
+            type="buttons",
+            direction="right",
+            x=0.5, xanchor="center",
+            y=1.15, yanchor="top",
+            buttons=buttons,
+            showactive=True,
+        )],
+        margin=dict(t=100),
+    )
+
+    return fig
