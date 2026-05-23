@@ -5,8 +5,6 @@ from visualisierungen import heatmap
 from visualisierungen import heatmap as heat
 """
 
-# BALKENDIAGRAMM
-
 from pathlib import Path
 
 import geopandas as gpd
@@ -25,7 +23,6 @@ from matplotlib.colors import ListedColormap
 HAUPTFARBE = "#4477AA"
 AKZENTFARBE = "#CC6677"
 
-# Blau, Altrosa, Sand, Himmel, Purpur, Teal
 PALETTE_KATEGORIAL = ["#4477AA", "#CC6677", "#DDCC77", "#88CCEE", "#AA4499", "#44AA99"]
 PALETTE_KATEGORIAL_VIELE_WERTE = ["#4477AA", "#CC6677", "#DDCC77", "#88CCEE", "#AA4499", "#44AA99", "#332288", "#882255", "#999933", "#66CCEE", "#117733", "#AA7744", "#6699CC", "#CC9988", "#44BB99"]
 PALETTE_SNS = sns.color_palette(PALETTE_KATEGORIAL)
@@ -33,19 +30,16 @@ PALETTE_SNS = sns.color_palette(PALETTE_KATEGORIAL)
 CMAP_HEATMAP = "coolwarm"
 CMAP_DIVERGIEREND = "coolwarm"
 
-# GeoJSON Kantone (Simplemaps, data/raw/ch.json): properties «id» z. B. CHZH, «name» englisch
 _DEFAULT_CH_GEOJSON = Path(__file__).resolve().parent.parent / "data" / "raw" / "ch.json"
 
 
 def palette_farben(n):
-    """Gibt n Farben aus der kategorialen Palette zurück."""
     if n <= len(PALETTE_KATEGORIAL):
         return sns.color_palette(PALETTE_KATEGORIAL[:n])
     return sns.color_palette(PALETTE_KATEGORIAL, n_colors=n)
 
 
 def _annotate_bars(ax, fmt=".0f"):
-    """Hilfsfunktion: Werte über Balken schreiben."""
     for p in ax.patches:
         h = p.get_height()
         if pd.notna(h) and h != 0:
@@ -54,6 +48,17 @@ def _annotate_bars(ax, fmt=".0f"):
                         ha="center", va="bottom",
                         fontsize=9, xytext=(0, 3),
                         textcoords="offset points")
+
+
+def _transparent(fig, ax=None):
+    """Setzt Figure- und Axes-Hintergrund auf transparent."""
+    fig.patch.set_facecolor("none")
+    if ax is not None:
+        if hasattr(ax, "__iter__"):
+            for a in ax:
+                a.set_facecolor("none")
+        else:
+            ax.set_facecolor("none")
 
 
 # ══════════════════════════════════════════════════════════════
@@ -69,6 +74,7 @@ def balkendiagramm(data, x, y, hue=None, xlabel="", ylabel="", titel="",
 
     sns.set_style("whitegrid")
     fig, ax = plt.subplots(figsize=figsize)
+    _transparent(fig, ax)
     sns.barplot(data=data, x=x, y=y, hue=hue,
                 palette=palette, legend=hue is not None, order=order, ax=ax)
 
@@ -103,6 +109,7 @@ def balkendiagramm_sortiert(data, x, y, xlabel="", ylabel="", titel="",
 
     sns.set_style("whitegrid")
     fig, ax = plt.subplots(figsize=figsize)
+    _transparent(fig, ax)
     sns.barplot(data=data, x=x, y=y,
                 order=sortiert[x], hue=x, hue_order=sortiert[x],
                 palette=palette, legend=False, ax=ax)
@@ -136,6 +143,9 @@ def gestapeltes_balkendiagramm(df, xlabel="", ylabel="Anteil (%)",
         color=palette, figsize=figsize,
         edgecolor="none", legend=True)
 
+    plt.gcf().patch.set_facecolor("none")
+    plt.gca().set_facecolor("none")
+
     fig.legend(title=legend_titel, loc="center left",
               bbox_to_anchor=(1, 0.5), frameon=False)
 
@@ -167,10 +177,12 @@ def anteilsdiagramm(data, x, hue, xlabel="", ylabel="Anteil",
 
     sns.set_style("whitegrid")
     plt.figure(figsize=figsize)
+    plt.gcf().patch.set_facecolor("none")
     ax = sns.histplot(
         data=data, x=x, hue=hue,
         palette=palette,
         multiple="fill", stat="percent", discrete=True)
+    ax.set_facecolor("none")
 
     if xlabels:
         ax.set_xticklabels(xlabels)
@@ -196,12 +208,14 @@ def heatmap(pivot, xlabel="", ylabel="", vmax=None,
 
     sns.set_style("whitegrid")
     plt.figure(figsize=figsize)
+    plt.gcf().patch.set_facecolor("none")
     ax = sns.heatmap(
         pivot, cmap=cmap,
         vmin=0, vmax=1,
         linewidths=0.1,
         annot=True, fmt=fmt,
         annot_kws={"size": 9})
+    ax.set_facecolor("none")
     ax.xaxis.tick_top()
     ax.set_xticklabels(ax.get_xticklabels(), rotation=90, ha="center")
     ax.xaxis.set_label_position("top")
@@ -229,8 +243,10 @@ def boxplot(data, x=None, y=None, hue=None, titel="", xlabel="", ylabel="",
         farbe = HAUPTFARBE
 
     sns.set_style("whitegrid")
-    fig = plt.figure(figsize=figsize)    # <-- fig hier abfangen
-    sns.boxplot(data=data, x=x, y=y, hue=hue, color=farbe, palette=palette, width=width)
+    fig, ax = plt.subplots(figsize=figsize)
+    _transparent(fig, ax)
+    sns.boxplot(data=data, x=x, y=y, hue=hue, color=farbe,
+                palette=palette, width=width, ax=ax)
 
     if hline is not None:
         plt.axhline(hline, color="#CC6677", linestyle="--", linewidth=1, alpha=0.7)
@@ -241,8 +257,7 @@ def boxplot(data, x=None, y=None, hue=None, titel="", xlabel="", ylabel="",
     plt.xticks(rotation=rotation)
     if hue:
         plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-    plt.tight_layout()
-    plt.close(fig)
+    fig.tight_layout()
     return fig
 
 
@@ -257,10 +272,12 @@ def scatterplot(data, x, y, size=None, titel="", xlabel="", ylabel="",
 
     sns.set_style("whitegrid")
     plt.figure(figsize=figsize)
+    plt.gcf().patch.set_facecolor("none")
     ax = sns.scatterplot(
         data=data, x=x, y=y,
         size=size, sizes=sizes,
         alpha=alpha, color=farbe, hue=hue, palette=palette)
+    ax.set_facecolor("none")
 
     ax.legend(title=legendentitel)
     plt.title(titel, fontsize=14) if titel else None
@@ -282,7 +299,9 @@ def histogramm(data, spalte, bins=50, titel="", xlabel="", ylabel="Anzahl",
 
     sns.set_style("whitegrid")
     plt.figure(figsize=figsize)
-    sns.histplot(data[spalte], bins=bins, color=farbe)
+    plt.gcf().patch.set_facecolor("none")
+    ax = sns.histplot(data[spalte], bins=bins, color=farbe)
+    ax.set_facecolor("none")
 
     if vlines:
         for val, label in vlines:
@@ -310,6 +329,7 @@ def countplot(data, x, titel="", xlabel="", ylabel="Anzahl Nennungen",
 
     sns.set_style("whitegrid")
     fig, ax = plt.subplots(figsize=figsize)
+    _transparent(fig, ax)
     sns.countplot(data=data, x=x, color=farbe, ax=ax)
 
     if annotate:
@@ -338,12 +358,13 @@ def liniendiagramm(data, x, y, hue=None, titel="", xlabel="", ylabel="",
 
     sns.set_style("whitegrid")
     plt.figure(figsize=figsize)
-    sns.lineplot(
+    plt.gcf().patch.set_facecolor("none")
+    ax = sns.lineplot(
         data=data, x=x, y=y, hue=hue,
         palette=palette, color=farbe,
-        marker=marker, linewidth=linewidth,  errorbar="ci" if errorbar else None)
+        marker=marker, linewidth=linewidth, errorbar="ci" if errorbar else None)
+    ax.set_facecolor("none")
 
-    # Horizontale Referenzlinie
     if hline is not None:
         plt.axhline(hline, color="#CC6677", linestyle="--", linewidth=1, alpha=0.7)
 
@@ -356,10 +377,10 @@ def liniendiagramm(data, x, y, hue=None, titel="", xlabel="", ylabel="",
     plt.tight_layout()
     plt.show()
 
+
 # ══════════════════════════════════════════════════════════════
 # 11. MAP SCHWEIZERKARTE
 # ══════════════════════════════════════════════════════════════
-
 
 def schweiz_karte_choropleth(
     data,
@@ -377,24 +398,6 @@ def schweiz_karte_choropleth(
     vmin=None,
     vmax=None,
 ):
-    """
-    Statische Choroplethenkarte (Schweiz), Kantone.
-
-    Standard ist ``data/raw/ch.json`` (Simplemaps): Join-Spalte ``id`` mit Werten wie
-    «CHZH», «CHBE». Bei zwei Buchstaben im Datensatz z. B. ``df['id'] = 'CH' + df['kt']``.
-
-    Parameters
-    ----------
-    data : pandas.DataFrame
-        Enthält ``join_data`` und ``wert_spalte``.
-    geojson_pfad : str oder pathlib.Path, optional
-        GeoJSON mit Kantonsgrenzen. Standard: Projektdatei ``data/raw/ch.json``.
-    join_data / join_geo : str
-        Spalte in ``data`` bzw. in den Geometriedaten (bei ch.json typisch beide ``id``
-        oder z. B. ``name`` für englische Kantonsnamen).
-    vmin, vmax : float, optional
-        Farbskala-Grenzen (wie bei klassischen Heatmaps).
-    """
     if cmap is None:
         cmap = CMAP_HEATMAP
 
@@ -421,6 +424,7 @@ def schweiz_karte_choropleth(
 
     sns.set_style("white")
     fig, ax = plt.subplots(figsize=figsize)
+    _transparent(fig, ax)
 
     plot_kwds = {
         "column": wert_spalte,
@@ -445,8 +449,6 @@ def schweiz_karte_choropleth(
     plt.show()
 
 
-
-
 # ══════════════════════════════════════════════════════════════
 # 12. INTERAKTIVES LINIENDIAGRAMM MIT ZEITAUSWAHL
 # ══════════════════════════════════════════════════════════════
@@ -465,12 +467,6 @@ def liniendiagramm_interaktiv_zeitwahl(
     yrange=None,
     hline=0,
 ):
-    """
-    Interaktiver Lineplot mit Buttons für die Zeitaggregation.
-    Hovermode 'x unified' zeigt alle Akteure am selben x-Wert.
-    Doppelklick auf Akteur in Legende isoliert die Linie.
-    """
-    # --- Defaults ---
     if label_map is None:
         label_map = {col: col for col in wert_cols}
     if farben_map is None:
@@ -485,7 +481,6 @@ def liniendiagramm_interaktiv_zeitwahl(
     fig = go.Figure()
     n_linien = len(wert_cols)
 
-    # --- Pro Zeit-Aggregation alle Linien einfügen ---
     for label, spalte in zeit_spalten.items():
         agg = df.groupby(spalte)[wert_cols].mean().reset_index()
 
@@ -503,7 +498,6 @@ def liniendiagramm_interaktiv_zeitwahl(
                 hovertemplate=f"<b>{name}</b>: %{{y:.3f}}<extra></extra>",
             ))
 
-    # --- Buttons ---
     n_traces = n_linien * len(zeit_spalten)
     buttons = []
     for i, label in enumerate(zeit_spalten.keys()):
@@ -516,14 +510,12 @@ def liniendiagramm_interaktiv_zeitwahl(
             args=[{"visible": visible}],
         ))
 
-    # --- Referenzlinie ---
     if hline is not None:
         fig.add_hline(
             y=hline, line_dash="dash",
             line_color=AKZENTFARBE, line_width=1, opacity=0.7,
         )
 
-    # --- Layout ---
     layout_args = dict(
         title=titel,
         xaxis_title=xlabel,
@@ -532,6 +524,8 @@ def liniendiagramm_interaktiv_zeitwahl(
         font=dict(family="Arial", size=13),
         legend=dict(title=legend_titel),
         hovermode="x unified",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
         updatemenus=[dict(
             type="buttons",
             direction="right",
