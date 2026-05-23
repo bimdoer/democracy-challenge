@@ -32,6 +32,114 @@
 
 
 /* ============================================================
+   0a) Basis-Typografie (entspricht PyCharm-Default)
+   ============================================================ */
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #222;
+  max-width: 860px;
+  margin: 2em auto;
+  padding: 0 1.5em;
+  background: #ffffff;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 1.5em 0 0.5em 0;
+  color: #1a1a1a;
+}
+
+h1 { font-size: 1.9em; border-bottom: 1px solid #ddd; padding-bottom: 0.3em; }
+h2 { font-size: 1.45em; }
+h3 { font-size: 1.2em; }
+h4 { font-size: 1.05em; }
+
+p {
+  margin: 0.8em 0;
+}
+
+ul, ol {
+  margin: 0.5em 0 0.8em 0;
+  padding-left: 1.6em;
+}
+
+li {
+  margin: 0.25em 0;
+}
+
+a {
+  color: var(--hauptfarbe-hex);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.9em;
+  background: rgb(240, 240, 240);
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+}
+
+pre {
+  background: rgb(245, 245, 245);
+  padding: 0.8em 1em;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+}
+
+blockquote {
+  border-left: 4px solid #ddd;
+  padding-left: 1em;
+  color: #555;
+  margin: 1em 0;
+}
+
+table {
+  border-collapse: collapse;
+  margin: 1em 0;
+  width: 100%;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 0.5em 0.8em;
+  text-align: left;
+}
+
+th {
+  background: rgb(245, 247, 250);
+  font-weight: 700;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 2em 0;
+}
+
+
+/* ============================================================
    1) GRAFIK-TITEL (oberhalb der Grafik)
    ============================================================ */
 
@@ -200,7 +308,6 @@ details[open] summary {
    8) Buttons
    ============================================================ */
 
-/* Gemeinsame Basis für alle drei Buttons */
 .btn {
   background: transparent;
   border-width: 2px;
@@ -213,7 +320,6 @@ details[open] summary {
   transition: background 0.2s;
 }
 
-/* Zeitlich — Türkis */
 .btn-zeitlich {
   color: #1f5e51;
   border-color: #44AA99;
@@ -222,7 +328,6 @@ details[open] summary {
   background: rgb(229, 244, 240);
 }
 
-/* Geografisch — Olive */
 .btn-geografisch {
   color: #555518;
   border-color: #999933;
@@ -231,11 +336,54 @@ details[open] summary {
   background: rgb(243, 240, 222);
 }
 
-/* Thematisch — Braun */
 .btn-thematisch {
   color: #6b4422;
   border-color: #AA7744;
 }
 .btn-thematisch:hover {
   background: rgb(243, 234, 224);
+}
+
+
+/* ============================================================
+   9) PHASEN-KLAPPER (Türkis, zeitliche Achse)
+   ============================================================ */
+
+.phase {
+  border-left: 4px solid #44AA99;
+  background: rgb(229, 244, 240);
+  padding: 0.8em 1em;
+  margin: 1em 0;
+  border-radius: 0 4px 4px 0;
+}
+
+.phase summary {
+  font-weight: 700;
+  cursor: pointer;
+  color: #1f5e51;
+  list-style: none;
+}
+
+.phase summary::-webkit-details-marker {
+  display: none;
+}
+
+.phase summary::before {
+  content: "▶";
+  display: inline-block;
+  margin-right: 0.5em;
+  font-size: 0.8em;
+  transition: transform 0.2s ease;
+}
+
+.phase[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.phase[open] summary {
+  margin-bottom: 0.5em;
+}
+
+.phase strong {
+  color: #1f5e51;
 }
