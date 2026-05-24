@@ -5,6 +5,7 @@ from visualisierungen import heatmap
 from visualisierungen import heatmap as heat
 """
 
+import math
 from pathlib import Path
 
 import geopandas as gpd
@@ -13,7 +14,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-from matplotlib.colors import ListedColormap
+from plotly.subplots import make_subplots
 
 
 # ══════════════════════════════════════════════════════════════
@@ -24,19 +25,61 @@ HAUPTFARBE = "#4477AA"
 AKZENTFARBE = "#CC6677"
 
 PALETTE_KATEGORIAL = ["#4477AA", "#CC6677", "#DDCC77", "#88CCEE", "#AA4499", "#44AA99"]
-PALETTE_KATEGORIAL_VIELE_WERTE = ["#4477AA", "#CC6677", "#DDCC77", "#88CCEE", "#AA4499", "#44AA99", "#332288", "#882255", "#999933", "#66CCEE", "#117733", "#AA7744", "#6699CC", "#CC9988", "#44BB99"]
+PALETTE_KATEGORIAL_VIELE_WERTE = [
+    "#4477AA", "#CC6677", "#DDCC77", "#88CCEE", "#AA4499", "#44AA99",
+    "#332288", "#882255", "#999933", "#66CCEE", "#117733", "#AA7744",
+    "#6699CC", "#CC9988", "#44BB99",
+]
 PALETTE_SNS = sns.color_palette(PALETTE_KATEGORIAL)
 
 CMAP_HEATMAP = "coolwarm"
 CMAP_DIVERGIEREND = "coolwarm"
 
+
+# ══════════════════════════════════════════════════════════════
+# SCHRIFT, STIL, LAYOUT  (zentral, damit überall konsistent)
+# ══════════════════════════════════════════════════════════════
+
+# Schriftgrössen für Matplotlib/Seaborn
+FONTSIZE_TITEL = 14
+FONTSIZE_ACHSEN = 12
+FONTSIZE_TICKS = 10
+FONTSIZE_KLEIN = 9          # Annotations, kleine Ticks, Heatmap-Werte
+FONTWEIGHT_ACHSEN = "bold"
+
+# Hilfslinien (hlines, vlines) in Matplotlib
+HLINE_LINESTYLE = "--"
+HLINE_LINEWIDTH = 1
+HLINE_ALPHA = 0.7
+HLINE_COLOR = AKZENTFARBE
+
+# Plotly defaults
+PLOTLY_TEMPLATE = "simple_white"
+PLOTLY_FONT_FAMILY = "Arial"
+PLOTLY_FONT_SIZE = 13
+PLOTLY_FONT_SIZE_SUBPLOT = 12
+PLOTLY_BG_TRANSPARENT = "rgba(0,0,0,0)"
+
+
 _DEFAULT_CH_GEOJSON = Path(__file__).resolve().parent.parent / "data" / "raw" / "ch.json"
 
 
+# ══════════════════════════════════════════════════════════════
+# HILFSFUNKTIONEN
+# ══════════════════════════════════════════════════════════════
+
 def palette_farben(n):
-    if n <= len(PALETTE_KATEGORIAL):
-        return sns.color_palette(PALETTE_KATEGORIAL[:n])
+    # sns.color_palette wiederholt die Palette automatisch, wenn n > len(palette)
     return sns.color_palette(PALETTE_KATEGORIAL, n_colors=n)
+
+
+def hex_zu_rgba(hex_farbe, alpha):
+    """Konvertiert eine Hex-Farbe in einen rgba-String mit gegebener Deckkraft."""
+    if hex_farbe is None:
+        return None
+    h = hex_farbe.lstrip('#')
+    r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+    return f'rgba({r}, {g}, {b}, {alpha})'
 
 
 def _annotate_bars(ax, fmt=".0f"):
@@ -46,19 +89,41 @@ def _annotate_bars(ax, fmt=".0f"):
             ax.annotate(f"{h:{fmt}}",
                         (p.get_x() + p.get_width() / 2, h),
                         ha="center", va="bottom",
-                        fontsize=9, xytext=(0, 3),
+                        fontsize=FONTSIZE_KLEIN, xytext=(0, 3),
                         textcoords="offset points")
 
 
 def _transparent(fig, ax=None):
     """Setzt Figure- und Axes-Hintergrund auf transparent."""
     fig.patch.set_facecolor("none")
-    if ax is not None:
-        if hasattr(ax, "__iter__"):
-            for a in ax:
-                a.set_facecolor("none")
-        else:
-            ax.set_facecolor("none")
+    if ax is None:
+        return
+    # ax kann eine einzelne Axes oder ein Array von Axes sein
+    for a in np.atleast_1d(ax).ravel():
+        a.set_facecolor("none")
+
+
+def _baue_zeitwahl_buttons(zeit_spalten, n_traces_pro_label, anzahl_dummy_traces=0):
+    """
+    Erzeugt die Plotly-Buttons für die Zeitauswahl.
+    Pro Label werden n_traces_pro_label aufeinanderfolgende Traces eingeblendet,
+    optional bleiben die letzten anzahl_dummy_traces (typisch Legenden-Dummies)
+    immer sichtbar.
+    """
+    n_box_traces = n_traces_pro_label * len(zeit_spalten)
+    buttons = []
+    for i, label in enumerate(zeit_spalten.keys()):
+        visible = [False] * n_box_traces
+        for j in range(n_traces_pro_label):
+            visible[i * n_traces_pro_label + j] = True
+        if anzahl_dummy_traces > 0:
+            visible.extend([True] * anzahl_dummy_traces)
+        buttons.append(dict(
+            label=label,
+            method="update",
+            args=[{"visible": visible}],
+        ))
+    return buttons
 
 
 # ══════════════════════════════════════════════════════════════
@@ -81,11 +146,12 @@ def balkendiagramm(data, x, y, hue=None, xlabel="", ylabel="", titel="",
     if annotate:
         _annotate_bars(ax, fmt)
 
-    if titel:  ax.set_title(titel, fontsize=14)
-    ax.set_xlabel(xlabel, fontsize=10, fontweight="bold")
-    ax.set_ylabel(ylabel, fontsize=10, fontweight="bold")
-    ax.tick_params(axis='x', labelsize=10, rotation=rotation)
-    ax.tick_params(axis='y', labelsize=10)
+    if titel:
+        ax.set_title(titel, fontsize=FONTSIZE_TITEL)
+    ax.set_xlabel(xlabel, fontsize=FONTSIZE_ACHSEN, fontweight=FONTWEIGHT_ACHSEN)
+    ax.set_ylabel(ylabel, fontsize=FONTSIZE_ACHSEN, fontweight=FONTWEIGHT_ACHSEN)
+    ax.tick_params(axis='x', labelsize=FONTSIZE_TICKS, rotation=rotation)
+    ax.tick_params(axis='y', labelsize=FONTSIZE_TICKS)
     if ylim:
         ax.set_ylim(*ylim)
     if hue:
@@ -117,14 +183,15 @@ def balkendiagramm_sortiert(data, x, y, xlabel="", ylabel="", titel="",
     if annotate:
         _annotate_bars(ax, fmt)
 
-    plt.title(titel, fontsize=14) if titel else None
-    plt.xlabel(xlabel, fontsize=10, fontweight="bold")
-    plt.ylabel(ylabel, fontsize=10, fontweight="bold")
-    plt.xticks(fontsize=9, rotation=rotation)
-    plt.yticks(fontsize=9)
+    if titel:
+        ax.set_title(titel, fontsize=FONTSIZE_TITEL)
+    ax.set_xlabel(xlabel, fontsize=FONTSIZE_ACHSEN, fontweight=FONTWEIGHT_ACHSEN)
+    ax.set_ylabel(ylabel, fontsize=FONTSIZE_ACHSEN, fontweight=FONTWEIGHT_ACHSEN)
+    ax.tick_params(axis='x', labelsize=FONTSIZE_KLEIN, rotation=rotation)
+    ax.tick_params(axis='y', labelsize=FONTSIZE_KLEIN)
     if ylim:
-        plt.ylim(*ylim)
-    plt.tight_layout()
+        ax.set_ylim(*ylim)
+    fig.tight_layout()
     plt.show()
 
 
@@ -136,33 +203,33 @@ def gestapeltes_balkendiagramm(df, xlabel="", ylabel="Anteil (%)",
                                legend_titel="", figsize=(8, 6),
                                xlabels=None, palette=PALETTE_KATEGORIAL,
                                annotate=False, fmt=".0f", min_anteil=5):
+    # legend_titel-Parameter bleibt für API-Kompatibilität, wird aber nicht gerendert
     sns.set_style("whitegrid")
 
-    fig = df.plot(
+    ax = df.plot(
         kind="bar", stacked=True,
         color=palette, figsize=figsize,
         edgecolor="none", legend=True)
+    fig = ax.figure
+    _transparent(fig, ax)
 
-    plt.gcf().patch.set_facecolor("none")
-    plt.gca().set_facecolor("none")
-
-    fig.legend(title=legend_titel, loc="center left",
+    ax.legend(loc="center left",
               bbox_to_anchor=(1, 0.5), frameon=False)
 
     if xlabels:
-        fig.set_xticklabels(xlabels)
+        ax.set_xticklabels(xlabels)
 
     if annotate:
-        for c in fig.containers:
+        for c in ax.containers:
             labels = [f"{v.get_height():{fmt}}%" if v.get_height() >= min_anteil else ""
                       for v in c]
-            fig.bar_label(c, labels=labels, label_type="center", fontsize=9)
+            ax.bar_label(c, labels=labels, label_type="center", fontsize=FONTSIZE_KLEIN)
 
-    plt.xlabel(xlabel, fontsize=12, fontweight="bold")
-    plt.ylabel(ylabel, fontsize=12, fontweight="bold")
-    plt.xticks(fontsize=10, rotation=0)
-    plt.yticks(fontsize=9)
-    plt.tight_layout()
+    ax.set_xlabel(xlabel, fontsize=FONTSIZE_ACHSEN, fontweight=FONTWEIGHT_ACHSEN)
+    ax.set_ylabel(ylabel, fontsize=FONTSIZE_ACHSEN, fontweight=FONTWEIGHT_ACHSEN)
+    ax.tick_params(axis='x', labelsize=FONTSIZE_TICKS, rotation=0)
+    ax.tick_params(axis='y', labelsize=FONTSIZE_KLEIN)
+    fig.tight_layout()
     return fig
 
 
@@ -172,27 +239,27 @@ def gestapeltes_balkendiagramm(df, xlabel="", ylabel="Anteil (%)",
 
 def anteilsdiagramm(data, x, hue, xlabel="", ylabel="Anteil",
                     palette=None, figsize=(8, 5), xlabels=None, titel=''):
+    # titel-Parameter bleibt für API-Kompatibilität, wird aber nicht gerendert
     if palette is None:
         palette = PALETTE_KATEGORIAL
 
     sns.set_style("whitegrid")
-    plt.figure(figsize=figsize)
-    plt.gcf().patch.set_facecolor("none")
-    ax = sns.histplot(
+    fig, ax = plt.subplots(figsize=figsize)
+    _transparent(fig, ax)
+    sns.histplot(
         data=data, x=x, hue=hue,
         palette=palette,
-        multiple="fill", stat="percent", discrete=True)
-    ax.set_facecolor("none")
+        multiple="fill", stat="percent", discrete=True, ax=ax)
 
     if xlabels:
         ax.set_xticklabels(xlabels)
 
-    ax.legend(title=titel)
-    plt.xlabel(xlabel, fontsize=12, fontweight="bold")
-    plt.ylabel(ylabel, fontsize=12, fontweight="bold")
-    plt.xticks(fontsize=9)
-    plt.yticks(fontsize=9)
-    plt.tight_layout()
+    ax.legend()
+    ax.set_xlabel(xlabel, fontsize=FONTSIZE_ACHSEN, fontweight=FONTWEIGHT_ACHSEN)
+    ax.set_ylabel(ylabel, fontsize=FONTSIZE_ACHSEN, fontweight=FONTWEIGHT_ACHSEN)
+    ax.tick_params(axis='x', labelsize=FONTSIZE_KLEIN)
+    ax.tick_params(axis='y', labelsize=FONTSIZE_KLEIN)
+    fig.tight_layout()
     plt.show()
 
 
@@ -207,15 +274,15 @@ def heatmap(pivot, xlabel="", ylabel="", vmax=None,
         cmap = CMAP_HEATMAP
 
     sns.set_style("whitegrid")
-    plt.figure(figsize=figsize)
-    plt.gcf().patch.set_facecolor("none")
-    ax = sns.heatmap(
+    fig, ax = plt.subplots(figsize=figsize)
+    _transparent(fig, ax)
+    sns.heatmap(
         pivot, cmap=cmap,
         vmin=0, vmax=1,
         linewidths=0.1,
         annot=True, fmt=fmt,
-        annot_kws={"size": 9})
-    ax.set_facecolor("none")
+        annot_kws={"size": FONTSIZE_KLEIN},
+        ax=ax)
     ax.xaxis.tick_top()
     ax.set_xticklabels(ax.get_xticklabels(), rotation=90, ha="center")
     ax.xaxis.set_label_position("top")
@@ -225,11 +292,11 @@ def heatmap(pivot, xlabel="", ylabel="", vmax=None,
     if ylabels:
         ax.set_yticklabels(ylabels)
 
-    plt.xlabel(xlabel, fontsize=12, fontweight="bold")
-    plt.ylabel(ylabel, fontsize=12, fontweight="bold")
-    plt.xticks(fontsize=9)
-    plt.yticks(fontsize=9, rotation=rotation)
-    plt.tight_layout()
+    ax.set_xlabel(xlabel, fontsize=FONTSIZE_ACHSEN, fontweight=FONTWEIGHT_ACHSEN)
+    ax.set_ylabel(ylabel, fontsize=FONTSIZE_ACHSEN, fontweight=FONTWEIGHT_ACHSEN)
+    ax.tick_params(axis='x', labelsize=FONTSIZE_KLEIN)
+    ax.tick_params(axis='y', labelsize=FONTSIZE_KLEIN, rotation=rotation)
+    fig.tight_layout()
     plt.show()
 
 
@@ -249,14 +316,18 @@ def boxplot(data, x=None, y=None, hue=None, titel="", xlabel="", ylabel="",
                 palette=palette, width=width, ax=ax)
 
     if hline is not None:
-        plt.axhline(hline, color="#CC6677", linestyle="--", linewidth=1, alpha=0.7)
+        ax.axhline(hline, color=HLINE_COLOR, linestyle=HLINE_LINESTYLE,
+                   linewidth=HLINE_LINEWIDTH, alpha=HLINE_ALPHA)
 
-    if titel:  plt.title(titel, fontsize=14)
-    if xlabel: plt.xlabel(xlabel, fontsize=12)
-    if ylabel: plt.ylabel(ylabel, fontsize=12)
-    plt.xticks(rotation=rotation)
+    if titel:
+        ax.set_title(titel, fontsize=FONTSIZE_TITEL)
+    if xlabel:
+        ax.set_xlabel(xlabel, fontsize=FONTSIZE_ACHSEN)
+    if ylabel:
+        ax.set_ylabel(ylabel, fontsize=FONTSIZE_ACHSEN)
+    ax.tick_params(axis='x', rotation=rotation)
     if hue:
-        plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     fig.tight_layout()
     return fig
 
@@ -266,25 +337,27 @@ def boxplot(data, x=None, y=None, hue=None, titel="", xlabel="", ylabel="",
 # ══════════════════════════════════════════════════════════════
 
 def scatterplot(data, x, y, size=None, titel="", xlabel="", ylabel="",
-                sizes=(20, 800), alpha=0.4, farbe=None, hue=None, figsize=(10, 5), rotation=0, legendentitel='', palette=None):
+                sizes=(20, 800), alpha=0.4, farbe=None, hue=None,
+                figsize=(10, 5), rotation=0, legendentitel='', palette=None):
+    # legendentitel-Parameter bleibt für API-Kompatibilität, wird aber nicht gerendert
     if farbe is None:
         farbe = HAUPTFARBE
 
     sns.set_style("whitegrid")
-    plt.figure(figsize=figsize)
-    plt.gcf().patch.set_facecolor("none")
-    ax = sns.scatterplot(
+    fig, ax = plt.subplots(figsize=figsize)
+    _transparent(fig, ax)
+    sns.scatterplot(
         data=data, x=x, y=y,
         size=size, sizes=sizes,
-        alpha=alpha, color=farbe, hue=hue, palette=palette)
-    ax.set_facecolor("none")
+        alpha=alpha, color=farbe, hue=hue, palette=palette, ax=ax)
 
-    ax.legend(title=legendentitel)
-    plt.title(titel, fontsize=14) if titel else None
-    plt.xlabel(xlabel, fontsize=12, fontweight="bold")
-    plt.ylabel(ylabel, fontsize=12, fontweight="bold")
-    plt.xticks(rotation=rotation)
-    plt.tight_layout()
+    ax.legend()
+    if titel:
+        ax.set_title(titel, fontsize=FONTSIZE_TITEL)
+    ax.set_xlabel(xlabel, fontsize=FONTSIZE_ACHSEN, fontweight=FONTWEIGHT_ACHSEN)
+    ax.set_ylabel(ylabel, fontsize=FONTSIZE_ACHSEN, fontweight=FONTWEIGHT_ACHSEN)
+    ax.tick_params(axis='x', rotation=rotation)
+    fig.tight_layout()
     plt.show()
 
 
@@ -298,22 +371,23 @@ def histogramm(data, spalte, bins=50, titel="", xlabel="", ylabel="Anzahl",
         farbe = HAUPTFARBE
 
     sns.set_style("whitegrid")
-    plt.figure(figsize=figsize)
-    plt.gcf().patch.set_facecolor("none")
-    ax = sns.histplot(data[spalte], bins=bins, color=farbe)
-    ax.set_facecolor("none")
+    fig, ax = plt.subplots(figsize=figsize)
+    _transparent(fig, ax)
+    sns.histplot(data[spalte], bins=bins, color=farbe, ax=ax)
 
     if vlines:
         for val, label in vlines:
-            plt.axvline(val, color=AKZENTFARBE, linestyle='--', label=label)
-        plt.legend()
+            ax.axvline(val, color=AKZENTFARBE, linestyle=HLINE_LINESTYLE, label=label)
+        ax.legend()
 
-    plt.title(titel, fontsize=14) if titel else None
-    plt.xlabel(xlabel, fontsize=12, fontweight="bold")
-    plt.ylabel(ylabel, fontsize=12, fontweight="bold", rotation=rotation)
+    if titel:
+        ax.set_title(titel, fontsize=FONTSIZE_TITEL)
+    ax.set_xlabel(xlabel, fontsize=FONTSIZE_ACHSEN, fontweight=FONTWEIGHT_ACHSEN)
+    ax.set_ylabel(ylabel, fontsize=FONTSIZE_ACHSEN, fontweight=FONTWEIGHT_ACHSEN,
+                  rotation=rotation)
     if xlim:
-        plt.xlim(*xlim)
-    plt.tight_layout()
+        ax.set_xlim(*xlim)
+    fig.tight_layout()
     plt.show()
 
 
@@ -335,12 +409,13 @@ def countplot(data, x, titel="", xlabel="", ylabel="Anzahl Nennungen",
     if annotate:
         _annotate_bars(ax, fmt=".0f")
 
-    plt.title(titel, fontsize=14) if titel else None
-    plt.xlabel(xlabel, fontsize=12, fontweight="bold")
-    plt.ylabel(ylabel, fontsize=12, fontweight="bold")
-    plt.xticks(fontsize=9, rotation=rotation)
-    plt.yticks(fontsize=9)
-    plt.tight_layout()
+    if titel:
+        ax.set_title(titel, fontsize=FONTSIZE_TITEL)
+    ax.set_xlabel(xlabel, fontsize=FONTSIZE_ACHSEN, fontweight=FONTWEIGHT_ACHSEN)
+    ax.set_ylabel(ylabel, fontsize=FONTSIZE_ACHSEN, fontweight=FONTWEIGHT_ACHSEN)
+    ax.tick_params(axis='x', labelsize=FONTSIZE_KLEIN, rotation=rotation)
+    ax.tick_params(axis='y', labelsize=FONTSIZE_KLEIN)
+    fig.tight_layout()
     plt.show()
 
 
@@ -357,24 +432,29 @@ def liniendiagramm(data, x, y, hue=None, titel="", xlabel="", ylabel="",
         farbe = HAUPTFARBE
 
     sns.set_style("whitegrid")
-    plt.figure(figsize=figsize)
-    plt.gcf().patch.set_facecolor("none")
-    ax = sns.lineplot(
+    fig, ax = plt.subplots(figsize=figsize)
+    _transparent(fig, ax)
+    sns.lineplot(
         data=data, x=x, y=y, hue=hue,
         palette=palette, color=farbe,
-        marker=marker, linewidth=linewidth, errorbar="ci" if errorbar else None)
-    ax.set_facecolor("none")
+        marker=marker, linewidth=linewidth,
+        errorbar="ci" if errorbar else None,
+        ax=ax)
 
     if hline is not None:
-        plt.axhline(hline, color="#CC6677", linestyle="--", linewidth=1, alpha=0.7)
+        ax.axhline(hline, color=HLINE_COLOR, linestyle=HLINE_LINESTYLE,
+                   linewidth=HLINE_LINEWIDTH, alpha=HLINE_ALPHA)
 
-    plt.title(titel, fontsize=14) if titel else None
-    plt.xlabel(xlabel, fontsize=12, fontweight="bold")
-    plt.ylabel(ylabel, fontsize=12, fontweight="bold")
-    plt.xticks(fontsize=10, rotation=rotation)
-    plt.yticks(fontsize=10)
-    plt.ylim(-0.5, 0.5)
-    plt.tight_layout()
+    if titel:
+        ax.set_title(titel, fontsize=FONTSIZE_TITEL)
+    ax.set_xlabel(xlabel, fontsize=FONTSIZE_ACHSEN, fontweight=FONTWEIGHT_ACHSEN)
+    ax.set_ylabel(ylabel, fontsize=FONTSIZE_ACHSEN, fontweight=FONTWEIGHT_ACHSEN)
+    ax.tick_params(axis='x', labelsize=FONTSIZE_TICKS, rotation=rotation)
+    ax.tick_params(axis='y', labelsize=FONTSIZE_TICKS)
+    # y-Bereich ist bewusst fix, da diese Funktion für Übereinstimmungswerte
+    # zwischen -0.5 und 0.5 gedacht ist
+    ax.set_ylim(-0.5, 0.5)
+    fig.tight_layout()
     plt.show()
 
 
@@ -443,9 +523,9 @@ def schweiz_karte_choropleth(
 
     merged.plot(**plot_kwds)
 
-    ax.set_title(titel, fontsize=14)
+    ax.set_title(titel, fontsize=FONTSIZE_TITEL)
     ax.set_axis_off()
-    plt.tight_layout()
+    fig.tight_layout()
     plt.show()
 
 
@@ -467,6 +547,7 @@ def liniendiagramm_interaktiv_zeitwahl(
     yrange=None,
     hline=0,
 ):
+    # legend_titel-Parameter bleibt für API-Kompatibilität, wird aber nicht gerendert
     if label_map is None:
         label_map = {col: col for col in wert_cols}
     if farben_map is None:
@@ -498,34 +579,23 @@ def liniendiagramm_interaktiv_zeitwahl(
                 hovertemplate=f"<b>{name}</b>: %{{y:.3f}}<extra></extra>",
             ))
 
-    n_traces = n_linien * len(zeit_spalten)
-    buttons = []
-    for i, label in enumerate(zeit_spalten.keys()):
-        visible = [False] * n_traces
-        for j in range(n_linien):
-            visible[i * n_linien + j] = True
-        buttons.append(dict(
-            label=label,
-            method="update",
-            args=[{"visible": visible}],
-        ))
+    buttons = _baue_zeitwahl_buttons(zeit_spalten, n_linien)
 
     if hline is not None:
         fig.add_hline(
             y=hline, line_dash="dash",
-            line_color=AKZENTFARBE, line_width=1, opacity=0.7,
+            line_color=AKZENTFARBE, line_width=1, opacity=HLINE_ALPHA,
         )
 
     layout_args = dict(
         title=titel,
         xaxis_title=xlabel,
         yaxis_title=ylabel,
-        template="simple_white",
-        font=dict(family="Arial", size=13),
-        legend=dict(title=legend_titel),
+        template=PLOTLY_TEMPLATE,
+        font=dict(family=PLOTLY_FONT_FAMILY, size=PLOTLY_FONT_SIZE),
         hovermode="x unified",
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor=PLOTLY_BG_TRANSPARENT,
+        plot_bgcolor=PLOTLY_BG_TRANSPARENT,
         updatemenus=[dict(
             type="buttons",
             direction="right",
@@ -543,15 +613,20 @@ def liniendiagramm_interaktiv_zeitwahl(
 
     return fig
 
+
+# ══════════════════════════════════════════════════════════════
+# 13. INTERAKTIVER BOXPLOT MIT ZEITAUSWAHL
+# ══════════════════════════════════════════════════════════════
+
 def boxplot_interaktiv_zeitwahl(
     df,
     wert_cols,
-    hauptgruppe_spalte,                  # NEU: Pflichtparameter
+    hauptgruppe_spalte,
     phasen_spalte='phase',
     label_map=None,
     farben_map=None,
     zeit_spalten=None,
-    hauptgruppe_reihenfolge=None,        # NEU: optionale x-Reihenfolge
+    hauptgruppe_reihenfolge=None,
     default_label='Gesamte Zeitperiode',
     titel="",
     xlabel="Hauptgruppe",
@@ -559,16 +634,9 @@ def boxplot_interaktiv_zeitwahl(
     legend_titel="Akteur",
     yrange=None,
     hline=0,
-    fuell_alpha=0.3,                     # deutlich transparenter als vorher
+    fuell_alpha=0.3,
 ):
-    # Hilfsfunktion: Hex zu rgba, damit wir Alpha setzen können
-    def hex_zu_rgba(hex_farbe, alpha):
-        if hex_farbe is None:
-            return None
-        h = hex_farbe.lstrip('#')
-        r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
-        return f'rgba({r}, {g}, {b}, {alpha})'
-
+    # legend_titel-Parameter bleibt für API-Kompatibilität, wird aber nicht gerendert
     if label_map is None:
         label_map = {col: col for col in wert_cols}
     if farben_map is None:
@@ -586,7 +654,6 @@ def boxplot_interaktiv_zeitwahl(
     fig = go.Figure()
     n_boxen = len(wert_cols)
 
-    # Pro Zeitauswahl ein Trace pro Akteur, x ist jetzt die Hauptgruppe
     for label, phase in zeit_spalten.items():
         if phase is None:
             df_subset = df
@@ -600,14 +667,14 @@ def boxplot_interaktiv_zeitwahl(
 
             fig.add_trace(go.Box(
                 y=df_subset[col],
-                x=df_subset[hauptgruppe_spalte],   # NEU: Hauptgruppe als x
+                x=df_subset[hauptgruppe_spalte],
                 name=name,
                 fillcolor=fuellung,
                 line=dict(color=farbe, width=1.2),
                 marker=dict(
                     color=farbe,
                     size=4,
-                    opacity=0.85,                  # Punkte gut sichtbar
+                    opacity=0.85,
                     line=dict(width=0),
                 ),
                 boxpoints='all',
@@ -615,10 +682,10 @@ def boxplot_interaktiv_zeitwahl(
                 pointpos=0,
                 visible=(label == default_label),
                 boxmean=True,
-                showlegend=False,                  # Legende läuft über Dummies
+                showlegend=False,
             ))
 
-    # Stabile Legende: ein unsichtbarer Punkt pro Akteur, der nicht weggeschaltet wird
+    # Stabile Legende über Dummy-Punkte, immer sichtbar
     for col in wert_cols:
         name = label_map.get(col, col)
         farbe = farben_map.get(name)
@@ -631,19 +698,7 @@ def boxplot_interaktiv_zeitwahl(
             hoverinfo='skip',
         ))
 
-    # Buttons: Box-Traces durchschalten, Dummy-Traces am Ende immer sichtbar lassen
-    n_box_traces = n_boxen * len(zeit_spalten)
-    buttons = []
-    for i, label in enumerate(zeit_spalten.keys()):
-        visible = [False] * n_box_traces
-        for j in range(n_boxen):
-            visible[i * n_boxen + j] = True
-        visible.extend([True] * n_boxen)           # Legenden-Traces immer an
-        buttons.append(dict(
-            label=label,
-            method="update",
-            args=[{"visible": visible}],
-        ))
+    buttons = _baue_zeitwahl_buttons(zeit_spalten, n_boxen, anzahl_dummy_traces=n_boxen)
 
     if hline is not None:
         fig.add_hline(
@@ -663,14 +718,13 @@ def boxplot_interaktiv_zeitwahl(
     fig.update_layout(
         title=titel,
         hovermode=False,
-        boxmode='group',                           # WICHTIG: Akteure pro Hauptgruppe nebeneinander
+        boxmode='group',
         xaxis=xaxis_settings,
         yaxis=yaxis_settings,
-        template="simple_white",
-        font=dict(family="Arial", size=13),
-        legend=dict(title=legend_titel),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
+        template=PLOTLY_TEMPLATE,
+        font=dict(family=PLOTLY_FONT_FAMILY, size=PLOTLY_FONT_SIZE),
+        paper_bgcolor=PLOTLY_BG_TRANSPARENT,
+        plot_bgcolor=PLOTLY_BG_TRANSPARENT,
         updatemenus=[dict(
             type="buttons",
             direction="right",
@@ -681,5 +735,165 @@ def boxplot_interaktiv_zeitwahl(
         )],
         margin=dict(t=100),
     )
+
+    return fig
+
+
+# ══════════════════════════════════════════════════════════════
+# 14. FACETIERTER INTERAKTIVER BOXPLOT MIT ZEITAUSWAHL
+# ══════════════════════════════════════════════════════════════
+
+def boxplot_facetiert_zeitwahl(
+    df,
+    wert_cols,
+    hauptgruppe_spalte,
+    phasen_spalte='phase',
+    hauptgruppe_reihenfolge=None,
+    label_map=None,
+    farben_map=None,
+    zeit_spalten=None,
+    default_label='Gesamte Zeitperiode',
+    titel="",
+    ylabel="Wert",
+    legend_titel="Akteur",
+    yrange=None,
+    hline=0,
+    fuell_alpha=0.4,
+    n_cols=4,
+    hoehe_pro_zeile=280,
+):
+    # legend_titel-Parameter bleibt für API-Kompatibilität, wird aber nicht gerendert
+    if label_map is None:
+        label_map = {col: col for col in wert_cols}
+    if farben_map is None:
+        farben_map = {}
+    if zeit_spalten is None:
+        zeit_spalten = {
+            'Gesamte Zeitperiode': None,
+            '1848 bis 1899': 'phase1_fruehphase',
+            '1900 bis 1949': 'phase2_volatile',
+            '1950 bis 1980': 'phase3_konsens',
+            '1981 bis 2009': 'phase4_aufspaltung',
+            '2010 bis heute': 'phase5_2010_heute',
+        }
+
+    # Hauptgruppen-Reihenfolge fixieren, sonst sortiert Plotly alphabetisch
+    if hauptgruppe_reihenfolge is None:
+        hauptgruppen = df[hauptgruppe_spalte].dropna().unique().tolist()
+    else:
+        hauptgruppen = list(hauptgruppe_reihenfolge)
+
+    n_gruppen = len(hauptgruppen)
+    n_rows = math.ceil(n_gruppen / n_cols)
+    n_akteure = len(wert_cols)
+    akteur_namen = [label_map.get(c, c) for c in wert_cols]
+
+    fig = make_subplots(
+        rows=n_rows, cols=n_cols,
+        subplot_titles=hauptgruppen,
+        shared_yaxes=True,
+        vertical_spacing=0.10,
+        horizontal_spacing=0.04,
+    )
+
+    # Box-Traces: Reihenfolge Zeitperiode -> Hauptgruppe -> Akteur
+    for label, phase in zeit_spalten.items():
+        if phase is None:
+            df_subset = df
+        else:
+            df_subset = df[df[phasen_spalte] == phase]
+
+        for hg_idx, hg in enumerate(hauptgruppen):
+            row = hg_idx // n_cols + 1
+            col = hg_idx % n_cols + 1
+            df_hg = df_subset[df_subset[hauptgruppe_spalte] == hg]
+
+            for akteur_col in wert_cols:
+                name = label_map.get(akteur_col, akteur_col)
+                farbe = farben_map.get(name)
+                fuellung = hex_zu_rgba(farbe, fuell_alpha)
+
+                fig.add_trace(
+                    go.Box(
+                        y=df_hg[akteur_col],
+                        x=[name] * len(df_hg),
+                        name=name,
+                        fillcolor=fuellung,
+                        line=dict(color=farbe, width=1.2),
+                        marker=dict(
+                            color=farbe, size=3, opacity=0.75,
+                            line=dict(width=0),
+                        ),
+                        boxpoints='all',
+                        jitter=0.4,
+                        pointpos=0,
+                        visible=(label == default_label),
+                        boxmean=True,
+                        showlegend=False,
+                    ),
+                    row=row, col=col,
+                )
+
+    # Stabile Legende über Dummy-Punkte, immer sichtbar
+    for akteur_col in wert_cols:
+        name = label_map.get(akteur_col, akteur_col)
+        farbe = farben_map.get(name)
+        fig.add_trace(
+            go.Scatter(
+                x=[None], y=[None],
+                mode='markers',
+                marker=dict(size=10, color=farbe),
+                name=name,
+                showlegend=True,
+                hoverinfo='skip',
+            ),
+            row=1, col=1,
+        )
+
+    buttons = _baue_zeitwahl_buttons(
+        zeit_spalten,
+        n_traces_pro_label=n_gruppen * n_akteure,
+        anzahl_dummy_traces=n_akteure,
+    )
+
+    if hline is not None:
+        for hg_idx in range(n_gruppen):
+            row = hg_idx // n_cols + 1
+            col = hg_idx % n_cols + 1
+            fig.add_hline(
+                y=hline, line_dash="dash",
+                line_color=AKZENTFARBE, line_width=1, opacity=0.6,
+                row=row, col=col,
+            )
+
+    fig.update_layout(
+        title=titel,
+        hovermode=False,
+        template=PLOTLY_TEMPLATE,
+        font=dict(family=PLOTLY_FONT_FAMILY, size=PLOTLY_FONT_SIZE_SUBPLOT),
+        paper_bgcolor=PLOTLY_BG_TRANSPARENT,
+        plot_bgcolor=PLOTLY_BG_TRANSPARENT,
+        height=hoehe_pro_zeile * n_rows + 120,
+        updatemenus=[dict(
+            type="buttons",
+            direction="right",
+            x=0.5, xanchor="center",
+            y=1.08, yanchor="bottom",
+            buttons=buttons,
+            showactive=True,
+        )],
+        margin=dict(t=140),
+    )
+
+    fig.update_xaxes(
+        categoryorder='array',
+        categoryarray=akteur_namen,
+        title_text="",
+    )
+
+    if yrange is not None:
+        fig.update_yaxes(range=list(yrange))
+    for r in range(1, n_rows + 1):
+        fig.update_yaxes(title_text=ylabel, row=r, col=1)
 
     return fig
