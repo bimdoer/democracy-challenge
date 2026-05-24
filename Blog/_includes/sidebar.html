@@ -1,9 +1,12 @@
-<aside class="sidebar">
+<aside class="sidebar" aria-label="Seitennavigation">
   <a href="{{ '/' | relative_url }}" class="sidebar-site-title">{{ site.title }}</a>
 
   <nav class="sidebar-chapters" aria-label="Kapitel">
     <p class="sidebar-label">Kapitel</p>
     <ul>
+      <li>
+        <a href="{{ '/' | relative_url }}"{% if page.url == '/' or page.url == '/index.html' %} class="active" aria-current="page"{% endif %}>Start</a>
+      </li>
       <li>
         <a href="{{ '/einleitung/' | relative_url }}"{% if page.permalink == '/einleitung/' %} class="active" aria-current="page"{% endif %}>Einleitung</a>
       </li>

@@ -431,28 +431,29 @@ a.btn:hover {
    ============================================================ */
 
 body.site-layout {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
   max-width: none;
   margin: 0;
   padding: 0;
+  min-height: 100vh;
   background: #ffffff;
 }
 
-.site-layout {
-  display: grid;
-  grid-template-columns: 17rem 1fr;
-  min-height: 100vh;
-}
-
 .sidebar {
+  flex: 0 0 17rem;
+  width: 17rem;
   position: sticky;
   top: 0;
-  align-self: start;
-  height: 100vh;
+  align-self: flex-start;
+  max-height: 100vh;
   overflow-y: auto;
   padding: 1.5rem 1.25rem;
   border-right: 1px solid #ddd;
   background: rgb(248, 249, 251);
   box-sizing: border-box;
+  z-index: 10;
 }
 
 .sidebar-site-title {
@@ -549,6 +550,11 @@ body.site-layout {
   text-decoration: underline;
 }
 
+.toc-list a.active {
+  color: var(--hauptfarbe-hex);
+  font-weight: 600;
+}
+
 .toc-list .toc-h3 a {
   padding-left: 0.75rem;
   font-size: 0.82rem;
@@ -556,10 +562,14 @@ body.site-layout {
 }
 
 .site-main {
+  flex: 1 1 auto;
   min-width: 0;
+  display: flex;
+  justify-content: center;
 }
 
 .site-layout .content {
+  width: 100%;
   max-width: 52rem;
   margin: 0;
   padding: 2rem 2.5rem 4rem;
@@ -577,13 +587,15 @@ body.site-layout {
 }
 
 @media (max-width: 768px) {
-  .site-layout {
-    grid-template-columns: 1fr;
+  body.site-layout {
+    flex-direction: column;
   }
 
   .sidebar {
     position: static;
-    height: auto;
+    flex: none;
+    width: 100%;
+    max-height: none;
     border-right: none;
     border-bottom: 1px solid #ddd;
   }
