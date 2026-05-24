@@ -1,0 +1,33 @@
+<details>
+<summary>Methodik</summary>
+<p><strong>Operationalisierung: Kongruenzwert</strong><br>
+Für den Vergleich der Positionen von Bundesrat, Bundesversammlung sowie der fünf grossen Parteien SP, Grüne, Mitte, FDP und SVP haben wir einen Kongruenzwert gebildet. Dieser zeigt auf, wie kongruent die entsprechenden Empfehlungen mit den Abstimmungsresultaten übereinstimmen. Dabei ist zu beachten, dass die Mitte-Partei historisch gesehen aus der CVP hervorgeht. Auf die Integration der BDP in die Ergebnisse der Mitte haben wir bewusst verzichtet, da dies erst ab 2021 erfolgt ist und die BDP davor ein eigenständiges Programm geführt hat.</p>
+<p>Folgender Gedankengang wurde unsererseits gemacht, um die passende Formel für die Berechnung des Kongruenzwerts zu finden. Eine Abstimmung wird mit mehr als 50% der Stimmen gewonnen und entsprechend mit weniger als 50% Stimmen verloren. Dies führt uns zu einem Wertebereich von 100%, welchen wir mittig teilen und zwischen -0.5 und +0.5 festlegen. Der Nullpunkt von unserem Wertebereich liegt somit bei 50%. Für unseren Anwendungsfall ist die Differenz zu diesem Nullpunkt interessant, so können wir mittels dem Vorzeichenwechsel unterscheiden, ob eine Abstimmung gewonnen oder verloren wurde. Weiter geht aus dieser Differenz hervor, wie klar das Abstimmungsresulat effektiv war.<br>
+Diese Differenz wird in der vorliegenden Arbeit jeweils mit den Positionen von Bundesrat, Bundesversammlung sowie den fünf grossen Parteien verrechnet. Entsprach die Empfehlung für die Abstimmung dem Resultat, so wird die Differenz als positiver Wert eingetragen. Entsprach die Empfehlung nicht dem Resulat, so wird die Differenz als negativer Wert eingetragen.</p>
+<p>Für jede Vorlage <em>v</em> und jeden Akteur <em>i</em> berechnen wir den Kongruenzwert <em>K<sub>iv</sub></em> auf Basis des nationalen Ja-Anteils <em>Ja<sub>v</sub></em>.</p>
+<p style="text-align:center; margin:0.8rem 0; font-size:1.1rem;"><em>K<sub>iv</sub> = s<sub>iv</sub> · (Ja<sub>v</sub> − 50) / 100</em></p>
+<p>mit:<br>
+Jav: Ja-Anteil Stimmbevölkerung<br>
+siv: +1 bei befürtwortender Empfehlung<br>
+siv: -1 bei ablehnender Empfehlung</p>
+<p>Interpretation:<br>
+K&gt;0: Empfehlung entspricht Volksentscheid<br>
+K&lt;0: Empfehlung entspricht nicht Volksentscheid<br>
+|K|: Stärke der Kongruenz oder Diskongruenz<br>
+Wertebereich: [-0.5,+0.5]</p>
+<p>Beispiel: Empfiehlt ein Akteur "Ja" und die Vorlage wird mit 60% Ja-Stimmen vom Volk angenommen, ergibt sich K = +0.10. Empfiehlt dieser jedoch "Nein" bei gleichbleibender Stimmlage, ergibt sich K = -0.10.</p>
+<div class="grafik"><strong>D0:</strong> Schematische Logik des Kongruenzwerts</div>
+<p class="figure"><img src="{{ '/blog_plots/d0_kongruenz_berechnung.svg' | relative_url }}" alt="D0: Schematische Logik des Kongruenzwerts"></p>
+<div class="lesehilfe"><strong>Lesehilfe:</strong> Die Grafik zeigt die Vorzeichenlogik des Kongruenzwerts. Ob ein Wert positiv oder negativ ist, ergibt sich aus dem Zusammenspiel von Mehrheitsentscheidung (Volk) und Empfehlung (Ja/Nein).</div>
+<p><strong>Umgang mit fehlenden/ neutralen Positionen</strong><br>
+Wir zeigen sowohl zeitliche als auch geografische Aspekte auf in dieser Arbeit. Entsprechend existieren nicht alle Parteien und bei der geografischen Analyse auch nicht alle Kantone seit 1848. Weiter liegt nicht bei jeder Abstimmung eine Empfehlung vor. Daraus galt es einen Umgang mit fehlenden oder neutralen Werten zu finden. Für die Berechnung des Kongruenzwerts wurden fehlende Werte als neutral betrachtet und beeinflussen den Kongruenzwert somit nicht.</p>
+<p><strong>Kongruenzwert in den Analyseperspektiven</strong></p>
+<ul>
+<li>Institutionell: Kongruenzwert pro Akteur über alle Vorlagen</li>
+<li>Zeitlich: Mittelwert der Kongruenz</li>
+<li>Geografisch: Kongruenzwert auf Basis kantonaler Ja-Anteile der Stimmbevölkerung (Mittelwert pro Akteur und Kanton)</li>
+<li>Thematisch: Gruppierung nach Hauptgruppen, Vergleich zwischen Akteuren</li>
+</ul>
+<p><strong>Abgrenzung</strong><br>
+Der Kongruenzwert misst Nähe zwischen Empfehlung und Abstimmungsresultat, jedoch keine Kausalität. Die zusätzliche Dimension der Mobilisierung konnten wir aufgrund fehlenden Einflusses auf den Kongruenzwert nach entsprechend fundierter Analyse der Datengrundlage ausschliessen. Die vorliegenden Kongruenzwerte sind als deskriptives Mass politischer Nähe zum Volksentscheid zu verstehen.</p>
+</details>
