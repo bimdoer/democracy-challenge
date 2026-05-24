@@ -683,3 +683,181 @@ def boxplot_interaktiv_zeitwahl(
     )
 
     return fig
+
+from plotly.subplots import make_subplots
+
+
+def boxplot_facetiert_zeitwahl(
+    df,
+    wert_cols,
+    hauptgruppe_spalte,
+    phasen_spalte='phase',
+    hauptgruppe_reihenfolge=None,
+    label_map=None,
+    farben_map=None,
+    zeit_spalten=None,
+    default_label='Gesamte Zeitperiode',
+    titel="",
+    ylabel="Wert",
+    legend_titel="Akteur",
+    yrange=None,
+    hline=0,
+    fuell_alpha=0.4,
+    n_cols=4,
+    hoehe_pro_zeile=280,
+):
+    def hex_zu_rgba(hex_farbe, alpha):
+        if hex_farbe is None:
+            return None
+        h = hex_farbe.lstrip('#')
+        r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+        return f'rgba({r}, {g}, {b}, {alpha})'
+
+    if label_map is None:
+        label_map = {col: col for col in wert_cols}
+    if farben_map is None:
+        farben_map = {}
+    if zeit_spalten is None:
+        zeit_spalten = {
+            'Gesamte Zeitperiode': None,
+            '1848 bis 1899': 'phase1_fruehphase',
+            '1900 bis 1949': 'phase2_volatile',
+            '1950 bis 1980': 'phase3_konsens',
+            '1981 bis 2009': 'phase4_aufspaltung',
+            '2010 bis heute': 'phase5_2010_heute',
+        }
+
+    # Hauptgruppen-Reihenfolge fixieren, sonst sortiert Plotly alphabetisch
+    if hauptgruppe_reihenfolge is None:
+        hauptgruppen = df[hauptgruppe_spalte].dropna().unique().tolist()
+    else:
+        hauptgruppen = list(hauptgruppe_reihenfolge)
+
+    n_gruppen = len(hauptgruppen)
+    n_rows = (n_gruppen + n_cols - 1) // n_cols   # Aufrunden bei Rest
+    n_akteure = len(wert_cols)
+    akteur_namen = [label_map.get(c, c) for c in wert_cols]
+
+    fig = make_subplots(
+        rows=n_rows, cols=n_cols,
+        subplot_titles=hauptgruppen,
+        shared_yaxes=True,
+        vertical_spacing=0.10,
+        horizontal_spacing=0.04,
+    )
+
+    # Box-Traces: Reihenfolge Zeitperiode -> Hauptgruppe -> Akteur
+    for label, phase in zeit_spalten.items():
+        if phase is None:
+            df_subset = df
+        else:
+            df_subset = df[df[phasen_spalte] == phase]
+
+        for hg_idx, hg in enumerate(hauptgruppen):
+            row = hg_idx // n_cols + 1
+            col = hg_idx % n_cols + 1
+            df_hg = df_subset[df_subset[hauptgruppe_spalte] == hg]
+
+            for akteur_col in wert_cols:
+                name = label_map.get(akteur_col, akteur_col)
+                farbe = farben_map.get(name)
+                fuellung = hex_zu_rgba(farbe, fuell_alpha)
+
+                fig.add_trace(
+                    go.Box(
+                        y=df_hg[akteur_col],
+                        x=[name] * len(df_hg),
+                        name=name,
+                        fillcolor=fuellung,
+                        line=dict(color=farbe, width=1.2),
+                        marker=dict(
+                            color=farbe, size=3, opacity=0.75,
+                            line=dict(width=0),
+                        ),
+                        boxpoints='all',
+                        jitter=0.4,
+                        pointpos=0,
+                        visible=(label == default_label),
+                        boxmean=True,
+                        showlegend=False,
+                    ),
+                    row=row, col=col,
+                )
+
+    # Stabile Legende über Dummy-Punkte, immer sichtbar
+    for akteur_col in wert_cols:
+        name = label_map.get(akteur_col, akteur_col)
+        farbe = farben_map.get(name)
+        fig.add_trace(
+            go.Scatter(
+                x=[None], y=[None],
+                mode='markers',
+                marker=dict(size=10, color=farbe),
+                name=name,
+                showlegend=True,
+                hoverinfo='skip',
+            ),
+            row=1, col=1,
+        )
+
+    # Buttons: pro Periode genau die zugehörigen Traces einblenden, Dummies bleiben an
+    traces_pro_periode = n_gruppen * n_akteure
+    n_box_traces = traces_pro_periode * len(zeit_spalten)
+    buttons = []
+    for i, label in enumerate(zeit_spalten.keys()):
+        visible = [False] * n_box_traces
+        for j in range(traces_pro_periode):
+            visible[i * traces_pro_periode + j] = True
+        visible.extend([True] * n_akteure)
+        buttons.append(dict(
+            label=label,
+            method="update",
+            args=[{"visible": visible}],
+        ))
+
+    # Nulllinie in jedem Subplot
+    if hline is not None:
+        for hg_idx in range(n_gruppen):
+            row = hg_idx // n_cols + 1
+            col = hg_idx % n_cols + 1
+            fig.add_hline(
+                y=hline, line_dash="dash",
+                line_color=AKZENTFARBE, line_width=1, opacity=0.6,
+                row=row, col=col,
+            )
+
+    # Layout: Höhe wächst mit der Anzahl Zeilen
+    fig.update_layout(
+        title=titel,
+        hovermode=False,
+        template="simple_white",
+        font=dict(family="Arial", size=12),
+        legend=dict(title=legend_titel),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        height=hoehe_pro_zeile * n_rows + 120,
+        updatemenus=[dict(
+            type="buttons",
+            direction="right",
+            x=0.5, xanchor="center",
+            y=1.08, yanchor="bottom",
+            buttons=buttons,
+            showactive=True,
+        )],
+        margin=dict(t=140),
+    )
+
+    # x-Achsen: feste Akteurreihenfolge, keine x-Titel
+    fig.update_xaxes(
+        categoryorder='array',
+        categoryarray=akteur_namen,
+        title_text="",
+    )
+
+    # y-Achsen: Range, y-Titel nur in der linken Spalte
+    if yrange is not None:
+        fig.update_yaxes(range=list(yrange))
+    for r in range(1, n_rows + 1):
+        fig.update_yaxes(title_text=ylabel, row=r, col=1)
+
+    return fig
