@@ -1,0 +1,362 @@
+/* ============================================================
+   DEMOKRATIE-CHALLENGE: Callouts & Figuren-Layout (PyCharm)
+   ============================================================
+   Verwendung im Markdown:
+
+   <div class="grafik"><strong>D1:</strong> Titel</div>
+   <div class="lesehilfe">Lesehilfe-Text</div>
+   <div class="haupt"><strong>Titel:</strong> Hauptbox</div>
+   <div class="akzent"><strong>Titel:</strong> Akzentbox</div>
+   <div class="lit"><strong>Literaturverzeichnis:</strong> ...</div>
+   <details><summary>Titel</summary>Inhalt</details>
+
+   Drei-Spalten-Layout:
+   <div class="text-reihe">
+     <div class="feld text1"><strong>Titel</strong><p>Text</p></div>
+     <div class="feld text2"><strong>Titel</strong><p>Text</p></div>
+     <div class="feld text3"><strong>Titel</strong><p>Text</p></div>
+   </div>
+   ============================================================ */
+
+
+/* ============================================================
+   0) Farbvariablen
+   ============================================================ */
+
+:root {
+  --hauptfarbe-rgb: 68, 119, 170;       /* #4477AA */
+  --hauptfarbe-hex: #4477aa;
+  --akzentfarbe-rgb: 204, 102, 119;     /* #CC6677 */
+  --akzentfarbe-hex: #cc6677;
+}
+
+
+/* ============================================================
+   1) GRAFIK-TITEL (oberhalb der Grafik)
+   ============================================================ */
+
+.grafik {
+  border-top: 2px solid var(--hauptfarbe-hex);
+  border-bottom: 1px solid var(--hauptfarbe-hex);
+  padding: 0.6em 0;
+  margin: 1.2em 0 0.4em 0;
+  color: var(--hauptfarbe-hex);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: transparent;
+}
+
+
+/* ============================================================
+   2) LESEHILFE (unterhalb der Grafik)
+   ============================================================ */
+
+.lesehilfe {
+  border-top: 1px solid var(--hauptfarbe-hex);
+  border-bottom: 2px solid var(--hauptfarbe-hex);
+  padding: 0.5em 0 0.7em 0;
+  margin: 0.4em 0 1.2em 0;
+  font-size: 0.9em;
+  line-height: 1.5;
+  color: #555;
+  background: transparent;
+}
+
+
+/* ============================================================
+   3) HAUPT-CALLOUT (Hauptfarbe Blau, frei beschriftbar)
+   ============================================================ */
+
+.haupt {
+  border-left: 4px solid var(--hauptfarbe-hex);
+  background: rgba(68, 119, 170, 0.08);
+  padding: 0.8em 1em;
+  margin: 1em 0;
+  border-radius: 0 4px 4px 0;
+}
+
+.haupt strong {
+  color: var(--hauptfarbe-hex);
+}
+
+
+/* ============================================================
+   4) AKZENT-CALLOUT (für Hervorhebungen, Rosa)
+   ============================================================ */
+
+.akzent {
+  border-left: 4px solid var(--akzentfarbe-hex);
+  background: rgba(204, 102, 119, 0.08);
+  padding: 0.8em 1em;
+  margin: 1em 0;
+  border-radius: 0 4px 4px 0;
+}
+
+.akzent strong {
+  color: var(--akzentfarbe-hex);
+}
+
+
+/* ============================================================
+   5) KLAPPER (Standard <details>-Element)
+   ============================================================ */
+
+details {
+  border-left: 4px solid var(--hauptfarbe-hex);
+  background: rgba(68, 119, 170, 0.05);
+  padding: 0.8em 1em;
+  margin: 1em 0;
+  border-radius: 0 4px 4px 0;
+}
+
+details summary {
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--hauptfarbe-hex);
+}
+
+details[open] summary {
+  margin-bottom: 0.5em;
+}
+
+
+/* ============================================================
+   6) LITERATURVERZEICHNIS (kühles Grau)
+   ============================================================ */
+
+.lit {
+  border-left: 4px solid rgb(90, 110, 130);
+  background: rgb(235, 239, 243);
+  padding: 0.8em 1em;
+  margin: 1em 0;
+  border-radius: 0 4px 4px 0;
+}
+
+.lit strong {
+  color: rgb(90, 110, 130);
+}
+
+
+/* ============================================================
+   7) DREI-SPALTEN-LAYOUT
+      (zeitlich · geografisch · thematisch)
+   ============================================================ */
+
+.text-reihe {
+  display: flex;
+  gap: 16px;
+  margin: 1em 0;
+}
+
+.feld {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 0 4px 4px 0;
+}
+
+.feld strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.feld p {
+  margin: 0 0 0.5em 0;
+  line-height: 1.5;
+}
+
+.feld p:last-child {
+  margin-bottom: 0;
+}
+
+/* Zeitlich — Türkis */
+.text1 {
+  background: rgb(229, 244, 240);
+  border-left: 4px solid #44AA99;
+}
+.text1 strong {
+  color: #1f5e51;
+}
+
+/* Geografisch — Olive */
+.text2 {
+  background: rgb(243, 240, 222);
+  border-left: 4px solid #999933;
+}
+.text2 strong {
+  color: #555518;
+}
+
+/* Thematisch — Braun */
+.text3 {
+  background: rgb(243, 234, 224);
+  border-left: 4px solid #AA7744;
+}
+.text3 strong {
+  color: #6b4422;
+}
+
+
+/* ============================================================
+   8) Buttons
+   ============================================================ */
+
+/* Gemeinsame Basis für alle drei Buttons */
+.btn {
+  background: transparent;
+  border-width: 2px;
+  border-style: solid;
+  padding: 8px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+/* Zeitlich — Türkis */
+.btn-zeitlich {
+  color: #1f5e51;
+  border-color: #44AA99;
+}
+.btn-zeitlich:hover {
+  background: rgb(229, 244, 240);
+}
+
+/* Geografisch — Olive */
+.btn-geografisch {
+  color: #555518;
+  border-color: #999933;
+}
+.btn-geografisch:hover {
+  background: rgb(243, 240, 222);
+}
+
+/* Thematisch — Braun */
+.btn-thematisch {
+  color: #6b4422;
+  border-color: #AA7744;
+}
+.btn-thematisch:hover {
+  background: rgb(243, 234, 224);
+}
+
+
+/* ============================================================
+   9) Site-Layout (Jekyll / GitHub Pages)
+   ============================================================ */
+
+body {
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  color: #222;
+}
+
+.site-nav {
+  border-bottom: 1px solid #ddd;
+  padding: 1rem 2rem;
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.site-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.site-nav a {
+  text-decoration: none;
+  color: var(--hauptfarbe-hex);
+}
+
+.site-nav a:hover {
+  text-decoration: underline;
+}
+
+.content {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+img,
+iframe {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.content .figure {
+  margin: 0.5em 0 1em;
+}
+
+
+/* ============================================================
+   10) Markdown-Text (Fliesstext, Überschriften, Listen)
+   ============================================================ */
+
+.content h1 {
+  font-size: 1.75rem;
+  line-height: 1.25;
+  margin: 0 0 1rem;
+  color: var(--hauptfarbe-hex);
+}
+
+.content h2 {
+  font-size: 1.35rem;
+  margin: 2rem 0 0.75rem;
+  color: var(--hauptfarbe-hex);
+}
+
+.content h3 {
+  font-size: 1.1rem;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.content p {
+  margin: 0 0 1em;
+}
+
+.content ul,
+.content ol {
+  margin: 0 0 1em 1.25em;
+  padding: 0;
+}
+
+.content li {
+  margin-bottom: 0.35em;
+}
+
+.content em {
+  font-style: italic;
+}
+
+.content strong {
+  font-weight: 700;
+}
+
+.content a {
+  color: var(--hauptfarbe-hex);
+}
+
+.content hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 2em 0;
+}
+
+.content details p,
+.content details ul,
+.content details ol {
+  margin-top: 0.5em;
+}
+
+.content details li {
+  margin-bottom: 0.35em;
+}
