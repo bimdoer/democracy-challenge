@@ -431,9 +431,6 @@ a.btn:hover {
    ============================================================ */
 
 body.site-layout {
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
   max-width: none;
   margin: 0;
   padding: 0;
@@ -442,12 +439,11 @@ body.site-layout {
 }
 
 .sidebar {
-  flex: 0 0 17rem;
-  width: 17rem;
-  position: sticky;
+  position: fixed;
   top: 0;
-  align-self: flex-start;
-  max-height: 100vh;
+  left: 0;
+  width: 17rem;
+  height: 100vh;
   overflow-y: auto;
   padding: 1.5rem 1.25rem;
   border-right: 1px solid #ddd;
@@ -552,10 +548,10 @@ body.site-layout {
 }
 
 .site-main {
-  flex: 1 1 auto;
-  min-width: 0;
+  width: 100%;
+  min-height: 100vh;
   display: grid;
-  grid-template-columns: 1fr min(52rem, 100%) 1fr;
+  grid-template-columns: 1fr min(52rem, calc(100% - 3rem)) 1fr;
 }
 
 .site-layout .content {
@@ -564,6 +560,8 @@ body.site-layout {
   max-width: none;
   margin: 0;
   padding: 2rem 2.5rem 4rem;
+  /* keep text clear of fixed sidebar when column straddles it */
+  padding-left: max(2.5rem, calc(17rem + 0.5rem - ((100vw - min(52rem, calc(100% - 3rem))) / 2)));
   background: #ffffff;
   box-sizing: border-box;
 }
@@ -578,14 +576,10 @@ body.site-layout {
 }
 
 @media (max-width: 768px) {
-  body.site-layout {
-    flex-direction: column;
-  }
-
   .sidebar {
     position: static;
-    flex: none;
     width: 100%;
+    height: auto;
     max-height: none;
     border-right: none;
     border-bottom: 1px solid #ddd;
@@ -593,6 +587,7 @@ body.site-layout {
 
   .site-main {
     grid-template-columns: 1fr;
+    min-height: 0;
   }
 
   .site-layout .content {
