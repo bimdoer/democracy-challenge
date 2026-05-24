@@ -1,6 +1,10 @@
 (function () {
-  var chapterLinks = document.querySelectorAll('.sidebar-chapter-link[data-nav="chapter"]');
+  var chapterLinks = document.querySelectorAll('.sidebar-chapter-tab[data-nav="chapter"]');
   var sectionLinks = document.querySelectorAll('.sidebar-section-link[data-nav="section"]');
+  var SCROLL_MARKER = 120;
+  var scrollTicking = false;
+  var userClickedNav = false;
+  var clickResetTimer;
 
   function normalizePath(pathname) {
     var path = pathname || "/";
@@ -14,128 +18,134 @@
     return normalizePath(new URL(link.href, window.location.href).pathname);
   }
 
-  function clearNavState() {
-    chapterLinks.forEach(function (link) {
-      link.classList.remove("active", "is-on-page");
-      link.removeAttribute("aria-current");
-    });
-    sectionLinks.forEach(function (link) {
-      link.classList.remove("active");
-      link.removeAttribute("aria-current");
+  function hashIdFromLink(link) {
+    var raw = new URL(link.href, window.location.href).hash.slice(1);
+    if (!raw) {
+      return "";
+    }
+    try {
+      return decodeURIComponent(raw);
+    } catch (err) {
+      return raw;
+    }
+  }
+
+  function getPageSectionLinks() {
+    var path = normalizePath(window.location.pathname);
+    return Array.prototype.filter.call(sectionLinks, function (link) {
+      return linkPath(link) === path;
     });
   }
 
-  function setNavState() {
-    clearNavState();
+  function getSectionTargets(pageLinks) {
+    return pageLinks
+      .map(function (link) {
+        var id = hashIdFromLink(link);
+        var el = id ? document.getElementById(id) : null;
+        return el ? { id: id, el: el, link: link } : null;
+      })
+      .filter(Boolean);
+  }
 
-    var path = normalizePath(window.location.pathname);
-    var hash = window.location.hash;
-    var hasSection = !!hash;
+  function findActiveSectionId(targets) {
+    if (!targets.length) {
+      return null;
+    }
 
-    chapterLinks.forEach(function (link) {
-      var onPage = linkPath(link) === path;
-      if (!onPage) {
-        return;
-      }
-
-      link.classList.add("is-on-page");
-      if (!hasSection) {
-        link.classList.add("active");
-        link.setAttribute("aria-current", "page");
+    var activeId = targets[0].id;
+    targets.forEach(function (item) {
+      if (item.el.getBoundingClientRect().top <= SCROLL_MARKER) {
+        activeId = item.id;
       }
     });
+    return activeId;
+  }
 
-    if (!hasSection) {
+  function scrollNavLinkIntoView(link) {
+    var nav = document.querySelector(".sidebar-sections-nav");
+    if (!nav || !link) {
       return;
     }
 
+    var linkRect = link.getBoundingClientRect();
+    var navRect = nav.getBoundingClientRect();
+    if (linkRect.top < navRect.top + 8 || linkRect.bottom > navRect.bottom - 8) {
+      link.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+  }
+
+  function applyActiveSection(activeId) {
+    var path = normalizePath(window.location.pathname);
+    var activeLink = null;
+
+    chapterLinks.forEach(function (link) {
+      var onPage = linkPath(link) === path;
+      link.classList.toggle("is-on-page", onPage);
+      link.classList.toggle("active", onPage && !activeId);
+      if (onPage && !activeId) {
+        link.setAttribute("aria-current", "page");
+      } else {
+        link.removeAttribute("aria-current");
+      }
+    });
+
     sectionLinks.forEach(function (link) {
       var linkUrl = new URL(link.href, window.location.href);
-      if (normalizePath(linkUrl.pathname) !== path) {
-        return;
-      }
-      if (linkUrl.hash !== hash) {
-        return;
-      }
+      var id = hashIdFromLink(link);
+      var isActive =
+        !!activeId && normalizePath(linkUrl.pathname) === path && id === activeId;
 
-      link.classList.add("active");
-      link.setAttribute("aria-current", "location");
+      link.classList.toggle("active", isActive);
+      if (isActive) {
+        link.setAttribute("aria-current", "location");
+        activeLink = link;
+      } else {
+        link.removeAttribute("aria-current");
+      }
+    });
+
+    if (activeLink && !userClickedNav) {
+      scrollNavLinkIntoView(activeLink);
+    }
+  }
+
+  function updateFromScroll() {
+    var pageLinks = getPageSectionLinks();
+    var targets = getSectionTargets(pageLinks);
+
+    if (!targets.length) {
+      applyActiveSection(null);
+      return;
+    }
+
+    applyActiveSection(findActiveSectionId(targets));
+  }
+
+  function scheduleScrollUpdate() {
+    if (scrollTicking) {
+      return;
+    }
+    scrollTicking = true;
+    window.requestAnimationFrame(function () {
+      updateFromScroll();
+      scrollTicking = false;
     });
   }
 
-  setNavState();
-  window.addEventListener("hashchange", setNavState);
+  updateFromScroll();
+  window.addEventListener("scroll", scheduleScrollUpdate, { passive: true });
+  window.addEventListener("resize", scheduleScrollUpdate, { passive: true });
+  window.addEventListener("hashchange", scheduleScrollUpdate);
 
   sectionLinks.forEach(function (link) {
     link.addEventListener("click", function () {
-      window.setTimeout(setNavState, 0);
+      userClickedNav = true;
+      window.clearTimeout(clickResetTimer);
+      clickResetTimer = window.setTimeout(function () {
+        userClickedNav = false;
+      }, 800);
+      window.setTimeout(scheduleScrollUpdate, 50);
+      window.setTimeout(scheduleScrollUpdate, 300);
     });
-  });
-
-  var content = document.querySelector(".content");
-  if (!content || !("IntersectionObserver" in window)) {
-    return;
-  }
-
-  var currentPath = normalizePath(window.location.pathname);
-  var pageSections = Array.prototype.filter.call(sectionLinks, function (link) {
-    return linkPath(link) === currentPath;
-  });
-
-  if (!pageSections.length) {
-    return;
-  }
-
-  var observed = pageSections
-    .map(function (link) {
-      var id = new URL(link.href, window.location.href).hash.slice(1);
-      return id ? document.getElementById(id) : null;
-    })
-    .filter(Boolean);
-
-  if (!observed.length) {
-    return;
-  }
-
-  var observer = new IntersectionObserver(
-    function (entries) {
-      if (window.location.hash) {
-        return;
-      }
-
-      var visible = entries
-        .filter(function (entry) {
-          return entry.isIntersecting;
-        })
-        .sort(function (a, b) {
-          return a.boundingClientRect.top - b.boundingClientRect.top;
-        });
-
-      if (!visible.length) {
-        return;
-      }
-
-      var activeId = visible[0].target.id;
-      clearNavState();
-
-      chapterLinks.forEach(function (link) {
-        if (linkPath(link) === currentPath) {
-          link.classList.add("is-on-page");
-        }
-      });
-
-      pageSections.forEach(function (link) {
-        var id = new URL(link.href, window.location.href).hash.slice(1);
-        if (id === activeId) {
-          link.classList.add("active");
-          link.setAttribute("aria-current", "location");
-        }
-      });
-    },
-    { rootMargin: "-15% 0px -75% 0px", threshold: 0 }
-  );
-
-  observed.forEach(function (target) {
-    observer.observe(target);
   });
 })();

@@ -1,24 +1,38 @@
 <aside class="sidebar" aria-label="Seitennavigation">
   <div class="sidebar-inner">
-    <a href="{{ '/einleitung/' | relative_url }}" class="sidebar-site-title">{{ site.title }}</a>
+    <div class="sidebar-header">
+      <a href="{{ '/einleitung/' | relative_url }}" class="sidebar-site-title">{{ site.title }}</a>
 
-    <nav class="sidebar-chapters" aria-label="Navigation">
-      <ul class="sidebar-chapter-list">
-        {% for chapter in site.data.navigation.chapters %}
-        <li class="sidebar-chapter-item">
-          <a href="{{ chapter.permalink | relative_url }}" class="sidebar-chapter-link" data-nav="chapter">{{ chapter.title }}</a>
-          {% if chapter.sections.size > 0 %}
-          <ul class="sidebar-sections">
-            {% for section in chapter.sections %}
-            <li>
-              <a href="{{ chapter.permalink | relative_url }}#{{ section.anchor }}" class="sidebar-section-link" data-nav="section">{{ section.title }}</a>
-            </li>
-            {% endfor %}
-          </ul>
-          {% endif %}
+      <nav class="sidebar-chapter-tabs" aria-label="Kapitel">
+        <ul>
+          {% for chapter in site.data.navigation.chapters %}
+          <li>
+            <a href="{{ chapter.permalink | relative_url }}" class="sidebar-chapter-tab" data-nav="chapter">{{ chapter.title }}</a>
+          </li>
+          {% endfor %}
+        </ul>
+      </nav>
+    </div>
+
+    <nav class="sidebar-sections-nav" aria-label="Abschnitte">
+      {% assign current_chapter = nil %}
+      {% for chapter in site.data.navigation.chapters %}
+        {% if chapter.permalink == page.permalink %}
+          {% assign current_chapter = chapter %}
+        {% endif %}
+      {% endfor %}
+
+      {% if current_chapter and current_chapter.sections.size > 0 %}
+      <ul class="sidebar-sections">
+        {% for section in current_chapter.sections %}
+        <li>
+          <a href="{{ current_chapter.permalink | relative_url }}#{{ section.anchor }}" class="sidebar-section-link" data-nav="section">{{ section.title }}</a>
         </li>
         {% endfor %}
       </ul>
+      {% else %}
+      <p class="sidebar-sections-empty">Wähle ein Kapitel oben.</p>
+      {% endif %}
     </nav>
   </div>
 </aside>

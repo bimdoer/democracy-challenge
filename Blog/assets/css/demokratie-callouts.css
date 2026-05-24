@@ -431,21 +431,30 @@ a.btn:hover {
    ============================================================ */
 
 body.site-layout {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
   max-width: none;
   margin: 0;
   padding: 0;
   min-height: 100vh;
+  min-height: 100dvh;
   background: #ffffff;
 }
 
 .sidebar {
-  position: fixed;
-  inset: 0 auto 0 0;
+  flex: 0 0 17rem;
   width: 17rem;
-  min-height: 100vh;
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100vh;
+  max-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 0;
   border-right: 1px solid #ddd;
   background: rgb(248, 249, 251);
   box-sizing: border-box;
@@ -454,17 +463,27 @@ body.site-layout {
 
 .sidebar-inner {
   display: flex;
-  flex: 1;
   flex-direction: column;
-  min-height: 0;
-  padding: 1.5rem 1.25rem;
+  height: 100%;
+  min-height: 100%;
+  padding: 0;
+  box-sizing: border-box;
   overflow: hidden;
 }
 
-.sidebar-chapters {
-  flex: 1;
+.sidebar-header {
+  flex: 0 0 auto;
+  padding: 1.5rem 1.25rem 1rem;
+  border-bottom: 1px solid #ddd;
+  background: rgb(248, 249, 251);
+}
+
+.sidebar-sections-nav {
+  flex: 1 1 auto;
   min-height: 0;
+  overflow-x: hidden;
   overflow-y: auto;
+  padding: 1rem 1.25rem 2rem;
 }
 
 .sidebar-site-title {
@@ -474,7 +493,7 @@ body.site-layout {
   line-height: 1.35;
   color: var(--hauptfarbe-hex);
   text-decoration: none;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0;
 }
 
 .sidebar-site-title:hover {
@@ -499,20 +518,24 @@ body.site-layout {
   margin-top: 1.25rem;
 }
 
-.sidebar-chapter-list,
+.sidebar-chapter-tabs ul,
 .sidebar-sections {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.sidebar-chapter-item {
-  margin-bottom: 0.75rem;
+.sidebar-chapter-tabs {
+  margin-top: 1rem;
 }
 
-.sidebar-chapter-link {
+.sidebar-chapter-tabs li {
+  margin-bottom: 0.25rem;
+}
+
+.sidebar-chapter-tab {
   display: block;
-  padding: 0.35rem 0.5rem;
+  padding: 0.4rem 0.5rem;
   border-radius: 4px;
   text-decoration: none;
   color: #333;
@@ -520,24 +543,31 @@ body.site-layout {
   font-weight: 600;
 }
 
-.sidebar-chapter-link:hover {
+.sidebar-chapter-tab:hover {
   background: rgba(68, 119, 170, 0.1);
   text-decoration: none;
 }
 
-.sidebar-chapter-link.is-on-page {
+.sidebar-chapter-tab.is-on-page {
   color: var(--hauptfarbe-hex);
 }
 
-.sidebar-chapter-link.active {
+.sidebar-chapter-tab.active {
   background: rgba(68, 119, 170, 0.15);
   color: var(--hauptfarbe-hex);
   font-weight: 700;
 }
 
 .sidebar-sections {
-  margin: 0.15rem 0 0.5rem;
-  padding: 0 0 0 1rem;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar-sections-empty {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #666;
+  line-height: 1.4;
 }
 
 .sidebar-sections li {
@@ -563,11 +593,15 @@ body.site-layout {
 .sidebar-section-link.active {
   color: var(--hauptfarbe-hex);
   font-weight: 600;
-  background: rgba(68, 119, 170, 0.1);
+  background: rgba(68, 119, 170, 0.12);
+  border-left: 2px solid var(--hauptfarbe-hex);
+  margin-left: -2px;
+  padding-left: calc(0.5rem + 2px);
 }
 
 .site-main {
-  margin-left: 17rem;
+  flex: 1 1 auto;
+  min-width: 0;
   min-height: 100vh;
   min-height: 100dvh;
   display: grid;
@@ -584,6 +618,7 @@ body.site-layout {
   box-sizing: border-box;
 }
 
+.site-layout .content h1:target,
 .site-layout .content h2:target,
 .site-layout .content h3:target {
   scroll-margin-top: 1rem;
@@ -594,27 +629,36 @@ body.site-layout {
 }
 
 @media (max-width: 768px) {
+  body.site-layout {
+    flex-direction: column;
+  }
+
   .sidebar {
     position: static;
-    inset: auto;
+    flex: none;
     width: 100%;
-    min-height: 0;
-    display: block;
+    height: auto;
+    max-height: none;
+    overflow: visible;
     border-right: none;
     border-bottom: 1px solid #ddd;
   }
 
   .sidebar-inner {
-    overflow: visible;
+    min-height: 0;
+    height: auto;
+  }
+
+  .sidebar-header {
     padding: 1.25rem;
   }
 
-  .sidebar-chapters {
+  .sidebar-sections-nav {
     overflow: visible;
+    padding: 1rem 1.25rem 1.5rem;
   }
 
   .site-main {
-    margin-left: 0;
     grid-template-columns: 1fr;
     min-height: 0;
   }
