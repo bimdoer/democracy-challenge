@@ -1,25 +1,27 @@
 <aside class="sidebar" aria-label="Seitennavigation">
-  <a href="{{ '/' | relative_url }}" class="sidebar-site-title">{{ site.title }}</a>
+  <div class="sidebar-inner">
+    <a href="{{ '/' | relative_url }}" class="sidebar-site-title">{{ site.title }}</a>
 
-  <nav class="sidebar-chapters" aria-label="Navigation">
-    <ul class="sidebar-chapter-list">
-      <li class="sidebar-chapter-item">
-        <a href="{{ '/' | relative_url }}" class="sidebar-chapter-link{% if page.url == '/' or page.url == '/index.html' %} active{% endif %}"{% if page.url == '/' or page.url == '/index.html' %} aria-current="page"{% endif %}>Start</a>
-      </li>
-      {% for chapter in site.data.navigation.chapters %}
-      <li class="sidebar-chapter-item">
-        <a href="{{ chapter.permalink | relative_url }}" class="sidebar-chapter-link{% if page.permalink == chapter.permalink %} active{% endif %}"{% if page.permalink == chapter.permalink %} aria-current="page"{% endif %}>{{ chapter.title }}</a>
-        {% if chapter.sections.size > 0 %}
-        <ul class="sidebar-sections">
-          {% for section in chapter.sections %}
-          <li>
-            <a href="{{ chapter.permalink | relative_url }}#{{ section.anchor }}" class="sidebar-section-link" data-chapter="{{ chapter.permalink }}">{{ section.title }}</a>
-          </li>
-          {% endfor %}
-        </ul>
-        {% endif %}
-      </li>
-      {% endfor %}
-    </ul>
-  </nav>
+    <nav class="sidebar-chapters" aria-label="Navigation">
+      <ul class="sidebar-chapter-list">
+        <li class="sidebar-chapter-item">
+          <a href="{{ '/' | relative_url }}" class="sidebar-chapter-link" data-nav="chapter">Start</a>
+        </li>
+        {% for chapter in site.data.navigation.chapters %}
+        <li class="sidebar-chapter-item">
+          <a href="{{ chapter.permalink | relative_url }}" class="sidebar-chapter-link" data-nav="chapter">{{ chapter.title }}</a>
+          {% if chapter.sections.size > 0 %}
+          <ul class="sidebar-sections">
+            {% for section in chapter.sections %}
+            <li>
+              <a href="{{ chapter.permalink | relative_url }}#{{ section.anchor }}" class="sidebar-section-link" data-nav="section">{{ section.title }}</a>
+            </li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </nav>
+  </div>
 </aside>
