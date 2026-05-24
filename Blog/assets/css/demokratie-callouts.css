@@ -250,34 +250,43 @@ details[open] summary {
       (zeitlich · geografisch · thematisch)
    ============================================================ */
 
-.text-reihe {
+.text-reihe,
+.content .text-reihe {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
   margin: 1em 0;
   align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
-.feld {
+.feld,
+.content .feld {
   flex: 1 1 14rem;
-  min-width: 14rem;
+  min-width: min(100%, 14rem);
   padding: 12px 16px;
   border-radius: 0 4px 4px 0;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 }
 
-.feld strong {
+.feld strong,
+.content .feld strong {
   display: block;
   margin-bottom: 6px;
 }
 
-.feld p {
+.feld p,
+.content .feld p {
   margin: 0 0 0.5em 0;
   line-height: 1.5;
 }
 
-.feld p:last-child {
+.feld p:last-child,
+.content .feld p:last-child {
   margin-bottom: 0;
 }
 
@@ -317,7 +326,8 @@ details[open] summary {
   margin: 0.75em 0 0;
 }
 
-.feld .btn-gruppe {
+.feld .btn-gruppe,
+.content .feld .btn-gruppe {
   margin-top: auto;
   padding-top: 0.75em;
 }
@@ -423,6 +433,7 @@ body:has(.site-nav) {
   max-width: none;
   margin: 0;
   padding: 0;
+  background: #ffffff;
 }
 
 .site-nav {
@@ -451,6 +462,8 @@ body:has(.site-nav) {
   max-width: 52rem;
   margin: 0 auto;
   padding: 2rem 1.5rem 4rem;
+  background: #ffffff;
+  box-sizing: border-box;
 }
 
 .content .figure {
