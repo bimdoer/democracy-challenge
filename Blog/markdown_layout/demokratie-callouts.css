@@ -8,7 +8,7 @@
    <div class="haupt"><strong>Titel:</strong> Hauptbox</div>
    <div class="akzent"><strong>Titel:</strong> Akzentbox</div>
    <div class="lit"><strong>Literaturverzeichnis:</strong> ...</div>
-   Klapper: {% include klapper-….html %} in {::nomarkdown}…{:/nomarkdown}
+   Klapper: HTML-Block in {::nomarkdown}…{:/nomarkdown} (siehe .md-Kapitel)
 
    Drei-Spalten-Layout:
    <div class="text-reihe">
@@ -488,77 +488,67 @@ body.site-layout {
   margin-top: 1.25rem;
 }
 
-.sidebar-chapters ul,
-.toc-list {
+.sidebar-chapter-list,
+.sidebar-sections {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.sidebar-chapters li {
-  margin-bottom: 0.35rem;
+.sidebar-chapter-item {
+  margin-bottom: 0.75rem;
 }
 
-.sidebar-chapters a {
+.sidebar-chapter-link {
   display: block;
   padding: 0.35rem 0.5rem;
   border-radius: 4px;
   text-decoration: none;
   color: #333;
   font-size: 0.95rem;
+  font-weight: 600;
 }
 
-.sidebar-chapters a:hover {
+.sidebar-chapter-link:hover {
   background: rgba(68, 119, 170, 0.1);
   text-decoration: none;
 }
 
-.sidebar-chapters a.active {
+.sidebar-chapter-link.active {
   background: rgba(68, 119, 170, 0.15);
   color: var(--hauptfarbe-hex);
-  font-weight: 700;
 }
 
-.sidebar-toc {
-  margin-top: 0.25rem;
-}
-
-.sidebar-toc.is-empty {
-  display: none;
-}
-
-.toc-list {
+.sidebar-sections {
+  margin: 0.2rem 0 0;
+  padding: 0 0 0 0.65rem;
   border-left: 2px solid rgba(68, 119, 170, 0.25);
-  padding-left: 0.65rem;
 }
 
-.toc-list li {
-  margin-bottom: 0.3rem;
+.sidebar-sections li {
+  margin-bottom: 0.2rem;
 }
 
-.toc-list a {
+.sidebar-section-link {
   display: block;
-  padding: 0.2rem 0;
-  font-size: 0.88rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
   line-height: 1.35;
   text-decoration: none;
-  color: #444;
+  color: #555;
 }
 
-.toc-list a:hover {
+.sidebar-section-link:hover {
   color: var(--hauptfarbe-hex);
-  text-decoration: underline;
+  background: rgba(68, 119, 170, 0.08);
+  text-decoration: none;
 }
 
-.toc-list a.active {
+.sidebar-section-link.active {
   color: var(--hauptfarbe-hex);
   font-weight: 600;
-}
-
-.toc-list .toc-h3 a {
-  padding-left: 0.75rem;
-  font-size: 0.82rem;
-  color: #555;
+  background: rgba(68, 119, 170, 0.1);
 }
 
 .site-main {

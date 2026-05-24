@@ -16,4 +16,22 @@
       toggleKlapper(btn);
     });
   });
+
+  function openKlapperFromHash() {
+    var id = window.location.hash.replace(/^#/, "");
+    if (!id) {
+      return;
+    }
+    var btn = document.getElementById(id);
+    if (!btn || !btn.classList.contains("klapper-btn")) {
+      return;
+    }
+    var klapper = btn.closest(".klapper");
+    if (klapper && !klapper.classList.contains("is-open")) {
+      toggleKlapper(btn);
+    }
+  }
+
+  openKlapperFromHash();
+  window.addEventListener("hashchange", openKlapperFromHash);
 })();
