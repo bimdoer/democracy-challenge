@@ -6,10 +6,13 @@
   <title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
   <link rel="stylesheet" href="{{ '/assets/css/demokratie-callouts.css' | relative_url }}">
 </head>
-<body>
-  {% include nav.html %}
-  <main class="content">
-    {{ content }}
-  </main>
+<body class="site-layout">
+  {% include sidebar.html %}
+  <div class="site-main">
+    <main class="content">
+      {{ content }}
+    </main>
+  </div>
+  <script src="{{ '/assets/js/sidebar-toc.js' | relative_url }}" defer></script>
 </body>
 </html>

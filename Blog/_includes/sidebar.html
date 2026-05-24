@@ -1,0 +1,25 @@
+<aside class="sidebar">
+  <a href="{{ '/' | relative_url }}" class="sidebar-site-title">{{ site.title }}</a>
+
+  <nav class="sidebar-chapters" aria-label="Kapitel">
+    <p class="sidebar-label">Kapitel</p>
+    <ul>
+      <li>
+        <a href="{{ '/einleitung/' | relative_url }}"{% if page.permalink == '/einleitung/' %} class="active" aria-current="page"{% endif %}>Einleitung</a>
+      </li>
+      <li>
+        <a href="{{ '/zeitliche-analyse/' | relative_url }}"{% if page.permalink == '/zeitliche-analyse/' %} class="active" aria-current="page"{% endif %}>Zeitliche Analyse</a>
+      </li>
+      <li>
+        <a href="{{ '/geografische-analyse/' | relative_url }}"{% if page.permalink == '/geografische-analyse/' %} class="active" aria-current="page"{% endif %}>Geografische Analyse</a>
+      </li>
+    </ul>
+  </nav>
+
+  {% unless page.url == '/' or page.url == '/index.html' %}
+  <nav class="sidebar-toc" aria-label="Inhalt dieser Seite">
+    <p class="sidebar-label sidebar-page-title">{{ page.title }}</p>
+    <div id="page-toc"></div>
+  </nav>
+  {% endunless %}
+</aside>

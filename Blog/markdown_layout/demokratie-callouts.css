@@ -446,46 +446,164 @@ a.btn:hover {
 
 
 /* ============================================================
-   10) Jekyll / GitHub Pages (Navigation + Seitenrahmen)
+   10) Jekyll / GitHub Pages (Sidebar + Seitenrahmen)
    ============================================================ */
 
-body:has(.site-nav) {
+body.site-layout {
   max-width: none;
   margin: 0;
   padding: 0;
   background: #ffffff;
 }
 
-.site-nav {
-  border-bottom: 1px solid #ddd;
-  padding: 1rem 2rem;
-  display: flex;
-  gap: 2rem;
-  align-items: center;
-  flex-wrap: wrap;
+.site-layout {
+  display: grid;
+  grid-template-columns: 17rem 1fr;
+  min-height: 100vh;
 }
 
-.site-nav ul {
+.sidebar {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 1.5rem 1.25rem;
+  border-right: 1px solid #ddd;
+  background: rgb(248, 249, 251);
+  box-sizing: border-box;
+}
+
+.sidebar-site-title {
+  display: block;
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  color: var(--hauptfarbe-hex);
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+}
+
+.sidebar-site-title:hover {
+  text-decoration: underline;
+}
+
+.sidebar-label {
+  margin: 0 0 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(90, 110, 130);
+}
+
+.sidebar-page-title {
+  font-size: 0.85rem;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--hauptfarbe-hex);
+  line-height: 1.35;
+  margin-top: 1.25rem;
+}
+
+.sidebar-chapters ul,
+.toc-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
 }
 
-.site-nav a.site-title {
+.sidebar-chapters li {
+  margin-bottom: 0.35rem;
+}
+
+.sidebar-chapters a {
+  display: block;
+  padding: 0.35rem 0.5rem;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.sidebar-chapters a:hover {
+  background: rgba(68, 119, 170, 0.1);
+  text-decoration: none;
+}
+
+.sidebar-chapters a.active {
+  background: rgba(68, 119, 170, 0.15);
+  color: var(--hauptfarbe-hex);
   font-weight: 700;
 }
 
-.content {
+.sidebar-toc {
+  margin-top: 0.25rem;
+}
+
+.sidebar-toc.is-empty {
+  display: none;
+}
+
+.toc-list {
+  border-left: 2px solid rgba(68, 119, 170, 0.25);
+  padding-left: 0.65rem;
+}
+
+.toc-list li {
+  margin-bottom: 0.3rem;
+}
+
+.toc-list a {
+  display: block;
+  padding: 0.2rem 0;
+  font-size: 0.88rem;
+  line-height: 1.35;
+  text-decoration: none;
+  color: #444;
+}
+
+.toc-list a:hover {
+  color: var(--hauptfarbe-hex);
+  text-decoration: underline;
+}
+
+.toc-list .toc-h3 a {
+  padding-left: 0.75rem;
+  font-size: 0.82rem;
+  color: #555;
+}
+
+.site-main {
+  min-width: 0;
+}
+
+.site-layout .content {
   max-width: 52rem;
-  margin: 0 auto;
-  padding: 2rem 1.5rem 4rem;
+  margin: 0;
+  padding: 2rem 2.5rem 4rem;
   background: #ffffff;
   box-sizing: border-box;
 }
 
+.site-layout .content h2:target,
+.site-layout .content h3:target {
+  scroll-margin-top: 1rem;
+}
+
 .content .figure {
   margin: 0.5em 0 1em;
+}
+
+@media (max-width: 768px) {
+  .site-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+  }
 }
