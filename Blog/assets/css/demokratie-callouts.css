@@ -8,7 +8,7 @@
    <div class="haupt"><strong>Titel:</strong> Hauptbox</div>
    <div class="akzent"><strong>Titel:</strong> Akzentbox</div>
    <div class="lit"><strong>Literaturverzeichnis:</strong> ...</div>
-   Klapper: {% include klapper-….html %} in {::nomarkdown}…{:/nomarkdown}
+   Klapper: HTML-Block in {::nomarkdown}…{:/nomarkdown} (siehe .md-Kapitel)
 
    Drei-Spalten-Layout:
    <div class="text-reihe">
