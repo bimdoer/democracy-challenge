@@ -564,13 +564,14 @@ body.site-layout {
 .site-main {
   flex: 1 1 auto;
   min-width: 0;
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: 1fr min(52rem, 100%) 1fr;
 }
 
 .site-layout .content {
-  width: 100%;
-  max-width: 52rem;
+  grid-column: 2;
+  width: auto;
+  max-width: none;
   margin: 0;
   padding: 2rem 2.5rem 4rem;
   background: #ffffff;
@@ -598,5 +599,14 @@ body.site-layout {
     max-height: none;
     border-right: none;
     border-bottom: 1px solid #ddd;
+  }
+
+  .site-main {
+    grid-template-columns: 1fr;
+  }
+
+  .site-layout .content {
+    grid-column: 1;
+    padding: 1.5rem 1.25rem 3rem;
   }
 }
