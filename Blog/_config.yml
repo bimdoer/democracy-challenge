@@ -9,7 +9,8 @@ baseurl: "/democracy-challenge"
 markdown: kramdown
 kramdown:
   input: GFM
-  parse_block_html: true
+  # false: <details>, text-reihe etc. nicht in <p> zerlegen; Markdown nur in divs mit markdown="1"
+  parse_block_html: false
   auto_ids: true
   auto_id_stripping: true
 
