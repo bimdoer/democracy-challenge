@@ -1,0 +1,17 @@
+title: "Prädiktive Direkte Demokratie"
+description: "Kongruenz zwischen Abstimmungsempfehlungen und Volksentscheid"
+url: "https://bimdoer.github.io"
+baseurl: "/democracy-challenge"
+
+markdown: kramdown
+kramdown:
+  input: GFM
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+
+exclude:
+  - old files
