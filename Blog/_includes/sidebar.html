@@ -1,12 +1,9 @@
 <aside class="sidebar" aria-label="Seitennavigation">
   <div class="sidebar-inner">
-    <a href="{{ '/' | relative_url }}" class="sidebar-site-title">{{ site.title }}</a>
+    <a href="{{ '/einleitung/' | relative_url }}" class="sidebar-site-title">{{ site.title }}</a>
 
     <nav class="sidebar-chapters" aria-label="Navigation">
       <ul class="sidebar-chapter-list">
-        <li class="sidebar-chapter-item">
-          <a href="{{ '/' | relative_url }}" class="sidebar-chapter-link" data-nav="chapter">Start</a>
-        </li>
         {% for chapter in site.data.navigation.chapters %}
         <li class="sidebar-chapter-item">
           <a href="{{ chapter.permalink | relative_url }}" class="sidebar-chapter-link" data-nav="chapter">{{ chapter.title }}</a>
