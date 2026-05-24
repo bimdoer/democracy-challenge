@@ -221,10 +221,30 @@ details summary {
   font-weight: 700;
   cursor: pointer;
   color: var(--hauptfarbe-hex);
+  list-style: none;
+}
+
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+details summary::before {
+  content: "▶ ";
+  font-size: 0.75em;
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+details[open] summary::before {
+  transform: rotate(90deg);
 }
 
 details[open] summary {
   margin-bottom: 0.5em;
+}
+
+details > div[markdown] {
+  margin-top: 0.25em;
 }
 
 
