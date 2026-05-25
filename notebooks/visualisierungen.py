@@ -2,7 +2,6 @@
 Verwendung im Notebook:
 from visualisierungen import *
 from visualisierungen import heatmap
-from visualisierungen import heatmap_interaktiv_phasen
 from visualisierungen import heatmap as heat
 """
 
@@ -268,7 +267,7 @@ def anteilsdiagramm(data, x, hue, xlabel="", ylabel="Anteil",
 # 5. HEATMAP
 # ══════════════════════════════════════════════════════════════
 
-def heatmap(pivot, xlabel="", ylabel="", vmin=-0.5, vmax=0.5,
+def heatmap(pivot, xlabel="", ylabel="", vmax=None,
             cmap=None, figsize=(6, 7), fmt=".2f",
             xlabels=None, ylabels=None, rotation=0):
     if cmap is None:
@@ -279,8 +278,7 @@ def heatmap(pivot, xlabel="", ylabel="", vmin=-0.5, vmax=0.5,
     _transparent(fig, ax)
     sns.heatmap(
         pivot, cmap=cmap,
-        vmin=vmin, vmax=vmax,
-        center=0 if vmin is not None and vmax is not None and vmin < 0 < vmax else None,
+        vmin=0, vmax=1,
         linewidths=0.1,
         annot=True, fmt=fmt,
         annot_kws={"size": FONTSIZE_KLEIN},
@@ -300,114 +298,6 @@ def heatmap(pivot, xlabel="", ylabel="", vmin=-0.5, vmax=0.5,
     ax.tick_params(axis='y', labelsize=FONTSIZE_KLEIN, rotation=rotation)
     fig.tight_layout()
     plt.show()
-
-
-# ══════════════════════════════════════════════════════════════
-# 5b. INTERAKTIVE HEATMAP MIT PHASEN-/ZEITSLOT-AUSWAHL
-# ══════════════════════════════════════════════════════════════
-
-def heatmap_interaktiv_phasen(
-    phasen,
-    vmin=-0.5,
-    vmax=0.5,
-    titel="",
-    xlabel="Kantone",
-    ylabel="Akteure",
-    xlabels=None,
-    ylabels=None,
-    text_fmt=".2f",
-    colorscale=None,
-    width=720,
-    height=450,
-    default_index=0,
-):
-    """
-    Plotly-Heatmap mit Buttons zum Wechseln der Zeitphase.
-
-    phasen: Liste von (Button-Label, Pivot-DataFrame), z. B. aus df_phase pro phase.
-    Der Pivot sollte Zeilen = Akteure, Spalten = Kantone, Werte bereits in Plot-Skala sein.
-    """
-    if not phasen:
-        raise ValueError("phasen ist leer")
-
-    if colorscale is None:
-        colorscale = "RdBu"
-
-    fig = go.Figure()
-    default_index = min(default_index, len(phasen) - 1)
-
-    for i, (label, pivot) in enumerate(phasen):
-        x = list(xlabels) if xlabels is not None else [str(c) for c in pivot.columns]
-        y = list(ylabels) if ylabels is not None else [str(r) for r in pivot.index]
-        z = pivot.values.astype(float)
-        text = np.where(
-            np.isnan(z),
-            "",
-            np.char.mod(f"%{text_fmt}", z),
-        )
-
-        fig.add_trace(
-            go.Heatmap(
-                z=z,
-                x=x,
-                y=y,
-                zmin=vmin,
-                zmax=vmax,
-                zmid=0 if vmin < 0 < vmax else None,
-                colorscale=colorscale,
-                text=text,
-                texttemplate="%{text}",
-                textfont=dict(size=PLOTLY_FONT_SIZE - 2),
-                hoverinfo="skip",
-                colorbar=dict(title="Kongruenz"),
-                showscale=True,
-                visible=(i == default_index),
-                xgap=1,
-                ygap=1,
-            )
-        )
-
-    n_traces = len(phasen)
-    buttons = []
-    for i, (label, _) in enumerate(phasen):
-        visible = [j == i for j in range(n_traces)]
-        buttons.append(
-            dict(
-                label=label,
-                method="update",
-                args=[{"visible": visible}],
-            )
-        )
-
-    layout_kwargs = dict(
-        xaxis=dict(title=xlabel, side="top", tickangle=-90),
-        yaxis=dict(title=ylabel, autorange="reversed"),
-        template=PLOTLY_TEMPLATE,
-        font=dict(family=PLOTLY_FONT_FAMILY, size=PLOTLY_FONT_SIZE),
-        paper_bgcolor=PLOTLY_BG_TRANSPARENT,
-        plot_bgcolor=PLOTLY_BG_TRANSPARENT,
-        hovermode=False,
-        width=width,
-        height=height,
-        margin=dict(t=56, b=48, l=72, r=48),
-        updatemenus=[
-            dict(
-                type="buttons",
-                direction="right",
-                x=0.5,
-                xanchor="center",
-                y=1.14,
-                yanchor="bottom",
-                buttons=buttons,
-                showactive=True,
-            )
-        ],
-    )
-    if titel:
-        layout_kwargs["title"] = titel
-    fig.update_layout(**layout_kwargs)
-
-    return fig
 
 
 # ══════════════════════════════════════════════════════════════
