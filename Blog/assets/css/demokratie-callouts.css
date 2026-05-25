@@ -604,6 +604,16 @@ body.site-layout {
   margin: 0.5em 0 1em;
 }
 
+.content iframe {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+}
+
 @media (max-width: 768px) {
   body.site-layout {
     flex-direction: column;
