@@ -1,8 +1,32 @@
+{% comment %}
+  Resolve current chapter: page.url is reliable; page.permalink can be unset in Liquid.
+{% endcomment %}
+{% assign current_chapter = nil %}
+{% assign page_path = page.url | default: "" %}
+{% for chapter in site.data.navigation.chapters %}
+  {% assign chapter_path = chapter.permalink %}
+  {% if chapter_path == page_path or chapter_path == page.permalink %}
+    {% assign current_chapter = chapter %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+{% unless current_chapter %}
+  {% assign page_slug = page_path | split: "/" | last %}
+  {% for chapter in site.data.navigation.chapters %}
+    {% assign chapter_slug = chapter.permalink | split: "/" | last %}
+    {% if page_slug != "" and page_slug == chapter_slug %}
+      {% assign current_chapter = chapter %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
+{% endunless %}
+
 <aside class="sidebar" aria-label="Seitennavigation">
   <div class="sidebar-inner">
     <div class="sidebar-header">
-      <a href="{{ '/einleitung/' | relative_url }}" class="sidebar-site-title">{{ site.title }}</a>
+      <a href="{{ '/' | relative_url }}" class="sidebar-site-title">{{ site.title }}</a>
 
+      <p class="sidebar-label">Kapitel</p>
       <nav class="sidebar-chapter-tabs" aria-label="Kapitel">
         <ul>
           {% for chapter in site.data.navigation.chapters %}
@@ -14,15 +38,9 @@
       </nav>
     </div>
 
-    <nav class="sidebar-sections-nav" aria-label="Abschnitte">
-      {% assign current_chapter = nil %}
-      {% for chapter in site.data.navigation.chapters %}
-        {% if chapter.permalink == page.permalink %}
-          {% assign current_chapter = chapter %}
-        {% endif %}
-      {% endfor %}
-
+    <nav class="sidebar-sections-nav" aria-label="Abschnitte" data-nav-sections="{% if current_chapter %}{{ current_chapter.sections.size }}{% else %}0{% endif %}">
       {% if current_chapter and current_chapter.sections.size > 0 %}
+      <p class="sidebar-label sidebar-page-title">{{ current_chapter.title }}</p>
       <ul class="sidebar-sections">
         {% for section in current_chapter.sections %}
         <li>
@@ -30,8 +48,8 @@
         </li>
         {% endfor %}
       </ul>
-      {% else %}
-      <p class="sidebar-sections-empty">Wähle ein Kapitel oben.</p>
+      {% elsif page.title %}
+      <p class="sidebar-sections-empty">Für „{{ page.title }}“ sind keine Abschnitte in der Navigation hinterlegt.</p>
       {% endif %}
     </nav>
   </div>

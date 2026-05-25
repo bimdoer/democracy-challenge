@@ -1,6 +1,6 @@
 (function () {
-  var chapterLinks = document.querySelectorAll('.sidebar-chapter-tab[data-nav="chapter"]');
-  var sectionLinks = document.querySelectorAll('.sidebar-section-link[data-nav="section"]');
+  var chapterLinks = document.querySelectorAll(".sidebar-chapter-tab[data-nav='chapter']");
+  var sectionLinks = document.querySelectorAll(".sidebar-section-link[data-nav='section']");
   var SCROLL_MARKER = 120;
   var scrollTicking = false;
   var userClickedNav = false;
@@ -30,11 +30,21 @@
     }
   }
 
+  function hashIdFromLocation() {
+    var raw = window.location.hash.slice(1);
+    if (!raw) {
+      return "";
+    }
+    try {
+      return decodeURIComponent(raw);
+    } catch (err) {
+      return raw;
+    }
+  }
+
+  /** Sections in the sidebar belong to the current page only (Liquid). */
   function getPageSectionLinks() {
-    var path = normalizePath(window.location.pathname);
-    return Array.prototype.filter.call(sectionLinks, function (link) {
-      return linkPath(link) === path;
-    });
+    return Array.prototype.slice.call(sectionLinks);
   }
 
   function getSectionTargets(pageLinks) {
@@ -47,7 +57,7 @@
       .filter(Boolean);
   }
 
-  function findActiveSectionId(targets) {
+  function findActiveSectionIdFromScroll(targets) {
     if (!targets.length) {
       return null;
     }
@@ -59,6 +69,23 @@
       }
     });
     return activeId;
+  }
+
+  function resolveActiveSectionId(pageLinks, targets) {
+    var hashId = hashIdFromLocation();
+    if (hashId && pageLinks.some(function (link) { return hashIdFromLink(link) === hashId; })) {
+      return hashId;
+    }
+
+    if (targets.length) {
+      return findActiveSectionIdFromScroll(targets);
+    }
+
+    if (pageLinks.length) {
+      return hashIdFromLink(pageLinks[0]);
+    }
+
+    return null;
   }
 
   function scrollNavLinkIntoView(link) {
@@ -112,13 +139,7 @@
   function updateFromScroll() {
     var pageLinks = getPageSectionLinks();
     var targets = getSectionTargets(pageLinks);
-
-    if (!targets.length) {
-      applyActiveSection(null);
-      return;
-    }
-
-    applyActiveSection(findActiveSectionId(targets));
+    applyActiveSection(resolveActiveSectionId(pageLinks, targets));
   }
 
   function scheduleScrollUpdate() {
