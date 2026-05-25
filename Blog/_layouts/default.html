@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
+  <link rel="stylesheet" href="{{ '/assets/css/demokratie-callouts.css' | relative_url }}">
+</head>
+<body class="site-layout" data-baseurl="{{ site.baseurl | default: '' }}">
+  {% include sidebar.html %}
+  <div class="site-main">
+    <main class="content">
+      {{ content }}
+    </main>
+  </div>
+  <script src="{{ '/assets/js/klapper.js' | relative_url }}" defer></script>
+  <script src="{{ '/assets/js/sidebar-nav.js' | relative_url }}" defer></script>
+</body>
+</html>

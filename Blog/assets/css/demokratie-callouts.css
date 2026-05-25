@@ -8,7 +8,7 @@
    <div class="haupt"><strong>Titel:</strong> Hauptbox</div>
    <div class="akzent"><strong>Titel:</strong> Akzentbox</div>
    <div class="lit"><strong>Literaturverzeichnis:</strong> ...</div>
-   <details><summary>Titel</summary>Inhalt</details>
+   Klapper: HTML-Block in {::nomarkdown}…{:/nomarkdown} (siehe .md-Kapitel)
 
    Drei-Spalten-Layout:
    <div class="text-reihe">
@@ -206,10 +206,10 @@ hr {
 
 
 /* ============================================================
-   5) KLAPPER (Standard <details>-Element)
+   5) KLAPPER (Titel klicken → Text ein-/ausblenden)
    ============================================================ */
 
-details {
+.klapper {
   border-left: 4px solid var(--hauptfarbe-hex);
   background: rgba(68, 119, 170, 0.05);
   padding: 0.8em 1em;
@@ -217,14 +217,41 @@ details {
   border-radius: 0 4px 4px 0;
 }
 
-details summary {
+.klapper-btn {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
   font-weight: 700;
-  cursor: pointer;
+  text-align: left;
   color: var(--hauptfarbe-hex);
+  cursor: pointer;
 }
 
-details[open] summary {
+.klapper-btn-label::before {
+  content: "▶ ";
+  font-size: 0.75em;
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.klapper.is-open .klapper-btn-label::before {
+  transform: rotate(90deg);
+}
+
+.klapper.is-open .klapper-btn {
   margin-bottom: 0.5em;
+}
+
+.klapper-panel > :first-child {
+  margin-top: 0;
+}
+
+.klapper-panel > :last-child {
+  margin-bottom: 0;
 }
 
 
@@ -250,29 +277,43 @@ details[open] summary {
       (zeitlich · geografisch · thematisch)
    ============================================================ */
 
-.text-reihe {
+.text-reihe,
+.content .text-reihe {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   margin: 1em 0;
+  align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
-.feld {
-  flex: 1;
+.feld,
+.content .feld {
+  flex: 1 1 14rem;
+  min-width: min(100%, 14rem);
   padding: 12px 16px;
   border-radius: 0 4px 4px 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
-.feld strong {
+.feld strong,
+.content .feld strong {
   display: block;
   margin-bottom: 6px;
 }
 
-.feld p {
+.feld p,
+.content .feld p {
   margin: 0 0 0.5em 0;
   line-height: 1.5;
 }
 
-.feld p:last-child {
+.feld p:last-child,
+.content .feld p:last-child {
   margin-bottom: 0;
 }
 
@@ -308,7 +349,18 @@ details[open] summary {
    8) Buttons
    ============================================================ */
 
+.btn-gruppe {
+  margin: 0.75em 0 0;
+}
+
+.feld .btn-gruppe,
+.content .feld .btn-gruppe {
+  margin-top: auto;
+  padding-top: 0.75em;
+}
+
 .btn {
+  display: inline-block;
   background: transparent;
   border-width: 2px;
   border-style: solid;
@@ -318,6 +370,17 @@ details[open] summary {
   font-family: inherit;
   font-size: 14px;
   transition: background 0.2s;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+a.btn:hover {
+  text-decoration: none;
+}
+
+.btn-inaktiv {
+  opacity: 0.65;
+  cursor: default;
 }
 
 .btn-zeitlich {
@@ -349,41 +412,236 @@ details[open] summary {
    9) PHASEN-KLAPPER (Türkis, zeitliche Achse)
    ============================================================ */
 
-.phase {
-  border-left: 4px solid #44AA99;
+.klapper-phase {
+  border-left-color: #44AA99;
   background: rgb(229, 244, 240);
-  padding: 0.8em 1em;
-  margin: 1em 0;
-  border-radius: 0 4px 4px 0;
 }
 
-.phase summary {
+.klapper-phase .klapper-btn {
+  color: #1f5e51;
+}
+
+.klapper-phase strong {
+  color: #1f5e51;
+}
+
+
+/* ============================================================
+   10) Jekyll / GitHub Pages (Sidebar + Seitenrahmen)
+   ============================================================ */
+
+body.site-layout {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #ffffff;
+}
+
+.sidebar {
+  flex: 0 0 17rem;
+  width: 17rem;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100vh;
+  max-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 0;
+  border-right: 1px solid #ddd;
+  background: rgb(248, 249, 251);
+  box-sizing: border-box;
+  z-index: 10;
+}
+
+.sidebar-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 100%;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.sidebar-header {
+  flex: 0 0 auto;
+  padding: 1.5rem 1.25rem 1rem;
+  border-bottom: 1px solid #ddd;
+  background: rgb(248, 249, 251);
+}
+
+.sidebar-chapters-nav {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 1rem 1.25rem 2rem;
+}
+
+.sidebar-site-title {
+  display: block;
   font-weight: 700;
-  cursor: pointer;
-  color: #1f5e51;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  color: var(--hauptfarbe-hex);
+  text-decoration: none;
+  margin-bottom: 0;
+}
+
+.sidebar-site-title:hover {
+  text-decoration: underline;
+}
+
+.sidebar-chapter-list,
+.sidebar-sections {
   list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.phase summary::-webkit-details-marker {
-  display: none;
+.sidebar-chapter-item {
+  margin-bottom: 0.75rem;
 }
 
-.phase summary::before {
-  content: "▶";
-  display: inline-block;
-  margin-right: 0.5em;
-  font-size: 0.8em;
-  transition: transform 0.2s ease;
+.sidebar-chapter-item.is-current > .sidebar-chapter-tab {
+  color: var(--hauptfarbe-hex);
 }
 
-.phase[open] summary::before {
-  transform: rotate(90deg);
+.sidebar-sections {
+  display: block;
+  margin: 0.15rem 0 0;
+  padding: 0 0 0 1rem;
 }
 
-.phase[open] summary {
-  margin-bottom: 0.5em;
+.sidebar-chapter-tab {
+  display: block;
+  padding: 0.4rem 0.5rem;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #333;
+  font-size: 0.95rem;
+  font-weight: 600;
 }
 
-.phase strong {
-  color: #1f5e51;
+.sidebar-chapter-tab:hover {
+  background: rgba(68, 119, 170, 0.1);
+  text-decoration: none;
+}
+
+.sidebar-chapter-tab.is-on-page {
+  color: var(--hauptfarbe-hex);
+}
+
+.sidebar-chapter-tab.active {
+  background: rgba(68, 119, 170, 0.15);
+  color: var(--hauptfarbe-hex);
+  font-weight: 700;
+}
+
+.sidebar-sections li {
+  margin-bottom: 0.2rem;
+}
+
+.sidebar-section-link {
+  display: block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  text-decoration: none;
+  color: #555;
+}
+
+.sidebar-section-link:hover {
+  color: var(--hauptfarbe-hex);
+  background: rgba(68, 119, 170, 0.08);
+  text-decoration: none;
+}
+
+.sidebar-section-link.active {
+  color: var(--hauptfarbe-hex);
+  font-weight: 600;
+  background: rgba(68, 119, 170, 0.12);
+  border-left: 2px solid var(--hauptfarbe-hex);
+  margin-left: -2px;
+  padding-left: calc(0.5rem + 2px);
+}
+
+.site-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 52rem) 1fr;
+}
+
+.site-layout .content {
+  grid-column: 2;
+  width: 100%;
+  max-width: 52rem;
+  margin: 0;
+  padding: 2rem 2.5rem 4rem;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.site-layout .content h1:target,
+.site-layout .content h2:target,
+.site-layout .content h3:target {
+  scroll-margin-top: 1rem;
+}
+
+.content .figure {
+  margin: 0.5em 0 1em;
+}
+
+@media (max-width: 768px) {
+  body.site-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    position: static;
+    flex: none;
+    width: 100%;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .sidebar-inner {
+    min-height: 0;
+    height: auto;
+  }
+
+  .sidebar-header {
+    padding: 1.25rem;
+  }
+
+  .sidebar-chapters-nav {
+    overflow: visible;
+    padding: 1rem 1.25rem 1.5rem;
+  }
+
+  .site-main {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .site-layout .content {
+    grid-column: 1;
+    max-width: none;
+    padding: 1.5rem 1.25rem 3rem;
+  }
 }

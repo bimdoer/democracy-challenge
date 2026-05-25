@@ -1,0 +1,38 @@
+chapters:
+  - title: Einleitung
+    permalink: /einleitung/
+    sections:
+      - title: Wie stark stimmt das Schweizer Stimmvolk mit seinen Institutionen überein?
+        anchor: wie-stark-stimmt-das-schweizer-stimmvolk-mit-seinen-institutionen-überein
+      - title: Seit wann gibt es Abstimmungsempfehlungen?
+        anchor: seit-wann-gibt-es-abstimmungsempfehlungen
+      - title: "Eine erste Übersicht: Mit wem stimmt die Stimmbevölkerung am stärksten überein?"
+        anchor: eine-erste-übersicht-mit-wem-stimmt-die-stimmbevölkerung-am-stärksten-überein
+      - title: Aspekte
+        anchor: aspekte
+
+  - title: Zeitliche Analyse
+    permalink: /zeitliche-analyse/
+    sections:
+      - title: Entwicklung über die Zeit
+        anchor: entwicklung-über-die-zeit
+      - title: Wie oft gehen Herr und Frau Schweizer abstimmen?
+        anchor: klapper-abstimmungsfrequenz-btn
+      - title: Frühphase (1848–1899)
+        anchor: klapper-phase-fruehphase-btn
+      - title: Volatile Phase (1900–1949)
+        anchor: klapper-phase-volatile-btn
+      - title: Konsensphase (1950–1980)
+        anchor: klapper-phase-konsens-btn
+      - title: Aufspaltung ab den 1980er-Jahren
+        anchor: klapper-phase-aufspaltung-btn
+      - title: "2010er-Jahre bis heute: Konvergenz auf tiefem Niveau"
+        anchor: klapper-phase-2010-btn
+
+  - title: Geografische Analyse
+    permalink: /geografische-analyse/
+    sections:
+      - title: Geografische Ausprägungen
+        anchor: geografische-ausprägungen
+      - title: Wie sieht die Abstimmungskongruenz kantonal aus?
+        anchor: klapper-geografisch-btn

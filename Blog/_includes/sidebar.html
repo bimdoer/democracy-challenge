@@ -1,0 +1,35 @@
+{% assign current_chapter = nil %}
+{% assign page_path = page.url | default: "" %}
+{% for chapter in site.data.navigation.chapters %}
+  {% if chapter.permalink == page_path %}
+    {% assign current_chapter = chapter %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+<aside class="sidebar" aria-label="Seitennavigation">
+  <div class="sidebar-inner">
+    <div class="sidebar-header">
+      <a href="{{ '/' | relative_url }}" class="sidebar-site-title">{{ site.title }}</a>
+    </div>
+
+    <nav class="sidebar-chapters-nav" aria-label="Kapitel und Abschnitte">
+      <ul class="sidebar-chapter-list">
+        {% for chapter in site.data.navigation.chapters %}
+        <li class="sidebar-chapter-item{% if current_chapter and chapter.permalink == current_chapter.permalink %} is-current{% endif %}" data-chapter-path="{{ chapter.permalink }}">
+          <a href="{{ chapter.permalink | relative_url }}" class="sidebar-chapter-tab" data-nav="chapter" data-chapter-path="{{ chapter.permalink }}">{{ chapter.title }}</a>
+          {% if chapter.sections.size > 0 %}
+          <ul class="sidebar-sections">
+            {% for section in chapter.sections %}
+            <li>
+              <a href="{{ chapter.permalink | relative_url }}#{{ section.anchor }}" class="sidebar-section-link" data-nav="section">{{ section.title }}</a>
+            </li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </nav>
+  </div>
+</aside>
