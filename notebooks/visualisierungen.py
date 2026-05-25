@@ -317,7 +317,7 @@ def heatmap_interaktiv_phasen(
     ylabels=None,
     text_fmt=".2f",
     colorscale=None,
-    width=1000,
+    width=720,
     height=450,
     default_index=0,
 ):
@@ -358,11 +358,7 @@ def heatmap_interaktiv_phasen(
                 text=text,
                 texttemplate="%{text}",
                 textfont=dict(size=PLOTLY_FONT_SIZE - 2),
-                hovertemplate=(
-                    f"<b>%{{y}}</b><br>"
-                    f"{xlabel}: %{{x}}<br>"
-                    f"Kongruenz: %{{z:{text_fmt}}}<extra></extra>"
-                ),
+                hoverinfo="skip",
                 colorbar=dict(title="Kongruenz"),
                 showscale=True,
                 visible=(i == default_index),
@@ -375,45 +371,41 @@ def heatmap_interaktiv_phasen(
     buttons = []
     for i, (label, _) in enumerate(phasen):
         visible = [j == i for j in range(n_traces)]
-        phase_titel = f"{titel}: {label}" if titel else label
         buttons.append(
             dict(
                 label=label,
                 method="update",
-                args=[
-                    {"visible": visible},
-                    {"title": phase_titel},
-                ],
+                args=[{"visible": visible}],
             )
         )
 
-    default_label = phasen[default_index][0]
-    layout_titel = f"{titel}: {default_label}" if titel else default_label
-
-    fig.update_layout(
-        title=layout_titel,
+    layout_kwargs = dict(
         xaxis=dict(title=xlabel, side="top", tickangle=-90),
         yaxis=dict(title=ylabel, autorange="reversed"),
         template=PLOTLY_TEMPLATE,
         font=dict(family=PLOTLY_FONT_FAMILY, size=PLOTLY_FONT_SIZE),
         paper_bgcolor=PLOTLY_BG_TRANSPARENT,
         plot_bgcolor=PLOTLY_BG_TRANSPARENT,
+        hovermode=False,
         width=width,
         height=height,
-        margin=dict(t=100),
+        margin=dict(t=56, b=48, l=72, r=48),
         updatemenus=[
             dict(
                 type="buttons",
                 direction="right",
                 x=0.5,
                 xanchor="center",
-                y=1.12,
-                yanchor="top",
+                y=1.14,
+                yanchor="bottom",
                 buttons=buttons,
                 showactive=True,
             )
         ],
     )
+    if titel:
+        layout_kwargs["title"] = titel
+    fig.update_layout(**layout_kwargs)
 
     return fig
 
