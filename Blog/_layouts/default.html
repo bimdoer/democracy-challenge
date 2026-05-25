@@ -6,7 +6,7 @@
   <title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
   <link rel="stylesheet" href="{{ '/assets/css/demokratie-callouts.css' | relative_url }}">
 </head>
-<body class="site-layout">
+<body class="site-layout" data-baseurl="{{ site.baseurl | default: '' }}">
   {% include sidebar.html %}
   <div class="site-main">
     <main class="content">

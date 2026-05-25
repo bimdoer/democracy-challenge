@@ -500,24 +500,6 @@ body.site-layout {
   text-decoration: underline;
 }
 
-.sidebar-label {
-  margin: 0 0 0.5rem;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: rgb(90, 110, 130);
-}
-
-.sidebar-page-title {
-  font-size: 0.85rem;
-  text-transform: none;
-  letter-spacing: normal;
-  color: var(--hauptfarbe-hex);
-  line-height: 1.35;
-  margin-top: 1.25rem;
-}
-
 .sidebar-chapter-list,
 .sidebar-sections {
   list-style: none;
@@ -534,6 +516,7 @@ body.site-layout {
 }
 
 .sidebar-sections {
+  display: block;
   margin: 0.15rem 0 0;
   padding: 0 0 0 1rem;
 }
@@ -561,13 +544,6 @@ body.site-layout {
   background: rgba(68, 119, 170, 0.15);
   color: var(--hauptfarbe-hex);
   font-weight: 700;
-}
-
-.sidebar-sections-empty {
-  margin: 0;
-  font-size: 0.85rem;
-  color: #666;
-  line-height: 1.4;
 }
 
 .sidebar-sections li {
