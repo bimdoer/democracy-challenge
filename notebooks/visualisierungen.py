@@ -173,8 +173,12 @@ PLOTLY_PHASE_BAR_JS = """<script>
       btn.addEventListener("click", function () {
         var i = parseInt(btn.getAttribute("data-phase"), 10);
         var vis = [];
-        for (var j = 0; j < n; j++) vis.push(j === i);
-        Plotly.restyle(plotDiv, { visible: vis });
+        var showscale = [];
+        for (var j = 0; j < n; j++) {
+          vis.push(j === i);
+          showscale.push(j === i);
+        }
+        Plotly.restyle(plotDiv, { visible: vis, showscale: showscale });
         document.querySelectorAll(BAR_SEL).forEach(function (b) {
           b.classList.toggle("active", b === btn);
         });
@@ -220,6 +224,41 @@ def _phase_bar_buttons_html(labels):
 
 
 PLOTLY_HEATMAP_X_DOMAIN_END = 0.97
+PLOTLY_GEOMAP_X_DOMAIN_END = 0.97
+
+
+def _sync_geomap_colorbar(fig, x_domain_end=PLOTLY_GEOMAP_X_DOMAIN_END):
+    for trace in fig.data:
+        cb = trace.colorbar
+        if cb is None:
+            continue
+        cb.len = 0.92
+        cb.lenmode = "fraction"
+        cb.y = 0.5
+        cb.yref = "paper"
+        cb.yanchor = "middle"
+        cb.x = min(x_domain_end + 0.018, 0.995)
+        cb.xanchor = "left"
+        cb.xpad = 0
+        cb.thickness = 8
+
+
+def _expand_geomap_for_html_export(fig, x_domain_end=PLOTLY_GEOMAP_X_DOMAIN_END):
+    """Karte auf volle Breite (wie Heatmap), Colorbar daneben."""
+    fig.update_layout(
+        geo=dict(
+            domain=dict(x=[0, x_domain_end], y=[0, 1]),
+            fitbounds="geojson",
+            bgcolor=PLOTLY_BG_TRANSPARENT,
+            showland=False,
+            showcountries=False,
+            showcoastlines=False,
+            showocean=False,
+            showlakes=False,
+        ),
+        margin=dict(t=4, b=4, l=0, r=4, pad=0),
+    )
+    _sync_geomap_colorbar(fig, x_domain_end)
 
 
 def _sync_heatmap_colorbar(fig, plot_top, x_domain_end=PLOTLY_HEATMAP_X_DOMAIN_END):
@@ -281,11 +320,13 @@ def write_plotly_html_responsive(
     include_plotlyjs="inline",
     full_html=True,
     phase_bar_labels=None,
+    phase_bar_layout="heatmap",
 ):
     """Plotly-HTML für iframe mit width=100% (füllt die Content-Spalte).
 
     phase_bar_labels: Phasen-Labels → HTML-Zeile mit gleicher Buttonbreite und Abstand.
     height: Bei phase_bar_labels Gesamthöhe inkl. Buttonzeile (px), sonst Plot-Höhe.
+    phase_bar_layout: "heatmap" passt Domain/Margin für Heatmaps an, "generic" für Karten.
     """
     import copy
     import re
@@ -297,13 +338,16 @@ def write_plotly_html_responsive(
     if phase_bar_labels:
         export_fig = copy.deepcopy(fig)
         export_fig.layout.updatemenus = ()
-        _expand_phase_plot_for_html_export(export_fig)
+        if phase_bar_layout == "heatmap":
+            _expand_phase_plot_for_html_export(export_fig)
+        elif phase_bar_layout == "generic":
+            _expand_geomap_for_html_export(export_fig)
         total_height = height if height is not None else 400
         plot_height = total_height - PLOTLY_PHASE_BAR_HEIGHT_PX
 
     m = export_fig.layout.margin
     if phase_bar_labels:
-        top = int(m.t) if m.t is not None else 28
+        top = int(m.t) if m.t is not None else (28 if phase_bar_layout == "heatmap" else 8)
     else:
         top = max(88, int(m.t)) if m.t is not None else 88
     layout = {
@@ -313,7 +357,7 @@ def write_plotly_html_responsive(
             l=int(m.l) if m.l is not None else 0,
             r=int(m.r) if m.r is not None else 0,
             t=top,
-            b=int(m.b) if m.b is not None else (32 if phase_bar_labels else 40),
+            b=int(m.b) if m.b is not None else (32 if phase_bar_labels and phase_bar_layout == "heatmap" else 8),
             pad=0,
         ),
     }
@@ -955,6 +999,168 @@ def schweiz_karte_choropleth(
     ax.set_axis_off()
     fig.tight_layout()
     plt.show()
+
+
+def _load_ch_geojson_dict(geojson_pfad=None):
+    import json
+
+    path = Path(geojson_pfad) if geojson_pfad is not None else _DEFAULT_CH_GEOJSON
+    if not path.is_file():
+        raise FileNotFoundError(f"GeoJSON nicht gefunden: {path}")
+    with path.open(encoding="utf-8") as f:
+        return json.load(f)
+
+
+def phase_kantons_row_to_map_df(row, wert_spalte="kongruenz", id_col="id"):
+    """
+    Eine Zeile aus df_heatmap_by_phase (Kantons-Spalten …-japroz) → DataFrame id + Wert.
+    Skala wie Heatmap: (ja_proz − 50) in pp → −0.5 … +0.5.
+    """
+    canton_cols = [c for c in row.index if str(c).endswith("-japroz")]
+    values = pd.to_numeric(row[canton_cols], errors="coerce").astype(float)
+    if values.abs().max() > 1:
+        values = values / 100
+    values = values.clip(-0.5, 0.5)
+    return pd.DataFrame(
+        {
+            id_col: ["CH" + str(c).split("-")[0].upper() for c in canton_cols],
+            wert_spalte: values.values,
+        }
+    )
+
+
+def schweiz_karte_interaktiv_phasen(
+    phasen,
+    wert_spalte="kongruenz",
+    join_col="id",
+    vmin=-0.5,
+    vmax=0.5,
+    titel="",
+    colorscale=None,
+    geojson_pfad=None,
+    featureidkey="properties.id",
+    width=None,
+    height=360,
+    default_index=0,
+):
+    """
+    Plotly-Choropleth Schweiz mit Phasen-Umschaltung (wie heatmap_interaktiv_phasen).
+
+    phasen: Liste (Button-Label, DataFrame mit join_col + wert_spalte), z. B. aus phase_kantons_row_to_map_df.
+    """
+    if not phasen:
+        raise ValueError("phasen ist leer")
+
+    if colorscale is None:
+        colorscale = "RdBu"
+
+    geojson = _load_ch_geojson_dict(geojson_pfad)
+    fig = go.Figure()
+    default_index = min(default_index, len(phasen) - 1)
+
+    colorbar = dict(
+        thickness=8,
+        len=0.92,
+        lenmode="fraction",
+        y=0.5,
+        yanchor="middle",
+        yref="paper",
+        x=min(PLOTLY_GEOMAP_X_DOMAIN_END + 0.018, 0.995),
+        xanchor="left",
+        xpad=0,
+        outlinewidth=0,
+        tickfont=dict(size=PLOTLY_FONT_SIZE - 2),
+    )
+
+    for i, (_, df_map) in enumerate(phasen):
+        if join_col not in df_map.columns or wert_spalte not in df_map.columns:
+            raise ValueError(f"DataFrame braucht Spalten {join_col!r} und {wert_spalte!r}")
+        fig.add_trace(
+            go.Choropleth(
+                geojson=geojson,
+                locations=df_map[join_col],
+                z=df_map[wert_spalte],
+                featureidkey=featureidkey,
+                zmin=vmin,
+                zmax=vmax,
+                zmid=0 if vmin < 0 < vmax else None,
+                colorscale=colorscale,
+                marker_line_width=0.4,
+                marker_line_color="#333333",
+                colorbar=colorbar,
+                showscale=(i == default_index),
+                visible=(i == default_index),
+                hovertemplate="%{location}<br>Kongruenz: %{z:.2f}<extra></extra>",
+            )
+        )
+
+    n_traces = len(phasen)
+    raw_labels = [label for label, _ in phasen]
+    eq_labels = _equalize_phase_button_labels(raw_labels)
+    btn_font = dict(
+        family="Courier New, Courier, monospace",
+        size=9,
+        color="#333333",
+    )
+    phase_buttons = []
+    for i, (_, _) in enumerate(phasen):
+        visible = [j == i for j in range(n_traces)]
+        showscale = [j == i for j in range(n_traces)]
+        phase_buttons.append(
+            dict(
+                label=eq_labels[i],
+                method="update",
+                args=[
+                    {"visible": visible, "showscale": showscale},
+                ],
+            )
+        )
+
+    layout_kwargs = dict(
+        template=PLOTLY_TEMPLATE,
+        font=dict(family=PLOTLY_FONT_FAMILY, size=PLOTLY_FONT_SIZE),
+        paper_bgcolor=PLOTLY_BG_TRANSPARENT,
+        plot_bgcolor=PLOTLY_BG_TRANSPARENT,
+        hovermode=False,
+        autosize=True,
+        margin=dict(t=16, b=4, l=0, r=4, pad=0),
+        geo=dict(
+            domain=dict(x=[0, PLOTLY_GEOMAP_X_DOMAIN_END], y=[0, 1]),
+            bgcolor=PLOTLY_BG_TRANSPARENT,
+            lakecolor=PLOTLY_BG_TRANSPARENT,
+            showcountries=False,
+            showcoastlines=False,
+            showland=False,
+            showocean=False,
+            showlakes=False,
+            fitbounds="geojson",
+        ),
+        updatemenus=[
+            dict(
+                type="buttons",
+                direction="right",
+                active=default_index,
+                x=0.5,
+                xanchor="center",
+                y=1.08,
+                yanchor="bottom",
+                buttons=phase_buttons,
+                showactive=True,
+                bgcolor=PLOTLY_DROPDOWN_BG,
+                bordercolor=PLOTLY_DROPDOWN_BORDER,
+                borderwidth=1,
+                font=btn_font,
+            )
+        ],
+    )
+    if width is not None:
+        layout_kwargs["width"] = width
+    if height is not None:
+        layout_kwargs["height"] = height
+    if titel:
+        layout_kwargs["title"] = titel
+    fig.update_layout(**layout_kwargs)
+    return fig
 
 
 # ══════════════════════════════════════════════════════════════
