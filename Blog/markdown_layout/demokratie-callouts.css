@@ -605,13 +605,13 @@ body.site-layout {
   min-height: 100vh;
   min-height: 100dvh;
   display: grid;
-  grid-template-columns: 1fr minmax(0, 52rem) 1fr;
+  grid-template-columns: 1fr minmax(0, 65rem) 1fr;
 }
 
 .site-layout .content {
   grid-column: 2;
   width: 100%;
-  max-width: 52rem;
+  max-width: 65rem;
   margin: 0;
   padding: 2rem 2.5rem 4rem;
   background: #ffffff;
