@@ -22,7 +22,6 @@ defaults:
 
 include:
   - blog_plots
-  - markdown_layout
   - assets
 
 exclude:
