@@ -25,32 +25,25 @@
   <div class="sidebar-inner">
     <div class="sidebar-header">
       <a href="{{ '/' | relative_url }}" class="sidebar-site-title">{{ site.title }}</a>
-
-      <p class="sidebar-label">Kapitel</p>
-      <nav class="sidebar-chapter-tabs" aria-label="Kapitel">
-        <ul>
-          {% for chapter in site.data.navigation.chapters %}
-          <li>
-            <a href="{{ chapter.permalink | relative_url }}" class="sidebar-chapter-tab" data-nav="chapter">{{ chapter.title }}</a>
-          </li>
-          {% endfor %}
-        </ul>
-      </nav>
     </div>
 
-    <nav class="sidebar-sections-nav" aria-label="Abschnitte" data-nav-sections="{% if current_chapter %}{{ current_chapter.sections.size }}{% else %}0{% endif %}">
-      {% if current_chapter and current_chapter.sections.size > 0 %}
-      <p class="sidebar-label sidebar-page-title">{{ current_chapter.title }}</p>
-      <ul class="sidebar-sections">
-        {% for section in current_chapter.sections %}
-        <li>
-          <a href="{{ current_chapter.permalink | relative_url }}#{{ section.anchor }}" class="sidebar-section-link" data-nav="section">{{ section.title }}</a>
+    <nav class="sidebar-chapters-nav" aria-label="Kapitel und Abschnitte">
+      <ul class="sidebar-chapter-list">
+        {% for chapter in site.data.navigation.chapters %}
+        <li class="sidebar-chapter-item{% if current_chapter and chapter.permalink == current_chapter.permalink %} is-current{% endif %}">
+          <a href="{{ chapter.permalink | relative_url }}" class="sidebar-chapter-tab" data-nav="chapter">{{ chapter.title }}</a>
+          {% if chapter.sections.size > 0 %}
+          <ul class="sidebar-sections">
+            {% for section in chapter.sections %}
+            <li>
+              <a href="{{ chapter.permalink | relative_url }}#{{ section.anchor }}" class="sidebar-section-link" data-nav="section">{{ section.title }}</a>
+            </li>
+            {% endfor %}
+          </ul>
+          {% endif %}
         </li>
         {% endfor %}
       </ul>
-      {% elsif page.title %}
-      <p class="sidebar-sections-empty">Für „{{ page.title }}“ sind keine Abschnitte in der Navigation hinterlegt.</p>
-      {% endif %}
     </nav>
   </div>
 </aside>

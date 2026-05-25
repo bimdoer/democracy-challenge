@@ -42,9 +42,11 @@
     }
   }
 
-  /** Sections in the sidebar belong to the current page only (Liquid). */
   function getPageSectionLinks() {
-    return Array.prototype.slice.call(sectionLinks);
+    var path = normalizePath(window.location.pathname);
+    return Array.prototype.filter.call(sectionLinks, function (link) {
+      return linkPath(link) === path;
+    });
   }
 
   function getSectionTargets(pageLinks) {
@@ -89,7 +91,7 @@
   }
 
   function scrollNavLinkIntoView(link) {
-    var nav = document.querySelector(".sidebar-sections-nav");
+    var nav = document.querySelector(".sidebar-chapters-nav");
     if (!nav || !link) {
       return;
     }
