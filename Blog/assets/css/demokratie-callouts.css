@@ -16,6 +16,11 @@
      <div class="feld text2"><strong>Titel</strong><p>Text</p></div>
      <div class="feld text3"><strong>Titel</strong><p>Text</p></div>
    </div>
+
+   Themen-Varianten (zeitlich · geografisch · thematisch):
+   <div class="grafik grafik-zeitlich">...</div>
+   <div class="lesehilfe lesehilfe-zeitlich">...</div>
+   <div class="klapper klapper-zeitlich">...</div>
    ============================================================ */
 
 
@@ -28,6 +33,19 @@
   --hauptfarbe-hex: #4477aa;
   --akzentfarbe-rgb: 204, 102, 119;     /* #CC6677 */
   --akzentfarbe-hex: #cc6677;
+
+  /* Themen-Farben */
+  --zeitlich-rand:   #44AA99;
+  --zeitlich-bg:     rgb(229, 244, 240);
+  --zeitlich-text:   #1f5e51;
+
+  --geografisch-rand: #999933;
+  --geografisch-bg:   rgb(243, 240, 222);
+  --geografisch-text: #555518;
+
+  --thematisch-rand:  #AA7744;
+  --thematisch-bg:    rgb(243, 234, 224);
+  --thematisch-text:  #6b4422;
 }
 
 
@@ -58,27 +76,21 @@ h2 { font-size: 1.45em; }
 h3 { font-size: 1.2em; }
 h4 { font-size: 1.05em; }
 
-p {
-  margin: 0.8em 0;
-}
+p { margin: 0.8em 0; }
 
 ul, ol {
   margin: 0.5em 0 0.8em 0;
   padding-left: 1.6em;
 }
 
-li {
-  margin: 0.25em 0;
-}
+li { margin: 0.25em 0; }
 
 a {
   color: var(--hauptfarbe-hex);
   text-decoration: none;
 }
 
-a:hover {
-  text-decoration: underline;
-}
+a:hover { text-decoration: underline; }
 
 code {
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
@@ -154,6 +166,10 @@ hr {
   background: transparent;
 }
 
+.grafik strong {
+  color: inherit;
+}
+
 
 /* ============================================================
    2) LESEHILFE (unterhalb der Grafik)
@@ -168,6 +184,10 @@ hr {
   line-height: 1.5;
   color: #555;
   background: transparent;
+}
+
+.lesehilfe strong {
+  color: var(--hauptfarbe-hex);
 }
 
 
@@ -319,30 +339,24 @@ hr {
 
 /* Zeitlich — Türkis */
 .text1 {
-  background: rgb(229, 244, 240);
-  border-left: 4px solid #44AA99;
+  background: var(--zeitlich-bg);
+  border-left: 4px solid var(--zeitlich-rand);
 }
-.text1 strong {
-  color: #1f5e51;
-}
+.text1 strong { color: var(--zeitlich-text); }
 
 /* Geografisch — Olive */
 .text2 {
-  background: rgb(243, 240, 222);
-  border-left: 4px solid #999933;
+  background: var(--geografisch-bg);
+  border-left: 4px solid var(--geografisch-rand);
 }
-.text2 strong {
-  color: #555518;
-}
+.text2 strong { color: var(--geografisch-text); }
 
 /* Thematisch — Braun */
 .text3 {
-  background: rgb(243, 234, 224);
-  border-left: 4px solid #AA7744;
+  background: var(--thematisch-bg);
+  border-left: 4px solid var(--thematisch-rand);
 }
-.text3 strong {
-  color: #6b4422;
-}
+.text3 strong { color: var(--thematisch-text); }
 
 
 /* ============================================================
@@ -374,9 +388,7 @@ hr {
   box-sizing: border-box;
 }
 
-a.btn:hover {
-  text-decoration: none;
-}
+a.btn:hover { text-decoration: none; }
 
 .btn-inaktiv {
   opacity: 0.65;
@@ -384,45 +396,111 @@ a.btn:hover {
 }
 
 .btn-zeitlich {
-  color: #1f5e51;
-  border-color: #44AA99;
+  color: var(--zeitlich-text);
+  border-color: var(--zeitlich-rand);
 }
-.btn-zeitlich:hover {
-  background: rgb(229, 244, 240);
-}
+.btn-zeitlich:hover { background: var(--zeitlich-bg); }
 
 .btn-geografisch {
-  color: #555518;
-  border-color: #999933;
+  color: var(--geografisch-text);
+  border-color: var(--geografisch-rand);
 }
-.btn-geografisch:hover {
-  background: rgb(243, 240, 222);
-}
+.btn-geografisch:hover { background: var(--geografisch-bg); }
 
 .btn-thematisch {
-  color: #6b4422;
-  border-color: #AA7744;
+  color: var(--thematisch-text);
+  border-color: var(--thematisch-rand);
 }
-.btn-thematisch:hover {
-  background: rgb(243, 234, 224);
-}
+.btn-thematisch:hover { background: var(--thematisch-bg); }
 
 
 /* ============================================================
-   9) PHASEN-KLAPPER (Türkis, zeitliche Achse)
+   9) THEMEN-VARIANTEN (zeitlich · geografisch · thematisch)
+      Wirkt auf: .grafik, .lesehilfe, .klapper
    ============================================================ */
 
+/* —— Zeitlich (Türkis) ——————————————————————————————— */
+
+.grafik-zeitlich {
+  border-top-color: var(--zeitlich-rand);
+  border-bottom-color: var(--zeitlich-rand);
+  color: var(--zeitlich-text);
+}
+
+.lesehilfe-zeitlich {
+  border-top-color: var(--zeitlich-rand);
+  border-bottom-color: var(--zeitlich-rand);
+}
+.lesehilfe-zeitlich strong { color: var(--zeitlich-text); }
+
+.klapper-zeitlich {
+  border-left-color: var(--zeitlich-rand);
+  background: var(--zeitlich-bg);
+}
+.klapper-zeitlich .klapper-btn,
+.klapper-zeitlich .klapper-btn-label,
+.klapper-zeitlich strong {
+  color: var(--zeitlich-text);
+}
+
+/* Backwards compat: alter .klapper-phase weiterhin unterstützt */
 .klapper-phase {
-  border-left-color: #44AA99;
-  background: rgb(229, 244, 240);
+  border-left-color: var(--zeitlich-rand);
+  background: var(--zeitlich-bg);
 }
-
-.klapper-phase .klapper-btn {
-  color: #1f5e51;
-}
-
+.klapper-phase .klapper-btn,
 .klapper-phase strong {
-  color: #1f5e51;
+  color: var(--zeitlich-text);
+}
+
+
+/* —— Geografisch (Olive) ——————————————————————————————— */
+
+.grafik-geografisch {
+  border-top-color: var(--geografisch-rand);
+  border-bottom-color: var(--geografisch-rand);
+  color: var(--geografisch-text);
+}
+
+.lesehilfe-geografisch {
+  border-top-color: var(--geografisch-rand);
+  border-bottom-color: var(--geografisch-rand);
+}
+.lesehilfe-geografisch strong { color: var(--geografisch-text); }
+
+.klapper-geografisch {
+  border-left-color: var(--geografisch-rand);
+  background: var(--geografisch-bg);
+}
+.klapper-geografisch .klapper-btn,
+.klapper-geografisch .klapper-btn-label,
+.klapper-geografisch strong {
+  color: var(--geografisch-text);
+}
+
+
+/* —— Thematisch (Braun) ——————————————————————————————— */
+
+.grafik-thematisch {
+  border-top-color: var(--thematisch-rand);
+  border-bottom-color: var(--thematisch-rand);
+  color: var(--thematisch-text);
+}
+
+.lesehilfe-thematisch {
+  border-top-color: var(--thematisch-rand);
+  border-bottom-color: var(--thematisch-rand);
+}
+.lesehilfe-thematisch strong { color: var(--thematisch-text); }
+
+.klapper-thematisch {
+  border-left-color: var(--thematisch-rand);
+  background: var(--thematisch-bg);
+}
+.klapper-thematisch .klapper-btn,
+.klapper-thematisch .klapper-btn-label,
+.klapper-thematisch strong {
+  color: var(--thematisch-text);
 }
 
 
