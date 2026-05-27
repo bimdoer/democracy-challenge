@@ -1394,7 +1394,7 @@ def boxplot_facetiert_zeitwahl(
     hline=0,
     fuell_alpha=0.4,
     n_cols=4,
-    hoehe_pro_zeile=280,
+    hoehe_pro_zeile=300,
 ):
     # legend_titel-Parameter bleibt für API-Kompatibilität, wird aber nicht gerendert
     if label_map is None:
@@ -1426,7 +1426,7 @@ def boxplot_facetiert_zeitwahl(
         rows=n_rows, cols=n_cols,
         subplot_titles=hauptgruppen,
         shared_yaxes=True,
-        vertical_spacing=0.10,
+        vertical_spacing=0.12,
         horizontal_spacing=0.04,
     )
 
@@ -1508,6 +1508,7 @@ def boxplot_facetiert_zeitwahl(
         paper_bgcolor=PLOTLY_BG_TRANSPARENT,
         plot_bgcolor=PLOTLY_BG_TRANSPARENT,
         height=hoehe_pro_zeile * n_rows + 120,
+        showlegend=False,
         updatemenus=[dict(
             type="buttons",
             direction="right",
@@ -1529,5 +1530,7 @@ def boxplot_facetiert_zeitwahl(
         fig.update_yaxes(range=list(yrange))
     for r in range(1, n_rows + 1):
         fig.update_yaxes(title_text=ylabel, row=r, col=1)
+
+    fig.update_xaxes(tickangle=0, automargin=False)
 
     return fig
