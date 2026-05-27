@@ -546,6 +546,7 @@ def liniendiagramm_interaktiv_zeitwahl(
     legend_titel="Akteur",
     yrange=None,
     hline=0,
+    linien_opazitaet=0.8,
 ):
     # legend_titel-Parameter bleibt für API-Kompatibilität, wird aber nicht gerendert
     if label_map is None:
@@ -575,6 +576,7 @@ def liniendiagramm_interaktiv_zeitwahl(
                 name=name,
                 line=dict(color=farbe, width=2),
                 marker=dict(size=6),
+                opacity=linien_opazitaet,
                 visible=(label == default_label),
                 hovertemplate=f"<b>{name}</b>: %{{y:.3f}}<extra></extra>",
             ))
@@ -622,7 +624,7 @@ def boxplot_interaktiv_zeitwahl(
     df,
     wert_cols,
     hauptgruppe_spalte,
-    phasen_spalte='phase',
+    phasen_spalte,
     label_map=None,
     farben_map=None,
     zeit_spalten=None,
@@ -636,21 +638,6 @@ def boxplot_interaktiv_zeitwahl(
     hline=0,
     fuell_alpha=0.3,
 ):
-    # legend_titel-Parameter bleibt für API-Kompatibilität, wird aber nicht gerendert
-    if label_map is None:
-        label_map = {col: col for col in wert_cols}
-    if farben_map is None:
-        farben_map = {}
-    if zeit_spalten is None:
-        zeit_spalten = {
-            'Gesamte Zeitperiode': None,
-            '1848 bis 1899': 'phase1_fruehphase',
-            '1900 bis 1949': 'phase2_volatile',
-            '1950 bis 1980': 'phase3_konsens',
-            '1981 bis 2009': 'phase4_aufspaltung',
-            '2010 bis heute': 'phase5_2010_heute',
-        }
-
     fig = go.Figure()
     n_boxen = len(wert_cols)
 
@@ -747,7 +734,7 @@ def boxplot_facetiert_zeitwahl(
     df,
     wert_cols,
     hauptgruppe_spalte,
-    phasen_spalte='phase',
+    phasen_spalte,
     hauptgruppe_reihenfolge=None,
     label_map=None,
     farben_map=None,
@@ -762,20 +749,6 @@ def boxplot_facetiert_zeitwahl(
     n_cols=4,
     hoehe_pro_zeile=300,
 ):
-    # legend_titel-Parameter bleibt für API-Kompatibilität, wird aber nicht gerendert
-    if label_map is None:
-        label_map = {col: col for col in wert_cols}
-    if farben_map is None:
-        farben_map = {}
-    if zeit_spalten is None:
-        zeit_spalten = {
-            'Gesamte Zeitperiode': None,
-            '1848 bis 1899': 'phase1_fruehphase',
-            '1900 bis 1949': 'phase2_volatile',
-            '1950 bis 1980': 'phase3_konsens',
-            '1981 bis 2009': 'phase4_aufspaltung',
-            '2010 bis heute': 'phase5_2010_heute',
-        }
 
     # Hauptgruppen-Reihenfolge fixieren, sonst sortiert Plotly alphabetisch
     if hauptgruppe_reihenfolge is None:
