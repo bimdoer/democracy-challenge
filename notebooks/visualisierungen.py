@@ -1,3 +1,6 @@
+# Alle Plotfunktionen für die Analyse – im Notebook einfach importieren:
+# from visualisierungen import *
+# from visualisierungen import heatmap
 """
 Verwendung im Notebook:
 from visualisierungen import *
@@ -81,7 +84,7 @@ def palette_farben(n):
 
 
 def hex_zu_rgba(hex_farbe, alpha):
-    """Konvertiert eine Hex-Farbe in einen rgba-String mit gegebener Deckkraft."""
+    # Für Plotly-Füllfarben mit Transparenz
     if hex_farbe is None:
         return None
     h = hex_farbe.lstrip('#')
@@ -90,6 +93,7 @@ def hex_zu_rgba(hex_farbe, alpha):
 
 
 def _annotate_bars(ax, fmt=".0f"):
+    # Wert über jeden Balken schreiben
     for p in ax.patches:
         h = p.get_height()
         if pd.notna(h) and h != 0:
@@ -403,22 +407,17 @@ def write_plotly_html_responsive(
 
 
 def _transparent(fig, ax=None):
-    """Setzt Figure- und Axes-Hintergrund auf transparent."""
+    # Hintergrund transparent – sonst sieht es im Blog komisch aus
     fig.patch.set_facecolor("none")
     if ax is None:
         return
-    # ax kann eine einzelne Axes oder ein Array von Axes sein
+    # Klappt auch wenn ax eine einzelne Axes ist
     for a in np.atleast_1d(ax).ravel():
         a.set_facecolor("none")
 
 
 def _baue_zeitwahl_buttons(zeit_spalten, n_traces_pro_label, anzahl_dummy_traces=0):
-    """
-    Erzeugt die Plotly-Buttons für die Zeitauswahl.
-    Pro Label werden n_traces_pro_label aufeinanderfolgende Traces eingeblendet,
-    optional bleiben die letzten anzahl_dummy_traces (typisch Legenden-Dummies)
-    immer sichtbar.
-    """
+    # Erstellt die Zeitwahl-Buttons – Dummy-Traces am Ende bleiben immer sichtbar
     n_box_traces = n_traces_pro_label * len(zeit_spalten)
     buttons = []
     for i, label in enumerate(zeit_spalten.keys()):
@@ -485,6 +484,7 @@ def balkendiagramm_sortiert(data, x, y, xlabel="", ylabel="", titel="",
     sns.set_style("whitegrid")
     fig, ax = plt.subplots(figsize=figsize)
     _transparent(fig, ax)
+    # hue=x damit jeder Balken eine eigene Farbe bekommt
     sns.barplot(data=data, x=x, y=y,
                 order=sortiert[x], hue=x, hue_order=sortiert[x],
                 palette=palette, legend=False, ax=ax)
@@ -512,7 +512,7 @@ def gestapeltes_balkendiagramm(df, xlabel="", ylabel="Anteil (%)",
                                legend_titel="", figsize=(8, 6),
                                xlabels=None, palette=PALETTE_KATEGORIAL,
                                annotate=False, fmt=".0f", min_anteil=5):
-    # legend_titel-Parameter bleibt für API-Kompatibilität, wird aber nicht gerendert
+    # Legend_titel wird nicht gerendert
     sns.set_style("whitegrid")
 
     ax = df.plot(
@@ -529,6 +529,7 @@ def gestapeltes_balkendiagramm(df, xlabel="", ylabel="Anteil (%)",
         ax.set_xticklabels(xlabels)
 
     if annotate:
+        # Nur beschriften wenn Segment gross genug – sonst wird es unlesbar
         for c in ax.containers:
             labels = [f"{v.get_height():{fmt}}%" if v.get_height() >= min_anteil else ""
                       for v in c]
@@ -548,7 +549,7 @@ def gestapeltes_balkendiagramm(df, xlabel="", ylabel="Anteil (%)",
 
 def anteilsdiagramm(data, x, hue, xlabel="", ylabel="Anteil",
                     palette=None, figsize=(8, 5), xlabels=None, titel=''):
-    # titel-Parameter bleibt für API-Kompatibilität, wird aber nicht gerendert
+    # Titel wird nicht gerendert
     if palette is None:
         palette = PALETTE_KATEGORIAL
 
@@ -592,6 +593,7 @@ def heatmap(pivot, xlabel="", ylabel="", vmax=0.5, vmin=-0.5,
         annot=True, fmt=fmt,
         annot_kws={"size": FONTSIZE_KLEIN},
         ax=ax)
+    # Beschriftung oben, wie in einer Kreuztabelle
     ax.xaxis.tick_top()
     ax.set_xticklabels(ax.get_xticklabels(), rotation=90, ha="center")
     ax.xaxis.set_label_position("top")
@@ -811,7 +813,7 @@ def boxplot(data, x=None, y=None, hue=None, titel="", xlabel="", ylabel="",
 def scatterplot(data, x, y, size=None, titel="", xlabel="", ylabel="",
                 sizes=(20, 800), alpha=0.4, farbe=None, hue=None,
                 figsize=(10, 5), rotation=0, legendentitel='', palette=None):
-    # legendentitel-Parameter bleibt für API-Kompatibilität, wird aber nicht gerendert
+    # Legendentitel wird nicht gerendert
     if farbe is None:
         farbe = HAUPTFARBE
 
@@ -848,6 +850,7 @@ def histogramm(data, spalte, bins=50, titel="", xlabel="", ylabel="Anzahl",
     sns.histplot(data[spalte], bins=bins, color=farbe, ax=ax)
 
     if vlines:
+        # Vertikale Referenzlinien, z.B. Mittelwert oder Schwellenwert
         for val, label in vlines:
             ax.axvline(val, color=AKZENTFARBE, linestyle=HLINE_LINESTYLE, label=label)
         ax.legend()
@@ -923,8 +926,7 @@ def liniendiagramm(data, x, y, hue=None, titel="", xlabel="", ylabel="",
     ax.set_ylabel(ylabel, fontsize=FONTSIZE_ACHSEN, fontweight=FONTWEIGHT_ACHSEN)
     ax.tick_params(axis='x', labelsize=FONTSIZE_TICKS, rotation=rotation)
     ax.tick_params(axis='y', labelsize=FONTSIZE_TICKS)
-    # y-Bereich ist bewusst fix, da diese Funktion für Übereinstimmungswerte
-    # zwischen -0.5 und 0.5 gedacht ist
+    # Y-Achse fix auf -0.5 bis 0.5, nur für Kongruenzwerte
     ax.set_ylim(-0.5, 0.5)
     fig.tight_layout()
     plt.show()
@@ -968,6 +970,7 @@ def schweiz_karte_choropleth(
             f"Spalte «{join_geo}» fehlt in den Geodaten. Vorhanden: {list(kantone.columns)!r}"
         )
 
+    # Kantone aus GeoJSON mit Datensatz verknüpfen – left join damit alle Kantone sichtbar bleiben
     data_sub = data[[join_data, wert_spalte]].drop_duplicates(subset=[join_data])
     if join_geo == join_data:
         merged = kantone.merge(data_sub, on=join_geo, how="left")
@@ -1180,8 +1183,9 @@ def liniendiagramm_interaktiv_zeitwahl(
     legend_titel="Akteur",
     yrange=None,
     hline=0,
+    linien_opazitaet=0.8,
 ):
-    # legend_titel-Parameter bleibt für API-Kompatibilität, wird aber nicht gerendert
+    # Legend_titel wird nicht gerendert
     if label_map is None:
         label_map = {col: col for col in wert_cols}
     if farben_map is None:
@@ -1209,6 +1213,7 @@ def liniendiagramm_interaktiv_zeitwahl(
                 name=name,
                 line=dict(color=farbe, width=2),
                 marker=dict(size=6),
+                opacity=linien_opazitaet,
                 visible=(label == default_label),
                 hovertemplate=f"<b>{name}</b>: %{{y:.3f}}<extra></extra>",
             ))
@@ -1256,7 +1261,7 @@ def boxplot_interaktiv_zeitwahl(
     df,
     wert_cols,
     hauptgruppe_spalte,
-    phasen_spalte='phase',
+    phasen_spalte,
     label_map=None,
     farben_map=None,
     zeit_spalten=None,
@@ -1270,21 +1275,6 @@ def boxplot_interaktiv_zeitwahl(
     hline=0,
     fuell_alpha=0.3,
 ):
-    # legend_titel-Parameter bleibt für API-Kompatibilität, wird aber nicht gerendert
-    if label_map is None:
-        label_map = {col: col for col in wert_cols}
-    if farben_map is None:
-        farben_map = {}
-    if zeit_spalten is None:
-        zeit_spalten = {
-            'Gesamte Zeitperiode': None,
-            '1848 bis 1899': 'phase1_fruehphase',
-            '1900 bis 1949': 'phase2_volatile',
-            '1950 bis 1980': 'phase3_konsens',
-            '1981 bis 2009': 'phase4_aufspaltung',
-            '2010 bis heute': 'phase5_2010_heute',
-        }
-
     fig = go.Figure()
     n_boxen = len(wert_cols)
 
@@ -1319,7 +1309,7 @@ def boxplot_interaktiv_zeitwahl(
                 showlegend=False,
             ))
 
-    # Stabile Legende über Dummy-Punkte, immer sichtbar
+    # Dummy-Punkte für stabile Legende, echte Traces haben showlegend=False
     for col in wert_cols:
         name = label_map.get(col, col)
         farbe = farben_map.get(name)
@@ -1381,7 +1371,7 @@ def boxplot_facetiert_zeitwahl(
     df,
     wert_cols,
     hauptgruppe_spalte,
-    phasen_spalte='phase',
+    phasen_spalte,
     hauptgruppe_reihenfolge=None,
     label_map=None,
     farben_map=None,
@@ -1396,22 +1386,8 @@ def boxplot_facetiert_zeitwahl(
     n_cols=4,
     hoehe_pro_zeile=300,
 ):
-    # legend_titel-Parameter bleibt für API-Kompatibilität, wird aber nicht gerendert
-    if label_map is None:
-        label_map = {col: col for col in wert_cols}
-    if farben_map is None:
-        farben_map = {}
-    if zeit_spalten is None:
-        zeit_spalten = {
-            'Gesamte Zeitperiode': None,
-            '1848 bis 1899': 'phase1_fruehphase',
-            '1900 bis 1949': 'phase2_volatile',
-            '1950 bis 1980': 'phase3_konsens',
-            '1981 bis 2009': 'phase4_aufspaltung',
-            '2010 bis heute': 'phase5_2010_heute',
-        }
 
-    # Hauptgruppen-Reihenfolge fixieren, sonst sortiert Plotly alphabetisch
+    # Ohne fixe Reihenfolge sortiert Plotly alphabetisch
     if hauptgruppe_reihenfolge is None:
         hauptgruppen = df[hauptgruppe_spalte].dropna().unique().tolist()
     else:
@@ -1430,7 +1406,7 @@ def boxplot_facetiert_zeitwahl(
         horizontal_spacing=0.04,
     )
 
-    # Box-Traces: Reihenfolge Zeitperiode -> Hauptgruppe -> Akteur
+    # Traces in Reihenfolge: Zeitperiode → Hauptgruppe → Akteur
     for label, phase in zeit_spalten.items():
         if phase is None:
             df_subset = df
@@ -1468,7 +1444,7 @@ def boxplot_facetiert_zeitwahl(
                     row=row, col=col,
                 )
 
-    # Stabile Legende über Dummy-Punkte, immer sichtbar
+    # Gleicher Dummy-Trick wie oben
     for akteur_col in wert_cols:
         name = label_map.get(akteur_col, akteur_col)
         farbe = farben_map.get(name)
