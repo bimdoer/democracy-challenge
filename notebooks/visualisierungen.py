@@ -159,10 +159,6 @@ PLOTLY_PHASE_BAR_CSS = """<style>
 .phase-btn-bar button:hover:not(.active) {
   background: #f5f5f5;
 }
-.phase-heatmap-embed .updatemenu-container,
-.phase-heatmap-embed .updatemenu-header-group {
-  display: none !important;
-}
 </style>"""
 
 PLOTLY_PHASE_BAR_JS = """<script>
@@ -173,14 +169,36 @@ PLOTLY_PHASE_BAR_JS = """<script>
     var plotDiv = document.querySelector(PLOT_SEL);
     if (!plotDiv || !plotDiv.data) return false;
     var n = plotDiv.data.length;
+    // Generisch für Heatmap und Geomap: Phasen-Traces (heatmap/choropleth) werden
+    // umgeschaltet, Label-Ebenen (scattergeo) folgen der Phase, die weisse Basisebene
+    // (basis_weiss) bleibt immer sichtbar.
+    var phaseTraces = [];
+    var labelTraces = [];
+    for (var k = 0; k < n; k++) {
+      var d0 = plotDiv.data[k];
+      if (d0.name === "basis_weiss") continue;
+      if (d0.type === "scattergeo") labelTraces.push(k);
+      else phaseTraces.push(k);
+    }
     document.querySelectorAll(BAR_SEL).forEach(function (btn) {
       btn.addEventListener("click", function () {
         var i = parseInt(btn.getAttribute("data-phase"), 10);
+        var activePhase = phaseTraces[i];
+        var activeLabel = labelTraces.length ? labelTraces[i] : -1;
         var vis = [];
         var showscale = [];
         for (var j = 0; j < n; j++) {
-          vis.push(j === i);
-          showscale.push(j === i);
+          var d = plotDiv.data[j];
+          if (d.name === "basis_weiss") {
+            vis.push(true);
+            showscale.push(false);
+          } else if (d.type === "scattergeo") {
+            vis.push(j === activeLabel);
+            showscale.push(false);
+          } else {
+            vis.push(j === activePhase);
+            showscale.push(j === activePhase);
+          }
         }
         Plotly.restyle(plotDiv, { visible: vis, showscale: showscale });
         document.querySelectorAll(BAR_SEL).forEach(function (b) {
@@ -198,6 +216,104 @@ PLOTLY_PHASE_BAR_JS = """<script>
   }
 })();
 </script>"""
+
+
+def _map_controls_css():
+    top = PLOTLY_PHASE_BAR_HEIGHT_PX + 6
+    return f"""<style>
+.phase-heatmap-embed {{ position: relative; }}
+.map-controls {{
+  position: absolute;
+  top: {top}px;
+  left: 6px;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}}
+.map-controls select {{
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  line-height: 1.2;
+  color: #333333;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #cccccc;
+  border-radius: 6px;
+  padding: 3px 6px;
+  cursor: pointer;
+}}
+.map-controls select:hover {{ background: #f5f5f5; }}
+</style>"""
+
+
+def _map_controls_html(akteur_reihenfolge, default_akteur, limit_stufen):
+    import html as html_module
+
+    parts = []
+    if akteur_reihenfolge:
+        opts = "".join(
+            f'<option value="{html_module.escape(str(a))}"'
+            f'{" selected" if a == default_akteur else ""}>{html_module.escape(str(a))}</option>'
+            for a in akteur_reihenfolge
+        )
+        parts.append(f'<select id="actor-select" title="Akteur">{opts}</select>')
+    if limit_stufen:
+        opts = "".join(f'<option value="{float(s)!r}">\u00b1{s:g}</option>' for s in limit_stufen)
+        parts.append(f'<select id="limit-select" title="Farbgrenzen">{opts}</select>')
+    if not parts:
+        return ""
+    return '<div class="map-controls">' + "".join(parts) + "</div>"
+
+
+def _map_controls_js(akteur_z):
+    import json
+
+    az_json = json.dumps(akteur_z) if akteur_z else "null"
+    return (
+        "<script>\n(function () {\n"
+        '  var PLOT_SEL = ".phase-heatmap-embed .plotly-graph-div";\n'
+        f"  var AKTEUR_Z = {az_json};\n"
+        "  function choroIdx(plotDiv) {\n"
+        "    var a = [];\n"
+        "    for (var k = 0; k < plotDiv.data.length; k++) {\n"
+        '      var d = plotDiv.data[k];\n'
+        '      if (d.type === "choropleth" && d.name !== "basis_weiss") a.push(k);\n'
+        "    }\n"
+        "    return a;\n"
+        "  }\n"
+        "  function applyActor(plotDiv, label) {\n"
+        "    if (!AKTEUR_Z || !AKTEUR_Z[label]) return;\n"
+        '    Plotly.restyle(plotDiv, { "z": AKTEUR_Z[label] }, choroIdx(plotDiv));\n'
+        "  }\n"
+        "  function ticks(l) { return [-l, -l / 2, 0, l / 2, l]; }\n"
+        "  function applyLimit(plotDiv, l) {\n"
+        "    var c = choroIdx(plotDiv);\n"
+        "    var t = ticks(l);\n"
+        "    Plotly.restyle(plotDiv, {\n"
+        '      "zmin": c.map(function () { return -l; }),\n'
+        '      "zmax": c.map(function () { return l; }),\n'
+        '      "zmid": c.map(function () { return 0; }),\n'
+        '      "colorbar.tickvals": c.map(function () { return t; })\n'
+        "    }, c);\n"
+        "  }\n"
+        "  function wire() {\n"
+        "    var plotDiv = document.querySelector(PLOT_SEL);\n"
+        "    if (!plotDiv || !plotDiv.data) return false;\n"
+        '    var aSel = document.querySelector("#actor-select");\n'
+        '    var lSel = document.querySelector("#limit-select");\n'
+        '    if (aSel) { aSel.addEventListener("change", function () { applyActor(plotDiv, aSel.value); }); }\n'
+        '    if (lSel) { lSel.addEventListener("change", function () { applyLimit(plotDiv, parseFloat(lSel.value)); }); }\n'
+        "    return true;\n"
+        "  }\n"
+        "  if (!wire()) {\n"
+        "    var tries = 0;\n"
+        "    var t = setInterval(function () {\n"
+        "      if (wire() || ++tries > 60) clearInterval(t);\n"
+        "    }, 50);\n"
+        "  }\n"
+        "})();\n</script>"
+    )
 
 
 def _equalize_phase_button_labels(labels):
@@ -230,9 +346,15 @@ def _phase_bar_buttons_html(labels):
 PLOTLY_HEATMAP_X_DOMAIN_END = 0.97
 PLOTLY_GEOMAP_X_DOMAIN_END = 0.97
 
+# updatemenus mit diesem Namen bleiben im HTML-Export erhalten (native Plotly-Buttons),
+# während Phasen-Buttons durch die HTML-Leiste ersetzt werden.
+PLOTLY_HTML_KEEP_UPDATEMENU = "html_keep"
+
 
 def _sync_geomap_colorbar(fig, x_domain_end=PLOTLY_GEOMAP_X_DOMAIN_END):
     for trace in fig.data:
+        if not hasattr(trace, "colorbar"):
+            continue
         cb = trace.colorbar
         if cb is None:
             continue
@@ -252,8 +374,10 @@ def _expand_geomap_for_html_export(fig, x_domain_end=PLOTLY_GEOMAP_X_DOMAIN_END)
     fig.update_layout(
         geo=dict(
             domain=dict(x=[0, x_domain_end], y=[0, 1]),
+            projection=dict(type="mercator"),
             fitbounds="geojson",
             bgcolor=PLOTLY_BG_TRANSPARENT,
+            showframe=False,
             showland=False,
             showcountries=False,
             showcoastlines=False,
@@ -268,6 +392,8 @@ def _expand_geomap_for_html_export(fig, x_domain_end=PLOTLY_GEOMAP_X_DOMAIN_END)
 def _sync_heatmap_colorbar(fig, plot_top, x_domain_end=PLOTLY_HEATMAP_X_DOMAIN_END):
     """Colorbar-Höhe und -Position an Heatmap-Domain koppeln."""
     for trace in fig.data:
+        if not hasattr(trace, "colorbar"):
+            continue
         cb = trace.colorbar
         if cb is None:
             continue
@@ -317,6 +443,28 @@ html, body {{
 </style>"""
 
 
+def _phase_bar_responsive_css():
+    """Volle Breite, Höhe folgt der Breite (Proportion über iframe-aspect-ratio)."""
+    return """<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.phase-heatmap-embed {
+  height: 100%;
+}
+.phase-heatmap-embed .plotly-graph-div {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto !important;
+  overflow: hidden;
+}
+</style>"""
+
+
 def write_plotly_html_responsive(
     fig,
     path,
@@ -336,11 +484,16 @@ def write_plotly_html_responsive(
     import re
     from pathlib import Path
 
+    # Generische Karten füllen die volle Breite; die Höhe ergibt sich aus dem
+    # iframe-aspect-ratio, daher keine feste Pixelhöhe erzwingen.
+    responsive_fill = bool(phase_bar_labels) and phase_bar_layout == "generic"
+
     export_fig = fig
     total_height = height
     plot_height = height
     if phase_bar_labels:
         export_fig = copy.deepcopy(fig)
+        # Phasen-Buttons und Limit-Umschalter werden durch HTML-Steuerelemente ersetzt.
         export_fig.layout.updatemenus = ()
         if phase_bar_layout == "heatmap":
             _expand_phase_plot_for_html_export(export_fig)
@@ -365,35 +518,68 @@ def write_plotly_html_responsive(
             pad=0,
         ),
     }
-    if plot_height is not None:
+    if responsive_fill:
+        layout["height"] = None
+    elif plot_height is not None:
         layout["height"] = plot_height
     export_fig.update_layout(**layout)
 
-    config = {"responsive": True, "displayModeBar": False}
+    config = {
+        "responsive": True,
+        "displayModeBar": False,
+        "scrollZoom": False,
+        "doubleClick": False,
+    }
     html = export_fig.to_html(
         include_plotlyjs=include_plotlyjs,
         full_html=full_html,
         config=config,
     )
+    # Karten-Steuerelemente (Akteur-/Limit-Dropdown) aus layout.meta lesen.
+    limit_stufen = None
+    akteur_z = None
+    akteur_reihenfolge = None
+    default_akteur = None
+    meta = export_fig.layout.meta
+    if responsive_fill and isinstance(meta, dict):
+        limit_stufen = meta.get("limit_stufen")
+        akteur_z = meta.get("akteur_z")
+        akteur_reihenfolge = meta.get("akteur_reihenfolge")
+        default_akteur = meta.get("default_akteur")
+    has_map_controls = bool(limit_stufen or akteur_reihenfolge)
+
     head_css = PLOTLY_EMBED_CSS
     if phase_bar_labels:
         head_css += PLOTLY_PHASE_BAR_CSS
-        head_css += _phase_bar_height_css(total_height, plot_height)
+        head_css += _phase_bar_responsive_css() if responsive_fill else _phase_bar_height_css(total_height, plot_height)
+    if has_map_controls:
+        head_css += _map_controls_css()
     html = html.replace("</head>", head_css + "</head>", 1)
 
     if phase_bar_labels:
         bar_html = _phase_bar_buttons_html(phase_bar_labels)
+        controls_html = (
+            _map_controls_html(akteur_reihenfolge, default_akteur, limit_stufen)
+            if has_map_controls
+            else ""
+        )
         html = re.sub(
             r'(<div id="[^"]+" class="plotly-graph-div")',
             r'<div class="phase-heatmap-embed"><div class="phase-btn-bar">'
             + bar_html
-            + r"</div>\1",
+            + r"</div>"
+            + controls_html
+            + r"\1",
             html,
             count=1,
         )
         html = html.replace("</body>", PLOTLY_PHASE_BAR_JS + "</body>", 1)
+        if has_map_controls:
+            html = html.replace("</body>", _map_controls_js(akteur_z) + "</body>", 1)
 
-    if phase_bar_labels:
+    if responsive_fill:
+        plot_style = 'class="plotly-graph-div" style="width:100%;height:100%;flex:1 1 auto;min-height:0;"'
+    elif phase_bar_labels:
         plot_style = f'class="plotly-graph-div" style="width:100%;height:{plot_height}px;"'
     else:
         plot_style = 'class="plotly-graph-div" style="width:100%;height:100%;"'
@@ -1014,6 +1200,60 @@ def _load_ch_geojson_dict(geojson_pfad=None):
         return json.load(f)
 
 
+def _ring_signed_area(ring):
+    a = 0.0
+    n = len(ring)
+    for i in range(n):
+        x0, y0 = ring[i][0], ring[i][1]
+        x1, y1 = ring[(i + 1) % n][0], ring[(i + 1) % n][1]
+        a += x0 * y1 - x1 * y0
+    return a * 0.5
+
+
+def _ring_centroid(ring):
+    """Flächenschwerpunkt eines Polygon-Rings (Shoelace), Fallback Mittelwert."""
+    a = _ring_signed_area(ring)
+    if abs(a) < 1e-12:
+        xs = [p[0] for p in ring]
+        ys = [p[1] for p in ring]
+        return sum(xs) / len(xs), sum(ys) / len(ys)
+    cx = cy = 0.0
+    n = len(ring)
+    for i in range(n):
+        x0, y0 = ring[i][0], ring[i][1]
+        x1, y1 = ring[(i + 1) % n][0], ring[(i + 1) % n][1]
+        cross = x0 * y1 - x1 * y0
+        cx += (x0 + x1) * cross
+        cy += (y0 + y1) * cross
+    return cx / (6 * a), cy / (6 * a)
+
+
+def _feature_label_point(geom):
+    """Repräsentativer Punkt (Schwerpunkt des grössten Rings) für ein Feature."""
+    t = geom.get("type")
+    coords = geom.get("coordinates", [])
+    if t == "Polygon":
+        ring = coords[0]
+    elif t == "MultiPolygon":
+        ring = max((poly[0] for poly in coords), key=lambda r: abs(_ring_signed_area(r)))
+    else:
+        return None
+    return _ring_centroid(ring)
+
+
+def _ch_canton_label_points(geojson, id_key="id"):
+    """{feature-id: (lon, lat)} – Beschriftungspunkte je Kanton."""
+    punkte = {}
+    for feat in geojson.get("features", []):
+        fid = feat.get("properties", {}).get(id_key, feat.get("id"))
+        if fid is None:
+            continue
+        pt = _feature_label_point(feat.get("geometry", {}))
+        if pt is not None:
+            punkte[fid] = pt
+    return punkte
+
+
 def phase_kantons_row_to_map_df(row, wert_spalte="kongruenz", id_col="id"):
     """
     Eine Zeile aus df_heatmap_by_phase (Kantons-Spalten …-japroz) → DataFrame id + Wert.
@@ -1032,8 +1272,20 @@ def phase_kantons_row_to_map_df(row, wert_spalte="kongruenz", id_col="id"):
     )
 
 
+def _kanton_werte_mit_ersatz(df_map, join_col, wert_spalte, ersatz_kantone):
+    """(werte_dict, versteckt_set): fehlende Kantone mit dem Spenderwert auffüllen."""
+    werte = dict(zip(df_map[join_col], df_map[wert_spalte]))
+    versteckt = set()
+    for fehlend, spender in (ersatz_kantone or {}).items():
+        eigen = werte.get(fehlend)
+        if (eigen is None or pd.isna(eigen)) and pd.notna(werte.get(spender)):
+            werte[fehlend] = werte[spender]
+            versteckt.add(fehlend)
+    return werte, versteckt
+
+
 def schweiz_karte_interaktiv_phasen(
-    phasen,
+    phasen=None,
     wert_spalte="kongruenz",
     join_col="id",
     vmin=-0.5,
@@ -1045,14 +1297,51 @@ def schweiz_karte_interaktiv_phasen(
     width=None,
     height=360,
     default_index=0,
+    kanton_labels=True,
+    label_fontsize=9,
+    ersatz_kantone=None,
+    limit_buttons=True,
+    limit_stufen=(0.5, 0.18),
+    akteur_phasen=None,
+    default_akteur=None,
+    leere_kantone_weiss=True,
 ):
     """
     Plotly-Choropleth Schweiz mit Phasen-Umschaltung (wie heatmap_interaktiv_phasen).
 
     phasen: Liste (Button-Label, DataFrame mit join_col + wert_spalte), z. B. aus phase_kantons_row_to_map_df.
+    akteur_phasen: Optionales geordnetes Dict {akteur_label: [(phasen_label, df), ...]} für
+        ein Akteur-Dropdown. Wird es gesetzt, liefert es auch ``phasen`` (für den Default-Akteur).
+        Beim Wechsel werden nur die z-Werte der Choropleth-Traces ausgetauscht (kein GeoJSON-Duplikat).
+    default_akteur: Schlüssel des voreingestellten Akteurs in ``akteur_phasen``.
+    leere_kantone_weiss: Legt eine weisse Basisebene mit allen Kantonsgrenzen unter die
+        Daten. Kantone ohne Wert (z. B. Parteien in frühen Phasen) erscheinen so weiss
+        gefüllt mit sichtbarer Grenze, statt ganz zu verschwinden.
+    kanton_labels: Kantonskürzel (z. B. ZH, BE) an den Kantonsschwerpunkten einblenden.
+    ersatz_kantone: {fehlender_kanton: spender_kanton}. Hat ein Kanton in einer Phase
+        keinen eigenen Wert (NaN), wird er mit dem Wert des Spenders eingefärbt und
+        sein Label ausgeblendet (z. B. Jura war bis 1979 Teil von Bern → {"CHJU": "CHBE"}).
+        None nutzt diese Vorgabe; ein leeres Dict deaktiviert die Ersetzung.
+
+    Die Farbskala ist über alle Phasen fix (vmin..vmax, zmid=0); die Rohwerte werden
+    direkt darauf abgebildet und nicht umskaliert.
+    limit_buttons: Zeigt einen Umschalter für die Farbgrenzen an.
+    limit_stufen: Wählbare symmetrische Grenzen (±Wert), z. B. (0.5, 0.25). Die erste
+        Stufe ist die Voreinstellung.
     """
+    # Akteur-Dropdown: Default-Akteur liefert die sichtbaren Traces.
+    akteur_reihenfolge = None
+    if akteur_phasen:
+        akteur_reihenfolge = list(akteur_phasen.keys())
+        if default_akteur is None or default_akteur not in akteur_phasen:
+            default_akteur = akteur_reihenfolge[0]
+        phasen = akteur_phasen[default_akteur]
+
     if not phasen:
         raise ValueError("phasen ist leer")
+
+    if ersatz_kantone is None:
+        ersatz_kantone = {"CHJU": "CHBE"}
 
     if colorscale is None:
         colorscale = "RdBu"
@@ -1072,18 +1361,75 @@ def schweiz_karte_interaktiv_phasen(
         xanchor="left",
         xpad=0,
         outlinewidth=0,
+        tickmode="array",
+        tickvals=[vmin, vmin / 2, 0, vmax / 2, vmax],
         tickfont=dict(size=PLOTLY_FONT_SIZE - 2),
     )
 
-    for i, (_, df_map) in enumerate(phasen):
-        if join_col not in df_map.columns or wert_spalte not in df_map.columns:
-            raise ValueError(f"DataFrame braucht Spalten {join_col!r} und {wert_spalte!r}")
+    n_choro = len(phasen)
+    id_key = featureidkey.split(".")[-1]
+    punkte = _ch_canton_label_points(geojson, id_key=id_key) if kanton_labels else {}
+
+    # Kanton-Namen für den Hover (id → Name aus dem GeoJSON).
+    kanton_namen = {}
+    for feat in geojson.get("features", []):
+        fid = feat.get("properties", {}).get(id_key, feat.get("id"))
+        if fid is not None:
+            kanton_namen[fid] = feat.get("properties", {}).get("name", str(fid))
+
+    # Weisse Basisebene mit allen Kantonsgrenzen (für Kantone ohne Wert).
+    BASIS_NAME = "basis_weiss"
+    base_offset = 0
+    if leere_kantone_weiss:
+        base_ids = list(kanton_namen.keys())
         fig.add_trace(
             go.Choropleth(
                 geojson=geojson,
-                locations=df_map[join_col],
-                z=df_map[wert_spalte],
+                locations=base_ids,
+                z=[0] * len(base_ids),
                 featureidkey=featureidkey,
+                colorscale=[[0, "white"], [1, "white"]],
+                showscale=False,
+                marker_line_width=0.4,
+                marker_line_color="#333333",
+                hoverinfo="skip",
+                visible=True,
+                name=BASIS_NAME,
+            )
+        )
+        base_offset = 1
+
+    # Pro Phase: fehlende Kantone (z. B. Jura vor 1979) mit Spenderwert füllen und
+    # die Liste der dabei ausgeblendeten Labels merken.
+    versteckte_labels_pro_phase = []
+    loc_order_pro_phase = []
+    for i, (_, df_map) in enumerate(phasen):
+        if join_col not in df_map.columns or wert_spalte not in df_map.columns:
+            raise ValueError(f"DataFrame braucht Spalten {join_col!r} und {wert_spalte!r}")
+
+        df_phase = df_map[[join_col, wert_spalte]].copy()
+        werte, versteckt = _kanton_werte_mit_ersatz(df_phase, join_col, wert_spalte, ersatz_kantone)
+        versteckte_labels_pro_phase.append(versteckt)
+        loc_order = list(df_phase[join_col])
+        loc_order_pro_phase.append(loc_order)
+        df_phase[wert_spalte] = df_phase[join_col].map(werte)
+
+        def _hover_name(loc, versteckt=versteckt):
+            name = kanton_namen.get(loc, str(loc))
+            if loc in versteckt:  # ersetzter Kanton (z. B. Jura war Teil von Bern)
+                spender_name = kanton_namen.get(ersatz_kantone.get(loc), "")
+                return f"{name} = {spender_name}" if spender_name else name
+            kuerzel = str(loc)[2:] if str(loc).startswith("CH") else str(loc)
+            return f"{name} ({kuerzel})"
+
+        hover_namen = [_hover_name(loc) for loc in df_phase[join_col]]
+        fig.add_trace(
+            go.Choropleth(
+                geojson=geojson,
+                locations=df_phase[join_col],
+                z=df_phase[wert_spalte],
+                featureidkey=featureidkey,
+                text=hover_namen,
                 zmin=vmin,
                 zmax=vmax,
                 zmid=0 if vmin < 0 < vmax else None,
@@ -1093,11 +1439,35 @@ def schweiz_karte_interaktiv_phasen(
                 colorbar=colorbar,
                 showscale=(i == default_index),
                 visible=(i == default_index),
-                hovertemplate="%{location}<br>Kongruenz: %{z:.2f}<extra></extra>",
+                hovertemplate="<b>%{text}</b><br>Kongruenz: %{z:.3f}<extra></extra>",
             )
         )
 
-    n_traces = len(phasen)
+    # Pro Phase eine Label-Ebene – Kürzel ersetzter Kantone (ohne eigene Daten) entfallen.
+    has_labels = bool(punkte)
+    if has_labels:
+        ids = list(punkte.keys())
+        for i in range(n_choro):
+            versteckt = versteckte_labels_pro_phase[i]
+            sichtbare_ids = [k for k in ids if k not in versteckt]
+            fig.add_trace(
+                go.Scattergeo(
+                    lon=[punkte[k][0] for k in sichtbare_ids],
+                    lat=[punkte[k][1] for k in sichtbare_ids],
+                    text=[str(k)[2:] if str(k).startswith("CH") else str(k) for k in sichtbare_ids],
+                    mode="text",
+                    textfont=dict(
+                        family=PLOTLY_FONT_FAMILY,
+                        size=label_fontsize,
+                        color="#1a1a1a",
+                    ),
+                    hoverinfo="skip",
+                    showlegend=False,
+                    visible=(i == default_index),
+                )
+            )
+
+    n_traces = len(fig.data)
     raw_labels = [label for label, _ in phasen]
     eq_labels = _equalize_phase_button_labels(raw_labels)
     btn_font = dict(
@@ -1105,10 +1475,17 @@ def schweiz_karte_interaktiv_phasen(
         size=9,
         color="#333333",
     )
+    # Trace-Reihenfolge: [Basis?, Choropleth 0..n-1, Label 0..n-1]
     phase_buttons = []
     for i, (_, _) in enumerate(phasen):
-        visible = [j == i for j in range(n_traces)]
-        showscale = [j == i for j in range(n_traces)]
+        visible = [False] * n_traces
+        showscale = [False] * n_traces
+        if base_offset:
+            visible[0] = True  # weisse Basisebene immer sichtbar
+        visible[base_offset + i] = True
+        showscale[base_offset + i] = True
+        if has_labels:
+            visible[base_offset + n_choro + i] = True
         phase_buttons.append(
             dict(
                 label=eq_labels[i],
@@ -1119,18 +1496,127 @@ def schweiz_karte_interaktiv_phasen(
             )
         )
 
+    updatemenus = [
+        dict(
+            type="buttons",
+            direction="right",
+            active=default_index,
+            x=0.5,
+            xanchor="center",
+            y=1.08,
+            yanchor="bottom",
+            buttons=phase_buttons,
+            showactive=True,
+            bgcolor=PLOTLY_DROPDOWN_BG,
+            bordercolor=PLOTLY_DROPDOWN_BORDER,
+            borderwidth=1,
+            font=btn_font,
+        )
+    ]
+
+    # Umschalter für die Farbgrenzen (wirkt nur auf die Choropleth-Traces).
+    if limit_buttons and limit_stufen:
+        limit_button_list = []
+        for lim in limit_stufen:
+            ticks = [-lim, -lim / 2, 0, lim / 2, lim]
+            limit_button_list.append(
+                dict(
+                    label=f"±{lim:g}",
+                    method="restyle",
+                    args=[
+                        {
+                            "zmin": [-lim] * n_choro,
+                            "zmax": [lim] * n_choro,
+                            "zmid": [0] * n_choro,
+                            "colorbar.tickvals": [ticks] * n_choro,
+                        },
+                        list(range(base_offset, base_offset + n_choro)),
+                    ],
+                )
+            )
+        updatemenus.append(
+            dict(
+                type="buttons",
+                direction="right",
+                active=0,
+                x=0.0,
+                xanchor="left",
+                y=1.0,
+                yanchor="top",
+                buttons=limit_button_list,
+                showactive=True,
+                bgcolor=PLOTLY_DROPDOWN_BG,
+                bordercolor=PLOTLY_DROPDOWN_BORDER,
+                borderwidth=1,
+                font=btn_font,
+                name=PLOTLY_HTML_KEEP_UPDATEMENU,
+                pad=dict(t=2, l=2),
+            )
+        )
+
+    # Akteur-Wechsel über z-Tausch (vermeidet GeoJSON-Duplikate pro Akteur).
+    akteur_z = None
+    if akteur_phasen:
+        akteur_z = {}
+        for label, akteur_phase_liste in akteur_phasen.items():
+            arrays = []
+            for i, (_, df_map) in enumerate(akteur_phase_liste):
+                werte, _ = _kanton_werte_mit_ersatz(
+                    df_map[[join_col, wert_spalte]], join_col, wert_spalte, ersatz_kantone
+                )
+                arr = []
+                for loc in loc_order_pro_phase[i]:
+                    v = werte.get(loc)
+                    arr.append(None if v is None or pd.isna(v) else float(v))
+                arrays.append(arr)
+            akteur_z[label] = arrays
+
+        akteur_buttons = [
+            dict(
+                label=label,
+                method="restyle",
+                args=[{"z": akteur_z[label]}, list(range(base_offset, base_offset + n_choro))],
+            )
+            for label in akteur_reihenfolge
+        ]
+        updatemenus.append(
+            dict(
+                type="dropdown",
+                direction="down",
+                active=akteur_reihenfolge.index(default_akteur),
+                x=0.0,
+                xanchor="left",
+                y=1.16,
+                yanchor="bottom",
+                buttons=akteur_buttons,
+                showactive=True,
+                bgcolor=PLOTLY_DROPDOWN_BG,
+                bordercolor=PLOTLY_DROPDOWN_BORDER,
+                borderwidth=1,
+                font=btn_font,
+            )
+        )
+
     layout_kwargs = dict(
         template=PLOTLY_TEMPLATE,
         font=dict(family=PLOTLY_FONT_FAMILY, size=PLOTLY_FONT_SIZE),
         paper_bgcolor=PLOTLY_BG_TRANSPARENT,
         plot_bgcolor=PLOTLY_BG_TRANSPARENT,
-        hovermode=False,
+        hovermode="closest",
+        hoverlabel=dict(
+            bgcolor="#ffffff",
+            bordercolor=PLOTLY_DROPDOWN_BORDER,
+            font=dict(family=PLOTLY_FONT_FAMILY, size=PLOTLY_FONT_SIZE - 1, color="#1a1a1a"),
+        ),
+        dragmode=False,
         autosize=True,
         margin=dict(t=16, b=4, l=0, r=4, pad=0),
         geo=dict(
             domain=dict(x=[0, PLOTLY_GEOMAP_X_DOMAIN_END], y=[0, 1]),
+            projection=dict(type="mercator"),
             bgcolor=PLOTLY_BG_TRANSPARENT,
             lakecolor=PLOTLY_BG_TRANSPARENT,
+            showframe=False,
             showcountries=False,
             showcoastlines=False,
             showland=False,
@@ -1138,23 +1624,7 @@ def schweiz_karte_interaktiv_phasen(
             showlakes=False,
             fitbounds="geojson",
         ),
-        updatemenus=[
-            dict(
-                type="buttons",
-                direction="right",
-                active=default_index,
-                x=0.5,
-                xanchor="center",
-                y=1.08,
-                yanchor="bottom",
-                buttons=phase_buttons,
-                showactive=True,
-                bgcolor=PLOTLY_DROPDOWN_BG,
-                bordercolor=PLOTLY_DROPDOWN_BORDER,
-                borderwidth=1,
-                font=btn_font,
-            )
-        ],
+        updatemenus=updatemenus,
     )
     if width is not None:
         layout_kwargs["width"] = width
@@ -1163,6 +1633,16 @@ def schweiz_karte_interaktiv_phasen(
     if titel:
         layout_kwargs["title"] = titel
     fig.update_layout(**layout_kwargs)
+    # Steuerungsdaten für den HTML-Export hinterlegen.
+    meta = {}
+    if limit_buttons and limit_stufen:
+        meta["limit_stufen"] = [float(s) for s in limit_stufen]
+    if akteur_z:
+        meta["akteur_z"] = akteur_z
+        meta["akteur_reihenfolge"] = akteur_reihenfolge
+        meta["default_akteur"] = default_akteur
+    if meta:
+        fig.update_layout(meta=meta)
     return fig
 
 
