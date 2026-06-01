@@ -11,6 +11,9 @@ chapters:
       - title: Aspekte
         anchor: aspekte
 
+  - title: Methodik
+    permalink: /methodik/
+
   - title: Zeitliche Analyse
     permalink: /zeitliche-analyse/
     sections:
@@ -36,3 +39,57 @@ chapters:
         anchor: geografische-ausprägungen
       - title: Wie sieht die Abstimmungskongruenz kantonal aus?
         anchor: klapper-geografisch-btn
+
+  - title: Thematische Analyse
+    permalink: /thematische-analyse/
+    sections:
+      - title: Thematische Ausprägungen
+        anchor: thematische-ausprägungen
+      - title: Staatsordnung
+        anchor: staatsordnung-btn
+      - title: Aussenpolitik
+        anchor: aussenpolitik-btn
+      - title: Sicherheitspolitik
+        anchor: sicherheitspolitik-btn
+      - title: Wirtschaft
+        anchor: wirtschaft-btn
+      - title: Landwirtschaft
+        anchor: landwirtschaft-btn
+      - title: Öffentliche Finanzen
+        anchor: oeffentliche-finanzen-btn
+      - title: Energie
+        anchor: energie-btn
+      - title: Verkehr und Infrastruktur
+        anchor: verkehr-infrastruktur-btn
+      - title: Umwelt und Lebensraum
+        anchor: umwelt-lebensraum-btn
+      - title: Sozial- und Gesellschaftspolitik
+        anchor: sozial-gesellschaft-btn
+      - title: Bildung und Forschung
+        anchor: bildung-forschung-btn
+      - title: Kultur, Religion und Medien
+        anchor: kultur-religion-medien-btn
+
+  - title: Fazit
+    permalink: /fazit/
+    sections:
+      - title: Institutionelle Befunde (D2)
+        anchor: institutionelle-befunde-d2
+      - title: Allgemeine Erkenntnisse
+        anchor: allgemeine-erkenntisse
+      - title: Zeitliche Entwicklung des Kongruenzwerts
+        anchor: zeitliche-entwicklung-des-kongruenzwerts
+      - title: Geografische Unterschiede
+        anchor: geografische-unterschiede
+      - title: Thematische Unterschiede
+        anchor: thematische-unterschiede
+      - title: Einordnung und Grenzen
+        anchor: einordnung-und-grenzen
+
+  - title: Literaturverzeichnis und Hilfsmittel
+    permalink: /literaturverzeichnis_und_hilfsmittel/
+    sections:
+      - title: Literaturverzeichnis
+        anchor: literaturverzeichnis
+      - title: Hilfsmittel
+        anchor: hilfsmittel
