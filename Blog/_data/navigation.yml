@@ -13,6 +13,19 @@ chapters:
 
   - title: Methodik
     permalink: /methodik/
+    sections:
+      - title: Datengrundlage und Fallauswahl
+        anchor: datengrundlage-und-fallauswahl
+      - title: Akteure und Variablen
+        anchor: akteure-und-variablen
+      - title: Vorgehensweise
+        anchor: vorgehensweise
+      - title: "Operationalisierung: Kongruenzwert"
+        anchor: operationalisierung-kongruenzwert
+      - title: Umgang mit fehlenden und neutralen Positionen
+        anchor: umgang-mit-fehlenden-und-neutralen-positionen
+      - title: Tools
+        anchor: tools
 
   - title: Zeitliche Analyse
     permalink: /zeitliche-analyse/
@@ -37,8 +50,28 @@ chapters:
     sections:
       - title: Geografische Ausprägungen
         anchor: geografische-ausprägungen
-      - title: Wie sieht die Abstimmungskongruenz kantonal aus?
+      - title: "Exkurs: Schweizer Kantonslandschaft"
         anchor: klapper-geografisch-btn
+      - title: Gesamtübersicht
+        anchor: gesamtübersicht
+      - title: Kongruenz nach Zeitphase
+        anchor: kongruenz-nach-zeitphase
+      - title: Kongruenz auf der Karte
+        anchor: kongruenz-auf-der-karte
+      - title: Zentralschweiz
+        anchor: klapper-region-zentral-btn
+      - title: Ostschweiz
+        anchor: klapper-region-ost-btn
+      - title: Espace Mittelland
+        anchor: klapper-region-mittelland-btn
+      - title: Nordwestschweiz
+        anchor: klapper-region-nordwest-btn
+      - title: Raum Zürich
+        anchor: klapper-region-zuerich-btn
+      - title: Genferseeraum
+        anchor: klapper-region-leman-btn
+      - title: Tessin
+        anchor: klapper-region-tessin-btn
 
   - title: Thematische Analyse
     permalink: /thematische-analyse/
