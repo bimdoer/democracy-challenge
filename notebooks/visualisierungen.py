@@ -549,6 +549,10 @@ def write_plotly_html_responsive(
     has_map_controls = bool(limit_stufen or akteur_reihenfolge)
 
     head_css = PLOTLY_EMBED_CSS
+    if height is not None and not responsive_fill:
+        head_css += f"""<style>
+html, body {{ height: {height}px; overflow: hidden; }}
+</style>"""
     if phase_bar_labels:
         head_css += PLOTLY_PHASE_BAR_CSS
         head_css += _phase_bar_responsive_css() if responsive_fill else _phase_bar_height_css(total_height, plot_height)
