@@ -70,6 +70,7 @@ PLOTLY_DROPDOWN_BG = "#ffffff"
 PLOTLY_DROPDOWN_BORDER = "#cccccc"
 PLOTLY_PLOT_BG = "#ffffff"
 PLOTLY_GRID_COLOR = "#d4d4d4"
+BOXPLOT_FUELL_ALPHA = 0.18  # Transparenz der Boxfüllung (0 = unsichtbar, 1 = deckend)
 
 
 _DEFAULT_CH_GEOJSON = Path(__file__).resolve().parent.parent / "data" / "raw" / "ch.json"
@@ -812,7 +813,7 @@ def boxplot_facetiert_zeitwahl(
     hauptgruppe_reihenfolge=None, label_map=None, farben_map=None,
     zeit_spalten=None, default_label='Gesamte Zeitperiode', titel="",
     ylabel="Wert", legend_titel="Akteur", yrange=None, hline=0,
-    fuell_alpha=0.4, n_cols=4, hoehe_pro_zeile=300,
+    fuell_alpha=BOXPLOT_FUELL_ALPHA, n_cols=4, hoehe_pro_zeile=300,
 ):
     if hauptgruppe_reihenfolge is None:
         hauptgruppen = df[hauptgruppe_spalte].dropna().unique().tolist()
@@ -1595,7 +1596,7 @@ def boxplot_interaktiv_zeitwahl(
     legend_titel="Akteur",
     yrange=None,
     hline=0,
-    fuell_alpha=0.3,
+    fuell_alpha=BOXPLOT_FUELL_ALPHA,
 ):
     fig = go.Figure()
     n_boxen = len(wert_cols)
