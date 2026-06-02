@@ -43,7 +43,7 @@ from plotly.subplots import make_subplots
 HAUPTFARBE = "#4477AA"
 AKZENTFARBE = "#CC6677"
 
-PALETTE_KATEGORIAL = ["#4477AA", "#CC6677", "#DDCC77", "#88CCEE", "#AA4499", "#44AA99"]
+PALETTE_KATEGORIAL = ["#4477AA", "#CC6677", "#DDCC77", "#88CCEE", "#AA4499", "#44AA99"]  # Paul Tol «muted» – farbenblindensicher
 PALETTE_KATEGORIAL_VIELE_WERTE = [
     "#4477AA", "#CC6677", "#DDCC77", "#88CCEE", "#AA4499", "#44AA99",
     "#332288", "#882255", "#999933", "#66CCEE", "#117733", "#AA7744",
@@ -118,7 +118,7 @@ html, body { margin: 0; padding: 0; width: 100%; }
 }
 </style>"""
 
-PLOTLY_PHASE_BAR_HEIGHT_PX = 44
+PLOTLY_PHASE_BAR_HEIGHT_PX = 44  # Höhe der HTML-Phasen-Buttonleiste in px – muss mit dem CSS übereinstimmen
 
 
 PLOTLY_PHASE_BAR_CSS = """<style>
@@ -349,7 +349,7 @@ def _phase_bar_buttons_html(labels):
     return "".join(parts)
 
 
-PLOTLY_HEATMAP_X_DOMAIN_END = 0.97
+PLOTLY_HEATMAP_X_DOMAIN_END = 0.97  # Plot endet bei 97% der Breite – die restlichen 3% gehören der Colorbar
 PLOTLY_GEOMAP_X_DOMAIN_END = 0.97
 
 # updatemenus mit diesem Namen bleiben im HTML-Export erhalten (native Plotly-Buttons),
@@ -492,8 +492,8 @@ def write_plotly_html_responsive(
     import re
     from pathlib import Path
 
-    # Generische Karten füllen die volle Breite; die Höhe ergibt sich aus dem
-    # iframe-aspect-ratio, daher keine feste Pixelhöhe erzwingen.
+    # Karten (phase_bar_layout="generic") passen sich der iframe-Breite an;
+    # Heatmaps ("heatmap") brauchen eine feste Pixelhöhe weil sie keine eigene Ratio haben.
     responsive_fill = bool(phase_bar_labels) and phase_bar_layout == "generic"
 
     export_fig = fig
@@ -777,7 +777,7 @@ def liniendiagramm(data, x, y, hue=None, titel="", xlabel="", ylabel="",
     ax.set_ylabel(ylabel, fontsize=FONTSIZE_ACHSEN, fontweight=FONTWEIGHT_ACHSEN)
     ax.tick_params(axis='x', labelsize=FONTSIZE_TICKS, rotation=rotation)
     ax.tick_params(axis='y', labelsize=FONTSIZE_TICKS)
-    ax.set_ylim(-0.5, 0.5)
+    ax.set_ylim(-0.5, 0.5)  # feste Kongruenz-Skala: −0.5 = immer gegen Volk, +0.5 = immer mit Volk
     fig.tight_layout()
     plt.show()
 
@@ -880,7 +880,8 @@ def boxplot_facetiert_zeitwahl(
                     visible=(label == default_label), boxmean=True, showlegend=False,
                 ), row=row, col=col)
 
-    # Dummy-Traces für stabile Legende
+    # Dummy-Traces für stabile Legende: echte Box-Traces haben showlegend=False damit jeder
+    # Akteur nur einmal erscheint; diese unsichtbaren Scatter-Punkte halten die Legende konstant
     for akteur_col in wert_cols:
         name = label_map.get(akteur_col, akteur_col)
         farbe = farben_map.get(name)
@@ -990,9 +991,11 @@ def heatmap_interaktiv_phasen(
     fig = go.Figure()
     default_index = min(default_index, len(phasen) - 1)
 
-    # Reservierter Streifen für Plotly-Phasen-Buttons (Notebook); Blog nutzt HTML-Leiste.
+    # Im Notebook-Modus brauchen die nativen Plotly-Buttons Platz oben.
+    # Im Blog-Embed werden diese Buttons durch die HTML-Leiste ersetzt und
+    # button_strip wird via _expand_phase_plot_for_html_export auf 0 gesetzt.
     button_strip = 0.16
-    plot_top = 1.0 - button_strip
+    plot_top = 1.0 - button_strip  # Heatmap füllt den unteren Teil, Buttons den oberen
 
     colorbar = dict(
         thickness=8,
@@ -1246,6 +1249,7 @@ def phase_kantons_row_to_map_df(row, wert_spalte="kongruenz", id_col="id"):
     values = values.clip(-0.5, 0.5)
     return pd.DataFrame(
         {
+            # GeoJSON-IDs haben das Format "CHZH", "CHBE" usw. → Präfix "CH" + Kantonskürzel
             id_col: ["CH" + str(c).split("-")[0].upper() for c in canton_cols],
             wert_spalte: values.values,
         }
@@ -1321,6 +1325,8 @@ def schweiz_karte_interaktiv_phasen(
         raise ValueError("phasen ist leer")
 
     if ersatz_kantone is None:
+        # Jura (CHJU) wurde erst 1979 gegründet – in früheren Phasen gibt es keinen eigenen Wert,
+        # deshalb wird der Wert von Bern (CHBE) übernommen, da Jura damals zu Bern gehörte.
         ersatz_kantone = {"CHJU": "CHBE"}
 
     if colorscale is None:
@@ -1357,7 +1363,10 @@ def schweiz_karte_interaktiv_phasen(
         if fid is not None:
             kanton_namen[fid] = feat.get("properties", {}).get("name", str(fid))
 
-    # Weisse Basisebene mit allen Kantonsgrenzen (für Kantone ohne Wert).
+    # Weisse Basisebene: ohne sie verschwinden Kantone ohne Datenwert (z. B. Jura in frühen Phasen)
+    # komplett – mit ihr erscheinen sie weiss mit sichtbarer Grenze.
+    # base_offset merkt sich ob diese Basisebene als erster Trace liegt (1) oder nicht (0),
+    # damit alle nachfolgenden Index-Berechnungen stimmen.
     BASIS_NAME = "basis_weiss"
     base_offset = 0
     if leere_kantone_weiss:
@@ -1684,7 +1693,8 @@ def boxplot_interaktiv_zeitwahl(
                 showlegend=False,
             ))
 
-    # Dummy-Punkte für stabile Legende, echte Traces haben showlegend=False
+    # Dummy-Punkte für stabile Legende: gleiche Technik wie bei boxplot_facetiert_zeitwahl –
+    # echte Box-Traces haben showlegend=False, nur diese unsichtbaren Punkte tauchen in der Legende auf
     for col in wert_cols:
         name = label_map.get(col, col)
         farbe = farben_map.get(name)
