@@ -11,22 +11,6 @@ chapters:
       - title: Aspekte
         anchor: aspekte
 
-  - title: Methodik
-    permalink: /methodik/
-    sections:
-      - title: Datengrundlage und Fallauswahl
-        anchor: datengrundlage-und-fallauswahl
-      - title: Akteure und Variablen
-        anchor: akteure-und-variablen
-      - title: Vorgehensweise
-        anchor: vorgehensweise
-      - title: "Operationalisierung: Kongruenzwert"
-        anchor: operationalisierung-kongruenzwert
-      - title: Umgang mit fehlenden und neutralen Positionen
-        anchor: umgang-mit-fehlenden-und-neutralen-positionen
-      - title: Tools
-        anchor: tools
-
   - title: Zeitliche Analyse
     permalink: /zeitliche-analyse/
     sections:
@@ -118,6 +102,22 @@ chapters:
         anchor: thematische-unterschiede
       - title: Einordnung und Grenzen
         anchor: einordnung-und-grenzen
+
+  - title: Methodik
+    permalink: /methodik/
+    sections:
+      - title: Datengrundlage und Fallauswahl
+        anchor: datengrundlage-und-fallauswahl
+      - title: Akteure und Variablen
+        anchor: akteure-und-variablen
+      - title: Vorgehensweise
+        anchor: vorgehensweise
+      - title: "Operationalisierung: Kongruenzwert"
+        anchor: operationalisierung-kongruenzwert
+      - title: Umgang mit fehlenden und neutralen Positionen
+        anchor: umgang-mit-fehlenden-und-neutralen-positionen
+      - title: Tools
+        anchor: tools
 
   - title: Literaturverzeichnis und Hilfsmittel
     permalink: /literaturverzeichnis_und_hilfsmittel/
