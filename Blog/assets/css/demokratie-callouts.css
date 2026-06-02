@@ -683,6 +683,39 @@ body.site-layout {
   margin: 0.5em 0 1em;
 }
 
+/* Fliesstext links um Abbildung rechts (z. B. Kampagnenplakate in Klappern) */
+.figure-text-wrap {
+  margin: 0.5em 0 1em;
+}
+
+.figure-text-wrap::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.figure-text-wrap__media {
+  float: right;
+  width: min(42%, 17rem);
+  margin: 0 0 0.75em 1.25em;
+}
+
+.figure-text-wrap__media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.figure-text-wrap__media figcaption {
+  margin-top: 0.5em;
+  font-size: 0.88em;
+  line-height: 1.45;
+}
+
+.figure-text-wrap > p:first-of-type {
+  margin-top: 0;
+}
+
 .content iframe {
   display: block;
   width: 100%;
@@ -732,5 +765,12 @@ body.site-layout {
     grid-column: 1;
     max-width: none;
     padding: 1.5rem 1.25rem 3rem;
+  }
+
+  .figure-text-wrap__media {
+    float: none;
+    width: 100%;
+    max-width: 20rem;
+    margin: 0 auto 1em;
   }
 }
