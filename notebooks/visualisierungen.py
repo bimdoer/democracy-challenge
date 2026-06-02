@@ -1,12 +1,26 @@
-# Alle Plotfunktionen für die Analyse – im Notebook einfach importieren:
-# from visualisierungen import *
-# from visualisierungen import heatmap
 """
-Verwendung im Notebook:
-from visualisierungen import *
-from visualisierungen import heatmap
-from visualisierungen import heatmap_interaktiv_phasen
-from visualisierungen import heatmap as heat
+Gemeinsame Plot-Hilfen für die Swissvotes-Analyse.
+
+Was dieses Modul macht
+----------------------
+- Matplotlib/Seaborn: Balken, Box, Scatter, Linien, Heatmaps
+- Plotly: interaktive Heatmaps, Karten, Boxplots mit Zeit-/Phasenwahl
+- Blog-Export: responsive HTML (iframe-tauglich)
+
+Datengrundlage (typisch in den Notebooks)
+-----------------------------------------
+- ``df_with_positions.csv`` – Kongruenz, Themen, Phase (3a, 3b, 3d)
+- ``df_heatmap_with_positions.csv`` / ``df_heatmap_by_phase.csv`` – Kantonswerte (3c)
+- ``data/raw/ch.json`` – Kantonsgrenzen für Karten
+
+Vorher: ``1_data_wrangling.ipynb`` → ``2_berechnung.ipynb``
+
+Danach: Analyse-Notebooks importieren z. B. ``from visualisierungen import *``
+
+Verwendung::
+
+    from visualisierungen import *
+    from visualisierungen import heatmap, schweiz_karte_interaktiv_phasen
 """
 
 import math
@@ -73,6 +87,7 @@ PLOTLY_GRID_COLOR = "#d4d4d4"
 BOXPLOT_FUELL_ALPHA = 0.18  # Transparenz der Boxfüllung (0 = unsichtbar, 1 = deckend)
 
 
+# Standardpfad zu den Kantonsgrenzen (relativ zum Repo-Root)
 _DEFAULT_CH_GEOJSON = Path(__file__).resolve().parent.parent / "data" / "raw" / "ch.json"
 
 
@@ -81,6 +96,7 @@ _DEFAULT_CH_GEOJSON = Path(__file__).resolve().parent.parent / "data" / "raw" / 
 # ══════════════════════════════════════════════════════════════
 
 def hex_zu_rgba(hex_farbe, alpha):
+    """Hex-Farbe mit Alpha -> Plotly-rgba-String."""
     # Für Plotly-Füllfarben mit Transparenz
     if hex_farbe is None:
         return None
@@ -89,6 +105,7 @@ def hex_zu_rgba(hex_farbe, alpha):
     return f'rgba({r}, {g}, {b}, {alpha})'
 
 
+# CSS: Plotly-Div füllt die Blog-Spalte (iframe width=100%)
 PLOTLY_EMBED_CSS = """<style>
 html, body { margin: 0; padding: 0; width: 100%; }
 .js-plotly-plot,
@@ -204,6 +221,7 @@ PLOTLY_PHASE_BAR_JS = """<script>
 
 
 def _map_controls_css():
+    """CSS für Karten-Dropdowns (Akteur, Farblimits) im HTML-Export."""
     top = PLOTLY_PHASE_BAR_HEIGHT_PX + 6
     return f"""<style>
 .phase-heatmap-embed {{ position: relative; }}
@@ -233,6 +251,7 @@ def _map_controls_css():
 
 
 def _map_controls_html(akteur_reihenfolge, default_akteur, limit_stufen):
+    """HTML-Block für Akteur- und Limit-Steuerung in der Karte."""
     import html as html_module
 
     parts = []
@@ -252,6 +271,7 @@ def _map_controls_html(akteur_reihenfolge, default_akteur, limit_stufen):
 
 
 def _map_controls_js(akteur_z):
+    """JavaScript: Akteur/Limit wechseln ohne Seiten-Reload."""
     import json
 
     az_json = json.dumps(akteur_z) if akteur_z else "null"
@@ -316,6 +336,7 @@ def _equalize_phase_button_labels(labels):
 
 
 def _phase_bar_buttons_html(labels):
+    """HTML-Buttons für Phasen-Umschaltung (Blog-Embed)."""
     import html as html_module
 
     parts = []
@@ -337,6 +358,7 @@ PLOTLY_HTML_KEEP_UPDATEMENU = "html_keep"
 
 
 def _sync_geomap_colorbar(fig, x_domain_end=PLOTLY_GEOMAP_X_DOMAIN_END):
+    """Colorbar der Karte an Plot-Breite anpassen."""
     for trace in fig.data:
         if not hasattr(trace, "colorbar"):
             continue
@@ -409,6 +431,7 @@ def _expand_phase_plot_for_html_export(fig, plot_top=1.0, x_domain_end=PLOTLY_HE
 
 
 def _phase_bar_height_css(total_height, plot_height):
+    """CSS: feste Gesamthöhe mit Phasen-Buttonzeile."""
     return f"""<style>
 html, body {{
   margin: 0;
@@ -582,6 +605,7 @@ html, body {{ height: {height}px; overflow: hidden; }}
 
 
 def _transparent(fig, ax=None):
+    """Figure und Axes halbtransparent (für farbige Blog-Hintergründe)."""
     # Leicht weisser Hintergrund – funktioniert auf farbigen Seitenhintergründen
     fig.patch.set_facecolor((1, 1, 1, 0.82))
     if ax is None:
@@ -592,6 +616,7 @@ def _transparent(fig, ax=None):
 
 
 def _baue_zeitwahl_buttons(zeit_spalten, n_traces_pro_label, anzahl_dummy_traces=0):
+    """Plotly-Buttons: pro Zeitraum nur die zugehörigen Traces sichtbar schalten."""
     # Erstellt die Zeitwahl-Buttons – Dummy-Traces am Ende bleiben immer sichtbar
     n_box_traces = n_traces_pro_label * len(zeit_spalten)
     buttons = []
@@ -614,6 +639,7 @@ def _baue_zeitwahl_buttons(zeit_spalten, n_traces_pro_label, anzahl_dummy_traces
 # ══════════════════════════════════════════════════════════════
 
 def _annotate_bars(ax, fmt=".0f"):
+    """Zahl über jedem Balken (nur wenn Höhe gesetzt und ungleich 0)."""
     # Wert über jeden Balken schreiben
     for p in ax.patches:
         h = p.get_height()
@@ -629,6 +655,7 @@ def balkendiagramm(data, x, y, hue=None, xlabel="", ylabel="", titel="",
                    ylim=None, palette=None,
                    figsize=(12, 6), rotation=0, order=None,
                    annotate=False, fmt=".0f"):
+    """Seaborn-Balkendiagramm mit einheitlichem Stil."""
     if palette is None:
         palette = PALETTE_KATEGORIAL
 
@@ -663,6 +690,7 @@ def gestapeltes_balkendiagramm(df, xlabel="", ylabel="Anteil (%)",
                                legend_titel="", figsize=(8, 6),
                                xlabels=None, palette=PALETTE_KATEGORIAL,
                                annotate=False, fmt=".0f", min_anteil=5):
+    """Gestapeltes Balkendiagramm (z. B. Rechtsformen pro Jahrzehnt)."""
     # Legend_titel wird nicht gerendert
     sns.set_style("whitegrid")
 
@@ -698,6 +726,7 @@ def gestapeltes_balkendiagramm(df, xlabel="", ylabel="Anteil (%)",
 def scatterplot(data, x, y, size=None, titel="", xlabel="", ylabel="",
                 sizes=(20, 800), alpha=0.4, farbe=None, hue=None,
                 figsize=(10, 5), rotation=0, legendentitel='', palette=None):
+    """Streudiagramm mit optionalem Hue und Punktgrösse."""
     # Legendentitel wird nicht gerendert
     if farbe is None:
         farbe = HAUPTFARBE
@@ -725,6 +754,7 @@ def scatterplot(data, x, y, size=None, titel="", xlabel="", ylabel="",
 def liniendiagramm(data, x, y, hue=None, titel="", xlabel="", ylabel="",
                    palette=None, farbe=None, figsize=(10, 5),
                    marker="o", linewidth=2, rotation=0, errorbar=False, hline=None):
+    """Liniendiagramm (Matplotlib), optional mit Fehlerbalken."""
     if palette is None and hue:
         palette = PALETTE_KATEGORIAL
     if farbe is None and not hue:
@@ -761,6 +791,7 @@ def liniendiagramm_interaktiv_zeitwahl(
     default_label='10 Jahre', titel="", xlabel="Jahr", ylabel="Wert",
     legend_titel="Akteur", yrange=None, hline=0, linien_opazitaet=0.8,
 ):
+    """Plotly-Linienplot mit Buttons für Zeitaggregation."""
     # Legend_titel wird nicht gerendert
     if label_map is None:
         label_map = {col: col for col in wert_cols}
@@ -772,6 +803,7 @@ def liniendiagramm_interaktiv_zeitwahl(
     fig = go.Figure()
     n_linien = len(wert_cols)
 
+    # Pro Zeitfenster: Mittelwert je Akteur-Spalte, ein Trace pro Linie
     for label, spalte in zeit_spalten.items():
         agg = df.groupby(spalte)[wert_cols].mean().reset_index()
         for col in wert_cols:
@@ -815,6 +847,7 @@ def boxplot_facetiert_zeitwahl(
     ylabel="Wert", legend_titel="Akteur", yrange=None, hline=0,
     fuell_alpha=BOXPLOT_FUELL_ALPHA, n_cols=4, hoehe_pro_zeile=300,
 ):
+    """Facetten-Boxplots nach Thema + Phasen-Buttons (Blog 3d)."""
     if hauptgruppe_reihenfolge is None:
         hauptgruppen = df[hauptgruppe_spalte].dropna().unique().tolist()
     else:
@@ -828,6 +861,7 @@ def boxplot_facetiert_zeitwahl(
     fig = make_subplots(rows=n_rows, cols=n_cols, subplot_titles=hauptgruppen,
                         shared_yaxes=True, vertical_spacing=0.12, horizontal_spacing=0.04)
 
+    # Pro Phase ein Subplot-Raster; je Thema und Akteur ein Box-Trace
     for label, phase in zeit_spalten.items():
         df_subset = df if phase is None else df[df[phasen_spalte] == phase]
         for hg_idx, hg in enumerate(hauptgruppen):
@@ -890,6 +924,7 @@ def boxplot_facetiert_zeitwahl(
 def heatmap(pivot, xlabel="", ylabel="", vmax=0.5, vmin=-0.5,
             cmap=None, figsize=(6, 7), fmt=".2f",
             xlabels=None, ylabels=None, rotation=0):
+    """Statische Heatmap aus Pivot-Tabelle (Matplotlib)."""
     if cmap is None:
         cmap = CMAP_HEATMAP
 
@@ -973,6 +1008,7 @@ def heatmap_interaktiv_phasen(
         tickfont=dict(size=PLOTLY_FONT_SIZE - 2),
     )
 
+    # Jede Phase = ein Heatmap-Trace; Buttons schalten visible um
     for i, (label, pivot) in enumerate(phasen):
         x = list(xlabels) if xlabels is not None else [str(c) for c in pivot.columns]
         y = list(ylabels) if ylabels is not None else [str(r) for r in pivot.index]
@@ -1090,6 +1126,7 @@ def heatmap_interaktiv_phasen(
 
 def boxplot(data, x=None, y=None, hue=None, titel="", xlabel="", ylabel="",
             farbe=None, palette=None, figsize=(10, 5), width=0.4, rotation=0, hline=None):
+    """Boxplot mit Mittelwert-Linie und optionalem hline."""
     if farbe is None and palette is None:
         farbe = HAUPTFARBE
 
@@ -1132,6 +1169,7 @@ def boxplot(data, x=None, y=None, hue=None, titel="", xlabel="", ylabel="",
 # ══════════════════════════════════════════════════════════════
 
 def _load_ch_geojson_dict(geojson_pfad=None):
+    """Schweizer Kantons-GeoJSON laden (``data/raw/ch.json``)."""
     import json
 
     path = Path(geojson_pfad) if geojson_pfad is not None else _DEFAULT_CH_GEOJSON
@@ -1142,6 +1180,7 @@ def _load_ch_geojson_dict(geojson_pfad=None):
 
 
 def _ring_signed_area(ring):
+    """Vorzeichen-Fläche eines Polygon-Rings (Geometrie-Hilfe)."""
     a = 0.0
     n = len(ring)
     for i in range(n):
@@ -1609,9 +1648,11 @@ def boxplot_interaktiv_zeitwahl(
     hline=0,
     fuell_alpha=BOXPLOT_FUELL_ALPHA,
 ):
+    """Plotly-Boxplot nach Hauptgruppe mit Phasen-Buttons."""
     fig = go.Figure()
     n_boxen = len(wert_cols)
 
+    # Pro Phase und Akteur-Spalte ein Box-Trace (sichtbar nur für default_label)
     for label, phase in zeit_spalten.items():
         if phase is None:
             df_subset = df
