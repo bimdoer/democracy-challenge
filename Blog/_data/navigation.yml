@@ -32,16 +32,16 @@ chapters:
   - title: Geografische Analyse
     permalink: /geografische-analyse/
     sections:
-      - title: Geografische Ausprägungen
-        anchor: geografische-ausprägungen
-      - title: "Exkurs: Schweizer Kantonslandschaft"
+      - title: Wie verteilt sich die Kongruenz geografisch?
+        anchor: wie-verteilt-sich-die-kongruenz-geografisch
+      - title: "Exkurs: Wie entwickelte sich die Schweizer Kantonslandschaft?"
         anchor: klapper-geografisch-btn
-      - title: Gesamtübersicht
-        anchor: gesamtübersicht
-      - title: Kongruenz nach Zeitphase
-        anchor: kongruenz-nach-zeitphase
-      - title: Kongruenz auf der Karte
-        anchor: kongruenz-auf-der-karte
+      - title: "Geografische Kongruenz über alle Abstimmungen (1848–2026)"
+        anchor: geografische-kongruenz-über-alle-abstimmungen-18482026
+      - title: Dieselbe Übersicht aufgeteilt nach den fünf Zeitphasen
+        anchor: dieselbe-übersicht-aufgeteilt-nach-den-fünf-zeitphasen
+      - title: Kongruenz nach Kanton und Akteur auf der Schweizerkarte
+        anchor: kongruenz-nach-kanton-und-akteur-auf-der-schweizerkarte
       - title: Zentralschweiz
         anchor: klapper-region-zentral-btn
       - title: Ostschweiz
@@ -90,18 +90,20 @@ chapters:
   - title: Fazit
     permalink: /fazit/
     sections:
-      - title: Institutionelle Befunde (D2)
-        anchor: institutionelle-befunde-d2
-      - title: Allgemeine Erkenntnisse
-        anchor: allgemeine-erkenntisse
-      - title: Zeitliche Entwicklung des Kongruenzwerts
-        anchor: zeitliche-entwicklung-des-kongruenzwerts
-      - title: Geografische Unterschiede
-        anchor: geografische-unterschiede
-      - title: Thematische Unterschiede
-        anchor: thematische-unterschiede
+      - title: Behörden und bürgerliche Mitte treffen den Volkswillen am verlässlichsten
+        anchor: behörden-und-bürgerliche-mitte-treffen-den-volkswillen-am-verlässlichsten
+      - title: Wie sich das über die Zeit verändert hat
+        anchor: wie-sich-das-über-die-zeit-verändert-hat
+      - title: Unterschiede zwischen den Kantonen
+        anchor: unterschiede-zwischen-den-kantonen
+      - title: Unterschiede zwischen den Themen
+        anchor: unterschiede-zwischen-den-themen
+      - title: Das grosse Bild
+        anchor: das-grosse-bild
       - title: Einordnung und Grenzen
         anchor: einordnung-und-grenzen
+      - title: Zurück zu den Analysen
+        anchor: zurück-zu-den-analysen
 
   - title: Methodik
     permalink: /methodik/
@@ -112,10 +114,10 @@ chapters:
         anchor: akteure-und-variablen
       - title: Vorgehensweise
         anchor: vorgehensweise
-      - title: "Operationalisierung: Kongruenzwert"
-        anchor: operationalisierung-kongruenzwert
-      - title: Umgang mit fehlenden und neutralen Positionen
-        anchor: umgang-mit-fehlenden-und-neutralen-positionen
+      - title: Wie wird der Kongruenzwert berechnet?
+        anchor: wie-wird-der-kongruenzwert-berechnet
+      - title: Umgang mit fehlenden und neutralen Abstimmungsempfehlungen
+        anchor: umgang-mit-fehlenden-und-neutralen-abstimmungsempfehlungen
       - title: Tools
         anchor: tools
 
