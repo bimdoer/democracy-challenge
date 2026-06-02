@@ -1097,7 +1097,18 @@ def boxplot(data, x=None, y=None, hue=None, titel="", xlabel="", ylabel="",
     fig, ax = plt.subplots(figsize=figsize)
     _transparent(fig, ax)
     sns.boxplot(data=data, x=x, y=y, hue=hue, color=farbe,
-                palette=palette, width=width, ax=ax)
+                palette=palette, width=width, showmeans=True,
+                meanline=True,
+                meanprops={"linestyle": "--", "linewidth": 1.5,
+                           "color": AKZENTFARBE},
+                ax=ax)
+
+    # Plotly-ähnlicher Stil: transparente Füllung, Umrandung in Füllfarbe statt schwarz
+    for patch in ax.patches:
+        fc = patch.get_facecolor()
+        patch.set_facecolor((*fc[:3], 0.6))
+        patch.set_edgecolor((*fc[:3], 0.9))
+        patch.set_linewidth(0.8)
 
     if hline is not None:
         ax.axhline(hline, color=HLINE_COLOR, linestyle=HLINE_LINESTYLE,
