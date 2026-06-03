@@ -1,0 +1,269 @@
+---
+title: "Prädiktive Direkte Demokratie"
+subtitle: "Wie stark stimmt das Schweizer Stimmvolk mit seinen Institutionen überein?"
+author: "Charlotte Schwegler · Manuel Emmenegger"
+date: "2026-06-09"
+date-format: "DD.MM.YYYY"
+format:
+  revealjs:
+    width: 1920
+    height: 1080
+    margin: 0
+    center: false
+    auto-stretch: false
+    embed-resources: false
+    slide-number: "c/t"
+    footer: "{{< meta date >}} · {{< meta author >}} · FHNW Challenge Data Science"
+    css: custom.css
+    include-after-body: iframe-init.js
+    revealjs-config:
+      viewDistance: 100
+      preloadIframes: true
+# HTML: quarto preview slides.qmd
+# PDF:  Im Browser öffnen → Taste «E» (Reveal.js PDF-Export)
+---
+
+------------------------------------------------------------------------
+
+## Agenda
+
+::: {.slide-full}
+```{=html}
+<nav class="agenda-timeline" aria-label="Agenda">
+  <div class="agenda-rail">
+    <div class="agenda-line-bg" aria-hidden="true"></div>
+    <div class="agenda-line-fill" aria-hidden="true"></div>
+    <div class="agenda-stops" role="list">
+      <div class="agenda-stop" role="listitem" style="--stop-color: #4477aa">
+        <span class="agenda-dot" aria-hidden="true"></span>
+        <span class="agenda-label">Datensatz &amp; Methodik</span>
+      </div>
+      <div class="agenda-stop" role="listitem" style="--stop-color: #44aa99">
+        <span class="agenda-dot" aria-hidden="true"></span>
+        <span class="agenda-label">Zeitliche Analyse</span>
+      </div>
+      <div class="agenda-stop" role="listitem" style="--stop-color: #999933">
+        <span class="agenda-dot" aria-hidden="true"></span>
+        <span class="agenda-label">Geografische Analyse</span>
+      </div>
+      <div class="agenda-stop" role="listitem" style="--stop-color: #b8a82e">
+        <span class="agenda-dot" aria-hidden="true"></span>
+        <span class="agenda-label">Geografische Analyse</span>
+      </div>
+      <div class="agenda-stop" role="listitem" style="--stop-color: #aa4499">
+        <span class="agenda-dot" aria-hidden="true"></span>
+        <span class="agenda-label">Thematische Analyse</span>
+      </div>
+      <div class="agenda-stop" role="listitem" style="--stop-color: #666666">
+        <span class="agenda-dot" aria-hidden="true"></span>
+        <span class="agenda-label">Pipeline</span>
+      </div>
+      <div class="agenda-stop" role="listitem" style="--stop-color: #cc6677">
+        <span class="agenda-dot" aria-hidden="true"></span>
+        <span class="agenda-label">Learnings</span>
+      </div>
+    </div>
+  </div>
+</nav>
+```
+:::
+
+------------------------------------------------------------------------
+
+## Datensatz & Methodik
+
+::: {.slide-full}
+```{=html}
+<div class="dm-split">
+  <figure class="dm-figure dm-figure--kongruenz">
+    <img src="assets/blog_plots/d2_kongruenz_akteur.png" alt="D2: Kongruenzwert nach Akteur">
+  </figure>
+  <figure class="dm-figure dm-figure--methodik">
+    <img src="assets/blog_plots/d0_kongruenz_berechnung.svg" alt="D0: Berechnung des Kongruenzwerts">
+  </figure>
+</div>
+```
+:::
+
+------------------------------------------------------------------------
+
+## Zeitliche Analyse
+
+::: {.slide-full}
+<iframe class="slide-iframe" src="plots/d3_kongruenz_zeit.html" title="D3 Kongruenzwert über Zeit"></iframe>
+:::
+
+------------------------------------------------------------------------
+
+## Geografische Analyse
+
+::: {.slide-full}
+<iframe class="slide-iframe" src="plots/d6_heatmap_zeitphasen.html" title="D6 Heatmap Zeitphasen"></iframe>
+:::
+
+------------------------------------------------------------------------
+
+## Geografische Analyse
+
+::: {.slide-full}
+<iframe class="slide-iframe" src="plots/d7_geomap_zeitphasen_bv.html" title="D7 Geomap Bundesversammlung"></iframe>
+:::
+
+------------------------------------------------------------------------
+
+## Thematische Analyse
+
+::: {.slide-full}
+<iframe class="slide-iframe" src="plots/d7_thema_facetiert.html" title="D7 Kongruenz nach Thema"></iframe>
+:::
+
+------------------------------------------------------------------------
+
+## Reproduzierbare Pipeline
+
+::: {.slide-full}
+```{=html}
+<nav class="agenda-timeline pipeline-timeline" aria-label="Pipeline">
+  <div class="agenda-rail">
+    <div class="agenda-line-bg" aria-hidden="true"></div>
+    <div class="agenda-line-fill" aria-hidden="true"></div>
+    <div class="agenda-stops" role="list">
+      <div class="agenda-stop" role="listitem" style="--stop-color: #4477aa">
+        <span class="agenda-dot" aria-hidden="true"></span>
+        <span class="agenda-label">Rohdaten</span>
+      </div>
+      <div class="agenda-stop" role="listitem" style="--stop-color: #44aa99">
+        <span class="agenda-dot" aria-hidden="true"></span>
+        <span class="agenda-label">Aufbereitung</span>
+      </div>
+      <div class="agenda-stop" role="listitem" style="--stop-color: #44aa99">
+        <span class="agenda-dot" aria-hidden="true"></span>
+        <span class="agenda-label">Kongruenzwert</span>
+      </div>
+      <div class="agenda-stop pipeline-stop--analysen" role="listitem" style="--stop-color: #999933">
+        <div class="pipeline-branch" aria-label="Analysen im Detail">
+          <div class="pipeline-branch-rail">
+            <div class="pipeline-branch-line-bg" aria-hidden="true"></div>
+            <div class="pipeline-branch-line-fill" aria-hidden="true"></div>
+            <div class="pipeline-branch-stops" role="list">
+              <div class="pipeline-branch-stop" role="listitem" style="--stop-color: #aa4499">
+                <span class="agenda-dot" aria-hidden="true"></span>
+                <span class="agenda-label pipeline-branch-label">Thematisch</span>
+              </div>
+              <div class="pipeline-branch-stop" role="listitem" style="--stop-color: #999933">
+                <span class="agenda-dot" aria-hidden="true"></span>
+                <span class="agenda-label pipeline-branch-label">Geografisch</span>
+              </div>
+              <div class="pipeline-branch-stop" role="listitem" style="--stop-color: #44aa99">
+                <span class="agenda-dot" aria-hidden="true"></span>
+                <span class="agenda-label pipeline-branch-label">Zeitlich</span>
+              </div>
+              <div class="pipeline-branch-stop" role="listitem" style="--stop-color: #4477aa">
+                <span class="agenda-dot" aria-hidden="true"></span>
+                <span class="agenda-label pipeline-branch-label">Überblick</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span class="agenda-dot" aria-hidden="true"></span>
+        <span class="agenda-label">Analysen</span>
+      </div>
+      <div class="agenda-stop" role="listitem" style="--stop-color: #aa4499">
+        <span class="agenda-dot" aria-hidden="true"></span>
+        <span class="agenda-label">Export</span>
+      </div>
+      <div class="agenda-stop" role="listitem" style="--stop-color: #aa4499">
+        <span class="agenda-dot" aria-hidden="true"></span>
+        <span class="agenda-label">Blog</span>
+      </div>
+      <div class="agenda-stop" role="listitem" style="--stop-color: #666666">
+        <span class="agenda-dot" aria-hidden="true"></span>
+        <span class="agenda-label">GitHub Pages</span>
+      </div>
+    </div>
+  </div>
+</nav>
+```
+:::
+
+------------------------------------------------------------------------
+
+## Learnings
+
+::: {.slide-full .learnings-slide}
+```{=html}
+<div class="learning-grid">
+<article class="learning-card learning-politik">
+<header class="learning-card__header">
+<img src="assets/icon-politik.svg" class="learning-icon" width="44" height="44" alt="" loading="eager">
+<h3>Politikwissenschaft</h3>
+</header>
+<div class="learning-card__body">
+<ul>
+<li><strong>Manuel:</strong> Von 0 auf 100 — HLS-Lexikon, Swissvotes, Interpretation der Daten und Grundsatzverständnis</li>
+<li><strong>Charlotte:</strong> Hilfreiche Diskussionen zur Findung der Ziellinie</li>
+</ul>
+</div>
+</article>
+<article class="learning-card learning-team">
+<header class="learning-card__header">
+<img src="assets/icon-team.svg" class="learning-icon" width="44" height="44" alt="" loading="eager">
+<h3>Menschliche Zusammenarbeit</h3>
+</header>
+<div class="learning-card__body">
+<ul>
+<li>Team von 3 auf 2 reduziert — viel vorgenommen</li>
+<li>Kommunikation untereinander lief gut</li>
+<li>Time-Management bei Manuel am Limit (Geschäft daneben); Charlotte konnte gut auffangen</li>
+<li>Ergänzten sich gegenseitig</li>
+</ul>
+</div>
+</article>
+<article class="learning-card learning-tech">
+<header class="learning-card__header">
+<img src="assets/icon-tech.svg" class="learning-icon" width="44" height="44" alt="" loading="eager">
+<h3>Technische Umsetzung</h3>
+</header>
+<div class="learning-card__body">
+<ul>
+<li>GitHub Pull Requests, main protected, Branches, Code Review</li>
+<li>Pushen ohne Resultate im Notebook</li>
+<li>Pipeline mit py-book library — Verweise in Notebooks</li>
+<li>Webseite über GitHub Pages mit übergeordnetem CSS</li>
+<li>Heute eher Next.js oder MkDocs statt Jekyll</li>
+</ul>
+</div>
+</article>
+<article class="learning-card learning-methodik">
+<header class="learning-card__header">
+<img src="assets/icon-methodik.svg" class="learning-icon" width="44" height="44" alt="" loading="eager">
+<h3>Methodik</h3>
+</header>
+<div class="learning-card__body">
+<ul>
+<li>Ziellinie lange unklar — viel Diskussion bis zum gemeinsamen Titel</li>
+<li>KI hätte Swissvotes-Zusammentragung deutlich erleichtert</li>
+<li>Stetiges Code-Kommentieren (erst spät etabliert)</li>
+<li>Rohe Datenvisualisierungen am Anfang besonders wertvoll</li>
+<li>Lernprozess fortlaufend dokumentieren</li>
+</ul>
+</div>
+</article>
+</div>
+```
+:::
+
+------------------------------------------------------------------------
+
+```{=html}
+<div id="closing-slide" class="quarto-title-block center">
+  <h1 class="title">Vielen Dank</h1>
+  <p class="subtitle">Wir freuen uns auf die Diskussion</p>
+  <div class="quarto-title-authors">
+    <div class="quarto-title-author">
+      <div class="quarto-title-author-name">Charlotte Schwegler · Manuel Emmenegger</div>
+    </div>
+  </div>
+  <p class="date">09.06.2026</p>
+</div>
+```
