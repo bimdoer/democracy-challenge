@@ -14,8 +14,15 @@ build/
 # Jupyter
 .ipynb_checkpoints/
 
-# Quarto
+# Quarto (Notebooks, Blog, presentation)
+# Junction für Quarto-Preview (sync-blog-assets.ps1)
+presentation/Blog/
+
 .quarto/
+_site/
+**/slides_files/
+site_libs/
+**/*.quarto_ipynb
 
 # IDE
 .idea/
@@ -28,6 +35,3 @@ Thumbs.db
 # Environment
 .env
 .env.local
-
-# local github pages
-_site/
