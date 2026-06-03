@@ -9,7 +9,7 @@
 
 /* Title & closing slide (zentriert wie Titelfolie) */
 .reveal .slides section#title-slide.quarto-title-block,
-.reveal .slides section.slide:has(> #closing-slide.quarto-title-block) {
+.reveal .slides section#closing-slide.slide-closing {
   display: flex !important;
   flex-direction: column;
   justify-content: center;
@@ -24,7 +24,11 @@
   overflow: hidden;
 }
 
-.reveal .slides section.slide:has(> #closing-slide) #closing-slide {
+.reveal .slides section#closing-slide.slide-closing h2 {
+  display: none !important;
+}
+
+.reveal .slides section#closing-slide .closing-slide-content {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -38,10 +42,10 @@
 .reveal .slides section#title-slide .subtitle,
 .reveal .slides section#title-slide .date,
 .reveal .slides section#title-slide .quarto-title-author-name,
-.reveal .slides #closing-slide .title,
-.reveal .slides #closing-slide .subtitle,
-.reveal .slides #closing-slide .date,
-.reveal .slides #closing-slide .quarto-title-author-name {
+.reveal .slides section#closing-slide .title,
+.reveal .slides section#closing-slide .subtitle,
+.reveal .slides section#closing-slide .date,
+.reveal .slides section#closing-slide .quarto-title-author-name {
   text-align: center !important;
   width: 100%;
   margin-left: auto;
@@ -177,6 +181,46 @@
 
 .reveal .slide-iframe--geomap {
   max-height: min(920px, calc(100% - 0.5em));
+}
+
+/* D7 Thematische Analyse: Plot proportional verkleinern (xy), ohne iframe-Scroll */
+.reveal .slides section.slide-thema:has(.slide-iframe) .slide-full {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding-top: 0.15em;
+}
+
+.reveal .slides section.slide-thema .thema-plot-scaler {
+  --thema-plot-height: 1020px;
+  --thema-scale: 0.86;
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  height: calc(var(--thema-plot-height) * var(--thema-scale));
+  max-height: calc(100% - 0.25em);
+  margin: 0 auto;
+  overflow: hidden;
+  flex-shrink: 1;
+}
+
+.reveal .slides section.slide-thema .slide-iframe--thema {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: calc(100% / var(--thema-scale)) !important;
+  max-width: none !important;
+  height: var(--thema-plot-height) !important;
+  max-height: none !important;
+  margin: 0 !important;
+  border: 0;
+  transform: translateX(-50%) scale(var(--thema-scale));
+  transform-origin: top center;
 }
 
 /* Agenda: horizontal timeline, vertically centered, left-to-right animation */
@@ -685,49 +729,267 @@
   margin-bottom: 0;
 }
 
-/* Folien-Fußzeile: links Datum · Autor · FHNW, rechts «Seite X / Y» */
+/* Footer: oben Timeline, darunter Datum · Autor · FHNW und Seitenzahl */
 
-.reveal .footer > p {
-  margin: 0 !important;
+.reveal > .footer,
+.reveal > .slide-number {
+  display: none !important;
+  visibility: hidden !important;
 }
 
-.reveal .footer {
-  text-align: left !important;
-  left: 0.55em !important;
-  right: auto !important;
-  width: auto !important;
-  max-width: calc(100% - 12em) !important;
-  margin: 0 !important;
-  bottom: 0.45em !important;
+.reveal .presentation-footer.presentation-footer--hidden {
+  display: none !important;
+}
+
+.reveal .presentation-footer:not(.presentation-footer--hidden) {
+  display: grid !important;
+  visibility: visible !important;
+}
+
+.reveal .presentation-footer.presentation-footer--with-agenda:not(.presentation-footer--hidden) {
+  display: flex !important;
+  flex-direction: column;
+}
+
+.reveal .presentation-footer {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 25;
+  display: grid;
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    "agenda"
+    "meta";
+  box-sizing: border-box;
+  background: #fff;
+  border-top: 1px solid #e8e8e8;
   font-family: "Source Sans Pro", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 0.32em !important;
+  font-size: 0.32em;
   font-weight: 400;
-  color: #555 !important;
+  color: #555;
   line-height: 1.3;
-  z-index: 3;
+  pointer-events: none;
 }
 
-.reveal .slide-number {
-  bottom: 0.45em !important;
-  right: 0.55em !important;
+.reveal .presentation-footer:not(.presentation-footer--with-agenda) {
+  grid-template-rows: auto;
+  grid-template-areas: "meta";
+}
+
+.reveal .presentation-footer-meta {
+  grid-area: meta;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  padding: 0.22em 0.55em 0.28em;
+  box-sizing: border-box;
+}
+
+.reveal .presentation-footer-meta .footer,
+.reveal .presentation-footer-meta .slide-number,
+.reveal .presentation-footer-meta .presentation-slide-number {
+  position: static !important;
+  bottom: auto !important;
   left: auto !important;
-  font-family: "Source Sans Pro", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 0.32em !important;
-  font-weight: 400;
-  color: #555 !important;
+  right: auto !important;
+  top: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: auto !important;
   background: transparent !important;
-  z-index: 3;
+  font-size: 1em !important;
+  font-family: inherit;
+  font-weight: inherit;
+  color: inherit !important;
+  line-height: inherit;
+  display: block !important;
+  visibility: visible !important;
 }
 
-.reveal .slide-number::before {
+.reveal .presentation-footer-meta .footer {
+  flex: 1 1 auto;
+  text-align: left !important;
+  max-width: calc(100% - 9em);
+}
+
+.reveal .presentation-footer-meta .footer > p {
+  margin: 0 !important;
+}
+
+.reveal .presentation-footer-meta .slide-number,
+.reveal .presentation-footer-meta .presentation-slide-number {
+  flex: 0 0 auto;
+  text-align: right !important;
+  display: block !important;
+}
+
+.reveal .presentation-footer-meta .presentation-slide-number::before {
   content: "Seite ";
 }
 
-.reveal .slide-number .slide-number-delimiter {
+.reveal .presentation-footer-meta .presentation-slide-number .slide-number-delimiter {
   margin: 0 0.15em;
 }
 
-html.print-pdf .reveal .footer,
-html.print-pdf .reveal .slide-number {
+.reveal .presentation-footer--with-agenda .presentation-footer-meta {
+  flex: 0 0 auto;
+  grid-area: unset;
+  border-top: 1px solid #ececec;
+}
+
+.reveal .presentation-footer-agenda.global-agenda-nav[hidden] {
+  display: none !important;
+}
+
+.reveal .presentation-footer-agenda.global-agenda-nav {
+  grid-area: agenda;
+  position: relative;
+  width: 100%;
+  height: auto;
+  flex: 0 0 auto;
+  min-height: 4.85rem;
+  box-sizing: border-box;
+  padding: 0 2.5%;
+  overflow: visible;
+  pointer-events: auto;
+}
+
+.reveal .presentation-footer-agenda .agenda-rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 30%;
+  width: 100%;
+  height: auto;
+  min-height: 3.1rem;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.reveal .presentation-footer-agenda .agenda-line-bg {
+  position: absolute;
+  left: 2%;
+  width: 96%;
+  top: 0.55em;
+  height: 3px;
+  border-radius: 2px;
+  background: #d8d8d8;
+  z-index: 0;
+}
+
+.reveal .presentation-footer-agenda .agenda-stops {
+  position: relative;
+  left: 2%;
+  width: 96%;
+  top: auto;
+  transform: none;
+  z-index: 2;
+  display: grid !important;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  align-items: start;
+  justify-items: stretch;
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 0.15em;
+  box-sizing: border-box;
+}
+
+.reveal .presentation-footer-agenda .agenda-stop {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-width: 0;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  opacity: 1;
+  text-align: center;
+}
+
+.reveal .presentation-footer-agenda .agenda-stop-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+  border-radius: 4px;
+  transition: opacity 0.15s ease;
+}
+
+.reveal .presentation-footer-agenda .agenda-stop-link:hover .agenda-label,
+.reveal .presentation-footer-agenda .agenda-stop-link:focus-visible .agenda-label {
+  color: #333;
+  text-decoration: underline;
+}
+
+.reveal .presentation-footer-agenda .agenda-stop-link:focus-visible {
+  outline: 2px solid #4477aa;
+  outline-offset: 2px;
+}
+
+.reveal .presentation-footer-agenda .agenda-dot {
+  width: 11px;
+  height: 11px;
+  border-width: 2px;
+  background: #c4c4c4;
+  border-color: #fff;
+  box-shadow: 0 0 0 1.5px #c4c4c4;
+}
+
+.reveal .presentation-footer-agenda .agenda-label {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 0.28em auto 0;
+  padding: 0 0.1em;
+  box-sizing: border-box;
+  font-size: 0.72em;
+  font-weight: 600;
+  color: #9a9a9a;
+  line-height: 1.08;
+  text-align: center;
+  text-wrap: balance;
+  hyphens: manual;
+}
+
+.reveal .presentation-footer-agenda .agenda-stop.is-active .agenda-dot {
+  width: 13px;
+  height: 13px;
+  background: var(--stop-color, #4477aa);
+  box-shadow: 0 0 0 2px var(--stop-color, #4477aa), 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.reveal .presentation-footer-agenda .agenda-stop.is-active .agenda-label {
+  color: #1a1a1a;
+  font-weight: 700;
+}
+
+.reveal.has-presentation-footer .slides section.slide[data-agenda] .slide-full {
+  margin-bottom: var(--presentation-footer-height, 5.25rem) !important;
+}
+
+.reveal.has-presentation-footer .slides section.slide#agenda .slide-full {
+  margin-bottom: 0 !important;
+}
+
+html.print-pdf .reveal .presentation-footer,
+html.print-pdf .reveal .presentation-footer-meta .footer,
+html.print-pdf .reveal .presentation-footer-meta .slide-number {
+  display: flex !important;
+}
+
+html.print-pdf .reveal .presentation-footer-agenda.global-agenda-nav {
   display: block !important;
 }

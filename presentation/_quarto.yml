@@ -18,7 +18,7 @@ format:
     math: katex
     highlight-style: github
     embed-resources: false
-    include-after-body: iframe-init.js
+    include-after-body: iframe-after.html
     revealjs-config:
       viewDistance: 100
       preloadIframes: true

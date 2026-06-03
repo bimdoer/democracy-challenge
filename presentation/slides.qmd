@@ -71,7 +71,7 @@ format:
 
 ------------------------------------------------------------------------
 
-## Datensatz & Methodik
+## Datensatz & Methodik {data-agenda="1"}
 
 ::: {.slide-full}
 ```{=html}
@@ -88,7 +88,7 @@ format:
 
 ------------------------------------------------------------------------
 
-## Zeitliche Analyse {.slide-zeitlich}
+## Zeitliche Analyse {.slide-zeitlich data-agenda="2"}
 
 ::: {.slide-full}
 <iframe class="slide-iframe" src="Blog/blog_plots/d3_kongruenz_zeit.html" title="D3 Kongruenzwert über Zeit" width="100%" height="500" frameborder="0"></iframe>
@@ -96,7 +96,7 @@ format:
 
 ------------------------------------------------------------------------
 
-## Geografische Analyse {.slide-heatmap}
+## Geografische Analyse {.slide-heatmap data-agenda="3"}
 
 ::: {.slide-full}
 <iframe class="slide-iframe" src="Blog/blog_plots/d6_heatmap_zeitphasen.html" title="D6 Heatmap Zeitphasen" width="100%" height="400" frameborder="0" scrolling="no"></iframe>
@@ -104,7 +104,7 @@ format:
 
 ------------------------------------------------------------------------
 
-## Geografische Analyse
+## Geografische Analyse {data-agenda="4"}
 
 ::: {.slide-full}
 <iframe class="slide-iframe slide-iframe--geomap" src="Blog/blog_plots/d7_geomap_zeitphasen_bv.html" title="D7 Geomap Bundesversammlung" width="100%" style="width:100%;height:auto;aspect-ratio:1.45;border:0;display:block" scrolling="no"></iframe>
@@ -112,15 +112,17 @@ format:
 
 ------------------------------------------------------------------------
 
-## Thematische Analyse
+## Thematische Analyse {data-agenda="5" .slide-thema}
 
 ::: {.slide-full}
-<iframe class="slide-iframe" src="Blog/blog_plots/d7_thema_facetiert.html" title="D7 Kongruenz nach Thema" width="100%" height="1020" frameborder="0" scrolling="no" style="width:100%;height:1020px;border:0;display:block"></iframe>
+<div class="thema-plot-scaler">
+<iframe class="slide-iframe slide-iframe--thema" src="Blog/blog_plots/d7_thema_facetiert.html" title="D7 Kongruenz nach Thema" width="100%" height="1020" frameborder="0" scrolling="no"></iframe>
+</div>
 :::
 
 ------------------------------------------------------------------------
 
-## Reproduzierbare Pipeline
+## Reproduzierbare Pipeline {data-agenda="6"}
 
 ::: {.slide-full}
 ```{=html}
@@ -189,7 +191,7 @@ format:
 
 ------------------------------------------------------------------------
 
-## Learnings
+## Learnings {data-agenda="7"}
 
 ::: {.slide-full .learnings-slide}
 ```{=html}
@@ -256,8 +258,10 @@ format:
 
 ------------------------------------------------------------------------
 
+## Vielen Dank {#closing-slide .slide-closing}
+
 ```{=html}
-<div id="closing-slide" class="quarto-title-block center">
+<div class="quarto-title-block center closing-slide-content">
   <h1 class="title">Vielen Dank</h1>
   <p class="subtitle">Wir freuen uns auf die Diskussion</p>
   <div class="quarto-title-authors">
