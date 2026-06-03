@@ -15,10 +15,11 @@ format:
     slide-number: "c/t"
     footer: "{{< meta date >}} · {{< meta author >}} · FHNW Challenge Data Science"
     css: custom.css
-    include-after-body: iframe-init.js
+    include-after-body: iframe-after.html
     revealjs-config:
       viewDistance: 100
       preloadIframes: true
+# Grafiken: dieselben HTML-Dateien wie im Jekyll-Blog (Blog/blog_plots), gleiche iframe-Einbettung.
 # HTML: quarto preview slides.qmd
 # PDF:  Im Browser öffnen → Taste «E» (Reveal.js PDF-Export)
 ---
@@ -76,10 +77,10 @@ format:
 ```{=html}
 <div class="dm-split">
   <figure class="dm-figure dm-figure--kongruenz">
-    <img src="assets/blog_plots/d2_kongruenz_akteur.png" alt="D2: Kongruenzwert nach Akteur">
+    <img src="Blog/blog_plots/d2_kongruenz_akteur.png" alt="D2: Kongruenzwert nach Akteur">
   </figure>
   <figure class="dm-figure dm-figure--methodik">
-    <img src="assets/blog_plots/d0_kongruenz_berechnung.svg" alt="D0: Berechnung des Kongruenzwerts">
+    <img src="Blog/blog_plots/d0_kongruenz_berechnung.svg" alt="D0: Berechnung des Kongruenzwerts">
   </figure>
 </div>
 ```
@@ -90,7 +91,7 @@ format:
 ## Zeitliche Analyse
 
 ::: {.slide-full}
-<iframe class="slide-iframe" src="plots/d3_kongruenz_zeit.html" title="D3 Kongruenzwert über Zeit"></iframe>
+<iframe class="slide-iframe" src="Blog/blog_plots/d3_kongruenz_zeit.html" title="D3 Kongruenzwert über Zeit" width="100%" height="500" frameborder="0"></iframe>
 :::
 
 ------------------------------------------------------------------------
@@ -98,7 +99,7 @@ format:
 ## Geografische Analyse
 
 ::: {.slide-full}
-<iframe class="slide-iframe" src="plots/d6_heatmap_zeitphasen.html" title="D6 Heatmap Zeitphasen"></iframe>
+<iframe class="slide-iframe" src="Blog/blog_plots/d6_heatmap_zeitphasen.html" title="D6 Heatmap Zeitphasen" width="100%" height="400" frameborder="0" scrolling="no"></iframe>
 :::
 
 ------------------------------------------------------------------------
@@ -106,7 +107,7 @@ format:
 ## Geografische Analyse
 
 ::: {.slide-full}
-<iframe class="slide-iframe" src="plots/d7_geomap_zeitphasen_bv.html" title="D7 Geomap Bundesversammlung"></iframe>
+<iframe class="slide-iframe slide-iframe--geomap" src="Blog/blog_plots/d7_geomap_zeitphasen_bv.html" title="D7 Geomap Bundesversammlung" width="100%" style="width:100%;height:auto;aspect-ratio:1.45;border:0;display:block" scrolling="no"></iframe>
 :::
 
 ------------------------------------------------------------------------
@@ -114,7 +115,7 @@ format:
 ## Thematische Analyse
 
 ::: {.slide-full}
-<iframe class="slide-iframe" src="plots/d7_thema_facetiert.html" title="D7 Kongruenz nach Thema"></iframe>
+<iframe class="slide-iframe" src="Blog/blog_plots/d7_thema_facetiert.html" title="D7 Kongruenz nach Thema" width="100%" height="1020" frameborder="0" scrolling="no" style="width:100%;height:1020px;border:0;display:block"></iframe>
 :::
 
 ------------------------------------------------------------------------
