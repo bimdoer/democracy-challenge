@@ -88,7 +88,7 @@ format:
 
 ------------------------------------------------------------------------
 
-## Zeitliche Analyse
+## Zeitliche Analyse {.slide-zeitlich}
 
 ::: {.slide-full}
 <iframe class="slide-iframe" src="Blog/blog_plots/d3_kongruenz_zeit.html" title="D3 Kongruenzwert über Zeit" width="100%" height="500" frameborder="0"></iframe>
@@ -96,7 +96,7 @@ format:
 
 ------------------------------------------------------------------------
 
-## Geografische Analyse
+## Geografische Analyse {.slide-heatmap}
 
 ::: {.slide-full}
 <iframe class="slide-iframe" src="Blog/blog_plots/d6_heatmap_zeitphasen.html" title="D6 Heatmap Zeitphasen" width="100%" height="400" frameborder="0" scrolling="no"></iframe>

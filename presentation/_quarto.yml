@@ -1,0 +1,35 @@
+project:
+  type: default
+  output-dir: .
+  pre-render: sync_blog_assets.py
+
+format:
+  revealjs:
+    theme: white
+    transition: fade
+    slideNumber: true
+    progress: true
+    controls: true
+    width: 1200
+    height: 900
+    margin: 0
+    center: false
+    auto-stretch: false
+    math: katex
+    highlight-style: github
+    embed-resources: false
+    include-after-body: iframe-init.js
+    revealjs-config:
+      viewDistance: 100
+      preloadIframes: true
+    css: custom.css
+
+resources:
+  - assets/icon-politik.svg
+  - assets/icon-team.svg
+  - assets/icon-tech.svg
+  - assets/icon-methodik.svg
+
+execute:
+  enabled: false
+  freeze: auto

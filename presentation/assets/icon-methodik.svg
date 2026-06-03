@@ -1,5 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" width="44" height="44">
-  <rect width="44" height="44" rx="8" fill="#aa4499"/>
-  <path d="M14 30V18l8-6 8 6v12" stroke="#fff" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
-  <path d="M18 30v-8h8v8" stroke="#fff" stroke-width="2.5" fill="none"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" width="44" height="44" aria-hidden="true">
+  <rect width="44" height="44" rx="8" fill="#fff"/>
+  <g fill="none" stroke="#aa4499" stroke-width="1.5" stroke-linecap="round">
+    <circle cx="22" cy="22" r="2" fill="#aa4499" stroke="none"/>
+    <line x1="22" y1="22" x2="22" y2="8"/>
+    <line x1="22" y1="22" x2="22" y2="36"/>
+    <line x1="22" y1="22" x2="8" y2="22"/>
+    <line x1="22" y1="22" x2="36" y2="22"/>
+    <line x1="22" y1="22" x2="12" y2="12"/>
+    <line x1="22" y1="22" x2="32" y2="12"/>
+    <line x1="22" y1="22" x2="12" y2="32"/>
+    <line x1="22" y1="22" x2="32" y2="32"/>
+    <circle cx="22" cy="22" r="6"/>
+    <circle cx="22" cy="22" r="10"/>
+    <circle cx="22" cy="22" r="14"/>
+    <path d="M22 8 Q30 14 36 22 Q30 30 22 36 Q14 30 8 22 Q14 14 22 8"/>
+  </g>
 </svg>

@@ -1,0 +1,733 @@
+/* Folien-Layout: Prädiktive Direkte Demokratie */
+
+/* Blog .site-layout .content: max-width 68rem, padding 2.5rem links/rechts */
+:root {
+  --blog-content-max: 68rem;
+  --blog-content-pad-x: 2.5rem;
+  --blog-plot-max-width: calc(var(--blog-content-max) - 2 * var(--blog-content-pad-x));
+}
+
+/* Title & closing slide (zentriert wie Titelfolie) */
+.reveal .slides section#title-slide.quarto-title-block,
+.reveal .slides section.slide:has(> #closing-slide.quarto-title-block) {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100% !important;
+  width: 100% !important;
+  padding: 0 2.5em !important;
+  margin: 0 !important;
+  box-sizing: border-box;
+  text-align: center;
+  top: 0 !important;
+  overflow: hidden;
+}
+
+.reveal .slides section.slide:has(> #closing-slide) #closing-slide {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+.reveal .slides section#title-slide .title,
+.reveal .slides section#title-slide .subtitle,
+.reveal .slides section#title-slide .date,
+.reveal .slides section#title-slide .quarto-title-author-name,
+.reveal .slides #closing-slide .title,
+.reveal .slides #closing-slide .subtitle,
+.reveal .slides #closing-slide .date,
+.reveal .slides #closing-slide .quarto-title-author-name {
+  text-align: center !important;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.reveal .slides section.slide {
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-columns: 1fr;
+  height: 100% !important;
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box;
+  overflow: hidden;
+  top: 0 !important;
+  align-content: start !important;
+}
+
+.reveal .slides section.slide h2 {
+  grid-row: 1;
+  display: block;
+  font-family: "Source Sans Pro", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1.75em;
+  font-weight: 600;
+  line-height: 1.15;
+  margin: 0.55em 0 0.3em 0.55em !important;
+  padding: 0;
+  text-align: left;
+  color: #222;
+  border: none;
+  border-bottom: none;
+  text-transform: none;
+  letter-spacing: normal;
+  text-shadow: none;
+  width: auto;
+  max-width: calc(100% - 1.1em);
+}
+
+.reveal .slides section.slide .slide-full {
+  grid-row: 2;
+  position: relative;
+  align-self: stretch;
+  min-height: 0;
+  width: calc(100% - 1.1em);
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 0.55em 0.25em 0.55em;
+  padding: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.reveal .slides section.slide .slide-full > p {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.reveal .slides section.slide .slide-full img,
+.reveal .slides section.slide .slide-full img.r-stretch {
+  max-height: 100% !important;
+  max-width: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 auto !important;
+  display: block;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* Plot-Folien: gleiche Logik wie Jekyll — iframe width=100%, Höhe/aspect-ratio im HTML */
+.reveal .slides section.slide:has(.slide-iframe) h2 {
+  margin: 0.35em 0 0.1em 0.55em !important;
+  font-size: 1.45em;
+}
+
+.reveal .slides section.slide:has(.slide-iframe) .slide-full {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0 0.55em;
+  box-sizing: border-box;
+  min-height: 0;
+  align-self: stretch;
+  display: block;
+  overflow: visible;
+}
+
+.reveal .slide-iframe {
+  width: 100% !important;
+  max-width: 100%;
+  border: 0;
+  pointer-events: auto;
+  background: #fff;
+  display: block;
+  margin: 0;
+}
+
+/* D3 Zeitliche Analyse: Breite wie Blog-Content (68rem − Padding), vertikal zentriert */
+.reveal .slides section.slide-zeitlich:has(.slide-iframe) .slide-full {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.reveal .slides section.slide-zeitlich .slide-iframe {
+  max-width: var(--blog-plot-max-width) !important;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* D6 Heatmap: volle Folienbreite, Plot zentriert */
+.reveal .slides section.slide-heatmap:has(.slide-iframe) .slide-full {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.reveal .slides section.slide-heatmap .slide-iframe {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0;
+}
+
+.reveal .slide-iframe--geomap {
+  max-height: min(920px, calc(100% - 0.5em));
+}
+
+/* Agenda: horizontal timeline, vertically centered, left-to-right animation */
+
+.reveal .slides section:has(.agenda-timeline) .slide-full,
+.reveal .slides section:has(.pipeline-timeline) .slide-full {
+  align-items: center;
+  justify-content: center;
+}
+
+.reveal .slides section:has(.pipeline-timeline),
+.reveal .slides section:has(.pipeline-timeline) .slide-full {
+  overflow: visible !important;
+}
+
+.pipeline-timeline .agenda-line-fill {
+  background: linear-gradient(
+    90deg,
+    #4477aa,
+    #44aa99,
+    #44aa99,
+    #999933,
+    #aa4499,
+    #aa4499,
+    #666666
+  );
+}
+
+/* Pipeline: vertical branch at Analysen (same line + bullets pattern as agenda) */
+
+.pipeline-timeline {
+  transform: translateY(2.75em);
+}
+
+.pipeline-timeline .agenda-rail {
+  height: 26em;
+}
+
+.pipeline-stop--analysen {
+  --branch-dot-size: 22px;
+  z-index: 3;
+}
+
+.pipeline-branch {
+  position: absolute;
+  bottom: calc(100% + 0.2em);
+  left: 50%;
+  /* align dot column (not full label width) with main Analysen bullet */
+  transform: translateX(calc(var(--branch-dot-size) / -2));
+  pointer-events: none;
+}
+
+.pipeline-branch-rail {
+  --branch-dot-size: 22px;
+  --branch-line-width: 6px;
+  --branch-line-left: calc((var(--branch-dot-size) - var(--branch-line-width)) / 2);
+  position: relative;
+  height: 13.5em;
+  width: var(--branch-dot-size);
+  overflow: visible;
+  box-sizing: content-box;
+}
+
+.pipeline-branch-line-bg,
+.pipeline-branch-line-fill {
+  position: absolute;
+  left: var(--branch-line-left);
+  width: var(--branch-line-width);
+  top: calc(var(--branch-dot-size) / 2);
+  bottom: calc(var(--branch-dot-size) / 2);
+  border-radius: 3px;
+  z-index: 0;
+}
+
+.pipeline-branch-line-bg {
+  background: #e0e0e0;
+}
+
+.pipeline-branch-line-fill {
+  background: linear-gradient(180deg, #aa4499, #999933, #44aa99, #4477aa);
+  z-index: 1;
+  transform: scaleY(0);
+  transform-origin: bottom center;
+}
+
+/* Stops sit on the line axis only (22px); labels float to the right */
+.reveal .slides section .pipeline-branch-stops {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--branch-dot-size, 22px);
+  height: 100%;
+  z-index: 2;
+  display: grid !important;
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+  align-items: center;
+  justify-items: center;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box;
+}
+
+.reveal .slides section .pipeline-branch-stop {
+  display: flex !important;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: var(--branch-dot-size, 22px);
+  height: var(--branch-dot-size, 22px);
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 0;
+  position: relative;
+  overflow: visible;
+}
+
+.pipeline-branch-stop .agenda-dot {
+  flex-shrink: 0;
+  margin: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.pipeline-branch-stop .agenda-label.pipeline-branch-label,
+.pipeline-branch-label {
+  position: absolute;
+  left: calc(var(--branch-dot-size, 22px) + 0.55em);
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0 !important;
+  max-width: 11em;
+  text-align: left;
+  white-space: nowrap;
+  width: max-content;
+}
+
+.reveal .slides section.present .pipeline-branch-line-fill {
+  animation: pipeline-branch-draw 0.85s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation-delay: 0.88s;
+}
+
+.reveal .slides section.present .pipeline-branch-stop {
+  animation: agenda-bullet-in 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* bottom (3a) first, then upward */
+.reveal .slides section.present .pipeline-branch-stop:nth-child(4) {
+  animation-delay: 1s;
+}
+
+.reveal .slides section.present .pipeline-branch-stop:nth-child(3) {
+  animation-delay: 1.14s;
+}
+
+.reveal .slides section.present .pipeline-branch-stop:nth-child(2) {
+  animation-delay: 1.28s;
+}
+
+.reveal .slides section.present .pipeline-branch-stop:nth-child(1) {
+  animation-delay: 1.42s;
+}
+
+@keyframes pipeline-branch-draw {
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.agenda-timeline {
+  width: 94%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.agenda-rail {
+  position: relative;
+  width: 100%;
+  height: 13em;
+  margin: auto 0;
+  box-sizing: border-box;
+}
+
+.agenda-line-bg,
+.agenda-line-fill {
+  position: absolute;
+  left: 2%;
+  width: 96%;
+  top: 38%;
+  height: 6px;
+  border-radius: 3px;
+  z-index: 0;
+}
+
+.agenda-line-bg {
+  background: #e0e0e0;
+}
+
+.agenda-line-fill {
+  background: linear-gradient(
+    90deg,
+    #4477aa,
+    #44aa99,
+    #999933,
+    #b8a82e,
+    #aa4499,
+    #666666,
+    #cc6677
+  );
+  z-index: 1;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+/* div grid: 7 columns along the horizontal line (not Reveal ol inline-block) */
+.reveal .slides section .agenda-stops {
+  position: absolute;
+  left: 2%;
+  width: 96%;
+  top: 38%;
+  transform: translateY(-11px);
+  z-index: 2;
+  display: grid !important;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  align-items: start;
+  justify-items: center;
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 0.35em;
+  box-sizing: border-box;
+}
+
+.reveal .slides section .agenda-stop {
+  position: relative;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible;
+  text-align: center;
+}
+
+.agenda-dot {
+  display: block;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--stop-color, #4477aa);
+  border: 4px solid #fff;
+  box-shadow: 0 0 0 2px var(--stop-color, #4477aa), 0 2px 8px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+  z-index: 2;
+}
+
+.agenda-label {
+  display: block;
+  margin-top: 0.85em;
+  width: 100%;
+  max-width: 10em;
+  font-family: "Source Sans Pro", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 0.44em;
+  font-weight: 600;
+  line-height: 1.15;
+  color: #1a1a1a;
+  hyphens: auto;
+}
+
+.reveal .slides section.present .agenda-line-fill {
+  animation: agenda-line-draw 1.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.reveal .slides section.present .agenda-stop {
+  opacity: 0;
+  animation: agenda-bullet-in 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.reveal .slides section.present .agenda-stop:nth-child(1) {
+  animation-delay: 0.22s;
+}
+
+.reveal .slides section.present .agenda-stop:nth-child(2) {
+  animation-delay: 0.38s;
+}
+
+.reveal .slides section.present .agenda-stop:nth-child(3) {
+  animation-delay: 0.54s;
+}
+
+.reveal .slides section.present .agenda-stop:nth-child(4) {
+  animation-delay: 0.7s;
+}
+
+.reveal .slides section.present .agenda-stop:nth-child(5) {
+  animation-delay: 0.86s;
+}
+
+.reveal .slides section.present .agenda-stop:nth-child(6) {
+  animation-delay: 1.02s;
+}
+
+.reveal .slides section.present .agenda-stop:nth-child(7) {
+  animation-delay: 1.18s;
+}
+
+/* Datensatz & Methodik: zwei Spalten — Position hier anpassen
+   dm-gap: Abstand zwischen den Bildern
+   dm-kongruenz-*: linke Grafik (D2)
+   dm-methodik-*: rechte Grafik (D0) — Klasse .dm-figure--methodik in slides.qmd */
+.reveal .slides section:has(.dm-split) {
+  --dm-gap: 0.65em;
+  --dm-kongruenz-x: 0;
+  --dm-kongruenz-y: 0;
+  --dm-kongruenz-scale: 1;
+  --dm-methodik-x: 0;
+  --dm-methodik-y: -7mm;
+  --dm-methodik-scale: 1;
+}
+
+.reveal .slides section:has(.dm-split) .slide-full {
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+.reveal .slides section:has(.dm-split) .slide-full > p {
+  display: none;
+}
+
+.dm-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: var(--dm-gap);
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+.dm-figure {
+  min-height: 0;
+  min-width: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.dm-figure img {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 auto !important;
+  object-fit: contain;
+  object-position: center center;
+}
+
+.dm-figure--kongruenz img {
+  transform: translate(var(--dm-kongruenz-x), var(--dm-kongruenz-y)) scale(var(--dm-kongruenz-scale));
+}
+
+.dm-figure--methodik img {
+  transform: translate(var(--dm-methodik-x), var(--dm-methodik-y)) scale(var(--dm-methodik-scale));
+}
+
+@keyframes agenda-line-draw {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes agenda-bullet-in {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Learnings: 2×2 cards — icon left, title right; compact height, larger body text */
+
+.reveal .slides section:has(.learning-grid) .slide-full {
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.55em !important;
+}
+
+.reveal .slides section:has(.learning-grid) .slide-full > p {
+  display: none;
+}
+
+.learning-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  align-content: center;
+  gap: 1em 1.1em;
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+.learning-card {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  border-radius: 12px;
+  border: 3px solid var(--learning-accent, #4477aa);
+  background: var(--learning-bg, #e8eef5);
+  overflow: hidden;
+  text-align: left;
+}
+
+.learning-politik {
+  --learning-accent: #4477aa;
+  --learning-bg: #e8eef5;
+}
+
+.learning-team {
+  --learning-accent: #cc6677;
+  --learning-bg: #fdeeee;
+}
+
+.learning-tech {
+  --learning-accent: #44aa99;
+  --learning-bg: #e5f4f0;
+}
+
+.learning-methodik {
+  --learning-accent: #aa4499;
+  --learning-bg: #f9eef7;
+}
+
+.learning-card__header {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.6em;
+  padding: 0.4em 0.7em;
+  background: var(--learning-accent);
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.learning-card__header .learning-icon {
+  order: 0;
+}
+
+.learning-card__header h3 {
+  order: 1;
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  font-family: "Source Sans Pro", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1em;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #fff;
+  text-transform: none;
+  letter-spacing: normal;
+  text-align: left;
+}
+
+.learning-icon {
+  display: block;
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px;
+  min-height: 44px;
+  flex: 0 0 44px;
+  flex-shrink: 0;
+  margin: 0 !important;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.learning-card__body {
+  flex: 0 1 auto;
+  overflow: visible;
+  padding: 0.4em 0.7em 0.45em;
+  font-family: "Source Sans Pro", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 0.52em;
+  line-height: 1.4;
+  color: #2a2a2a;
+}
+
+.learning-card__body ul {
+  margin: 0;
+  padding-left: 1.15em;
+}
+
+.learning-card__body li {
+  margin-bottom: 0.35em;
+}
+
+.learning-card__body li:last-child {
+  margin-bottom: 0;
+}
+
+/* Folien-Fußzeile: links Datum · Autor · FHNW, rechts «Seite X / Y» */
+
+.reveal .footer > p {
+  margin: 0 !important;
+}
+
+.reveal .footer {
+  text-align: left !important;
+  left: 0.55em !important;
+  right: auto !important;
+  width: auto !important;
+  max-width: calc(100% - 12em) !important;
+  margin: 0 !important;
+  bottom: 0.45em !important;
+  font-family: "Source Sans Pro", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 0.32em !important;
+  font-weight: 400;
+  color: #555 !important;
+  line-height: 1.3;
+  z-index: 3;
+}
+
+.reveal .slide-number {
+  bottom: 0.45em !important;
+  right: 0.55em !important;
+  left: auto !important;
+  font-family: "Source Sans Pro", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 0.32em !important;
+  font-weight: 400;
+  color: #555 !important;
+  background: transparent !important;
+  z-index: 3;
+}
+
+.reveal .slide-number::before {
+  content: "Seite ";
+}
+
+.reveal .slide-number .slide-number-delimiter {
+  margin: 0 0.15em;
+}
+
+html.print-pdf .reveal .footer,
+html.print-pdf .reveal .slide-number {
+  display: block !important;
+}
